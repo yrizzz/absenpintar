@@ -1,0 +1,56 @@
+# Subfolder patterns
+/pulse-presence/node_modules/
+/pulse-presence/vendor/
+
+# Environments
+/pulse-presence/.env
+/pulse-presence/.env.backup
+/pulse-presence/.env.production
+
+# Testing / Cache
+/pulse-presence/.phpunit.result.cache
+/pulse-presence/.phpunit.cache
+
+# IDE / Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
+.zed/
+.nova/
+.codex/
+
+# Laravel Storage & Cache
+/pulse-presence/storage/app/*
+!/pulse-presence/storage/app/.gitignore
+
+/pulse-presence/storage/framework/cache/data/*
+!/pulse-presence/storage/framework/cache/data/.gitignore
+
+/pulse-presence/storage/framework/sessions/*
+!/pulse-presence/storage/framework/sessions/.gitignore
+
+/pulse-presence/storage/framework/testing/*
+!/pulse-presence/storage/framework/testing/.gitignore
+
+/pulse-presence/storage/framework/views/*
+!/pulse-presence/storage/framework/views/.gitignore
+
+/pulse-presence/storage/logs/*
+!/pulse-presence/storage/logs/.gitignore
+
+/pulse-presence/storage/*.key
+/pulse-presence/storage/pail
+
+# Compiled front-end assets
+/pulse-presence/public/build
+/pulse-presence/public/hot
+/pulse-presence/public/storage
+/pulse-presence/public/fonts-manifest.dev.json
+
+# Misc files
+/pulse-presence/_ide_helper.php
+/pulse-presence/Homestead.json
+/pulse-presence/Homestead.yaml
+/pulse-presence/auth.json

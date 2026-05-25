@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Custom premium animations and components */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(1.03); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@utility animate-pulse-subtle {
+  animation: pulse-subtle 8s ease-in-out infinite;
+}
+
+/* Custom Frosted Midnight Glassmorphism Panel */
+@utility glass-panel {
+  background-color: rgba(18, 29, 51, 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Premium Luminous Midnight Mesh Background */
+@utility bg-premium-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
+}
+
+@utility text-gradient-blue-sky {
+  background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility shadow-premium {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 12px 36px rgba(9, 14, 26, 0.6);
+}
+
+@utility shadow-premium-hover {
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    0 20px 48px rgba(9, 14, 26, 0.8);
+}
+
+@utility shadow-button-primary {
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.4);
+}
+
+@utility shadow-button-primary-hover {
+  box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.6);
+}

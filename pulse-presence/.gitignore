@@ -1,0 +1,55 @@
+/node_modules
+/vendor
+
+# Environments
+.env
+.env.backup
+.env.production
+
+# Testing / Cache
+.phpunit.result.cache
+/.phpunit.cache
+
+# IDE / Editor Files
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/.cursor/
+/.zed
+/.nova
+/.codex
+
+# Laravel Storage & Cache
+/storage/app/*
+!/storage/app/.gitignore
+
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
+
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+
+/storage/logs/*
+!/storage/logs/.gitignore
+
+/storage/*.key
+/storage/pail
+
+# Compiled front-end assets
+/public/build
+/public/hot
+/public/storage
+/public/fonts-manifest.dev.json
+
+# Misc files
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+auth.json
