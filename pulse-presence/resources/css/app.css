@@ -11,6 +11,14 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
+/* Force pointer cursor globally on all button-like elements */
+button,
+[role="button"],
+[type="button"],
+[type="submit"] {
+  cursor: pointer !important;
+}
+
 /* Custom premium animations and components */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
@@ -22,12 +30,21 @@
   50% { opacity: 0.2; transform: scale(1.03); }
 }
 
+@keyframes scan-glow {
+  0%, 100% { top: 0%; }
+  50% { top: 100%; }
+}
+
 @utility animate-float {
   animation: float 6s ease-in-out infinite;
 }
 
 @utility animate-pulse-subtle {
   animation: pulse-subtle 8s ease-in-out infinite;
+}
+
+@utility animate-scan {
+  animation: scan-glow 3s linear infinite;
 }
 
 /* Custom Frosted Midnight Glassmorphism Panel */
@@ -70,4 +87,194 @@
 
 @utility shadow-button-primary-hover {
   box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.6);
+}
+
+/* Design tokens for consistent Buttons, Badges, Headings, and Labels */
+
+/* Headings */
+.heading-1 {
+  @apply text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight font-display;
+}
+
+.heading-2 {
+  @apply text-base sm:text-lg font-bold text-white tracking-tight font-display;
+}
+
+.heading-3 {
+  @apply text-sm sm:text-base font-bold text-white tracking-tight font-sans;
+}
+
+.heading-value {
+  @apply text-3xl sm:text-4xl font-extrabold text-white font-display;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-extrabold normal-case hover:from-blue-700 hover:to-indigo-700 shadow-button-primary hover:shadow-button-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-white/5 border border-white/20 text-slate-100 text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:bg-white/10 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98] shadow-sm transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-success {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:from-emerald-700 hover:to-teal-700 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all duration-200 cursor-pointer;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-rose-600 to-red-600 text-white text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:from-rose-700 hover:to-red-700 shadow-[0_0_15px_rgba(244,63,94,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer;
+}
+
+.btn-danger-outline {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-rose-500/10 border border-rose-500/40 text-rose-200 text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:bg-rose-500/20 hover:border-rose-500/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer;
+}
+
+.btn-success-outline {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-emerald-500/10 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:bg-emerald-500/20 hover:border-emerald-500/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer;
+}
+
+.btn-primary-outline {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-500/10 border border-blue-500/40 text-blue-200 text-xs sm:text-sm font-extrabold normal-case rounded-2xl hover:bg-blue-500/20 hover:border-blue-500/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer;
+}
+
+.btn-disabled {
+  @apply inline-flex items-center justify-center px-4 py-2 sm:px-5 sm:py-2.5 bg-white/5 border border-white/10 text-slate-500 text-xs sm:text-sm font-extrabold normal-case rounded-2xl cursor-not-allowed transition-all duration-200;
+}
+
+.btn-back {
+  @apply inline-flex items-center text-[11px] sm:text-xs font-extrabold normal-case text-slate-300 hover:text-blue-400 transition-colors duration-150;
+}
+
+.btn-xs {
+  padding: 5px 12px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  border-radius: 8px !important;
+  line-height: 1.25 !important;
+}
+
+.btn-sm {
+  padding: 7px 14px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  border-radius: 10px !important;
+  line-height: 1.25 !important;
+}
+
+/* Active state for Tabs & Filters to match Primary Button exactly */
+.tab-active {
+  background-image: linear-gradient(to right, #2563eb, #4f46e5) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.4) !important;
+}
+
+/* Badges (Pill/Rounded shape) */
+.badge-info {
+  @apply inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-blue-500/15 border border-blue-500/30 text-blue-400;
+}
+
+.badge-success {
+  @apply inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300;
+}
+
+.badge-warning {
+  @apply inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300;
+}
+
+.badge-danger {
+  @apply inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-rose-500/15 border border-rose-500/30 text-rose-300;
+}
+
+.badge-neutral {
+  @apply inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-white/10 border border-white/20 text-slate-100;
+}
+
+/* Badges (Rectangular/Rounded-lg shape) */
+.badge-rect-info {
+  @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-blue-500/15 border border-blue-500/30 text-blue-300;
+}
+
+.badge-rect-success {
+  @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300;
+}
+
+.badge-rect-warning {
+  @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300;
+}
+
+.badge-rect-danger {
+  @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-rose-500/15 border border-rose-500/30 text-rose-300;
+}
+
+.badge-rect-neutral {
+  @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-white/10 border border-white/20 text-slate-100;
+}
+
+/* Labels */
+.label-lg {
+  @apply text-sm sm:text-base font-extrabold text-white leading-tight;
+}
+
+.label-md {
+  @apply text-xs sm:text-sm font-bold text-slate-100;
+}
+
+.label-sm {
+  @apply text-xs text-slate-200 font-semibold;
+}
+
+.label-xs {
+  @apply text-[11px] font-semibold text-slate-300;
+}
+
+.label-value-white {
+  @apply text-xs sm:text-sm font-bold text-white;
+}
+
+.label-value-blue {
+  @apply text-xs sm:text-sm font-bold text-blue-300;
+}
+
+/* Custom Scrollbar — Dark Glassmorphic Theme */
+.overflow-x-auto,
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Global premium card style rules for consistent thin borders */
+div[class*="bg-[#121d33]"],
+div[class*="bg-[#0d1527]"],
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+div[class*="bg-[#121d33]"][class*="hover:"]:hover,
+div[class*="bg-[#0d1527]"][class*="hover:"]:hover,
+.glass-panel[class*="hover:"]:hover {
+  border-color: rgba(255, 255, 255, 0.22) !important;
 }

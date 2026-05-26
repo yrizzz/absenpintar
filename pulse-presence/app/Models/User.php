@@ -140,4 +140,34 @@ class User extends Authenticatable
         }
         return null;
     }
+
+    /**
+     * Retrieve base64 URL for a specific face angle (front, left, right).
+     */
+    public function getFaceAngleUrl(string $angle): ?string
+    {
+        $path = 'master_face/user_' . $this->id . '_' . $angle . '.jpg';
+        if (\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            try {
+                return 'data:image/jpeg;base64,' . base64_encode(\Illuminate\Support\Facades\Storage::disk('local')->get($path));
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the count of registered face angles.
+     */
+    public function getRegisteredAnglesAttribute(): int
+    {
+        $count = 0;
+        foreach (['front', 'left', 'right'] as $angle) {
+            if (\Illuminate\Support\Facades\Storage::disk('local')->exists('master_face/user_' . $this->id . '_' . $angle . '.jpg')) {
+                $count++;
+            }
+        }
+        return $count;
+    }
 }

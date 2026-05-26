@@ -32,6 +32,21 @@ class AttendanceService
             // Validate GPS accuracy
             $accuracyValidation = $this->geoValidation->validateAccuracy($data['accuracy']);
 
+            // Biometric Face Recognition Comparison Check
+            $masterPath = 'master_face/user_' . $user->id . '.jpg';
+            $selfiePath = $data['selfie_path'] ?? null;
+            if ($selfiePath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
+                $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
+                // Calibrate the admin threshold (e.g. 0.95 -> 0.665 similarity required in Python)
+                $calibratedThreshold = $settingThreshold * 0.70;
+
+                $verification = $this->compareFaceSimilarity($masterPath, $selfiePath, $calibratedThreshold);
+                
+                if (!$verification['verified']) {
+                    throw new \Exception("Verifikasi biometrik gagal! " . $verification['message'] . " (Tingkat Kecocokan: " . round($verification['similarity'], 1) . "%, minimal dibutuhkan " . round($settingThreshold * 100.0, 1) . "%).");
+                }
+            }
+
             // Validate geofence
             $geofenceValidation = $this->geoValidation->validateGeofence(
                 $data['latitude'],
@@ -84,9 +99,10 @@ class AttendanceService
                 ->first();
 
             // Calculate is_late automatically
+            $timezoneSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
             $workStartSetting = cache()->get('settings.work_hour_start', '08:00');
             $gracePeriodSetting = (int) cache()->get('settings.grace_period', 15);
-            $currentTimeStr = now()->format('H:i:s');
+            $currentTimeStr = now()->timezone($timezoneSetting)->format('H:i:s');
             $workStartWithGrace = date('H:i:s', strtotime($workStartSetting) + ($gracePeriodSetting * 60));
             $isLate = $currentTimeStr > $workStartWithGrace;
             
@@ -121,6 +137,7 @@ class AttendanceService
                 'is_late' => $isLate,
                 'notes' => $notes,
                 'metadata' => [
+                    'resolved_address' => $data['resolved_address'] ?? null,
                     'validations' => [
                         'gps_accuracy' => $accuracyValidation,
                         'geofence' => $geofenceValidation,
@@ -164,6 +181,21 @@ class AttendanceService
                 ?? $this->deviceFingerprint->registerDevice($user, $data['device_fingerprint']);
 
             $accuracyValidation = $this->geoValidation->validateAccuracy($data['accuracy']);
+
+            // Biometric Face Recognition Comparison Check
+            $masterPath = 'master_face/user_' . $user->id . '.jpg';
+            $selfiePath = $data['selfie_path'] ?? null;
+            if ($selfiePath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
+                $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
+                // Calibrate the admin threshold (e.g. 0.95 -> 0.665 similarity required in Python)
+                $calibratedThreshold = $settingThreshold * 0.70;
+
+                $verification = $this->compareFaceSimilarity($masterPath, $selfiePath, $calibratedThreshold);
+                
+                if (!$verification['verified']) {
+                    throw new \Exception("Verifikasi biometrik gagal! " . $verification['message'] . " (Tingkat Kecocokan: " . round($verification['similarity'], 1) . "%, minimal dibutuhkan " . round($settingThreshold * 100.0, 1) . "%).");
+                }
+            }
             $geofenceValidation = $this->geoValidation->validateGeofence(
                 $data['latitude'],
                 $data['longitude'],
@@ -188,8 +220,9 @@ class AttendanceService
                 ->first();
 
             // Calculate is_early_leave automatically
+            $timezoneSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
             $workEndSetting = cache()->get('settings.work_hour_end', '17:00');
-            $currentTimeStr = now()->format('H:i:s');
+            $currentTimeStr = now()->timezone($timezoneSetting)->format('H:i:s');
             $isEarlyLeave = $currentTimeStr < $workEndSetting;
 
             if ($isEarlyLeave && $approvedPermission && in_array($approvedPermission->type, ['ijin_pulang_awal', 'ijin_setengah_hari', 'ijin_tidak_masuk'])) {
@@ -271,6 +304,7 @@ class AttendanceService
                 'is_early_leave' => $isEarlyLeave,
                 'notes' => $notes,
                 'metadata' => [
+                    'resolved_address' => $data['resolved_address'] ?? null,
                     'validations' => [
                         'gps_accuracy' => $accuracyValidation,
                         'geofence' => $geofenceValidation,
@@ -328,5 +362,54 @@ class AttendanceService
             ->whereDate('timestamp', today())
             ->where('type', 'checkout')
             ->exists();
+    }
+
+    /**
+     * Compare two images using the Python Face Recognition engine.
+     * Returns an array containing verification status, similarity score, and messages.
+     */
+    public function compareFaceSimilarity(string $path1, string $path2, float $threshold = 0.65): array
+    {
+        $defaultResponse = [
+            'verified' => false,
+            'similarity' => 0.0,
+            'message' => 'Gagal memproses verifikasi biometrik.'
+        ];
+
+        try {
+            $diskLocal = \Illuminate\Support\Facades\Storage::disk('local');
+            $diskPublic = \Illuminate\Support\Facades\Storage::disk('public');
+
+            if (!$diskLocal->exists($path1) || !$diskPublic->exists($path2)) {
+                return array_merge($defaultResponse, ['message' => 'File gambar wajah tidak ditemukan.']);
+            }
+
+            // Get absolute paths to the files
+            // Laravel local disk stores in storage/app/private/
+            $absPath1 = storage_path('app/private/' . $path1);
+            $absPath2 = storage_path('app/public/' . $path2);
+
+            // Execute python3 face_compare.py with custom calibrated threshold
+            $scriptPath = base_path('face_compare.py');
+            $command = "python3 " . escapeshellarg($scriptPath) . " " . escapeshellarg($absPath1) . " " . escapeshellarg($absPath2) . " " . escapeshellarg($threshold);
+            
+            $output = shell_exec($command);
+            if (!$output) {
+                return $defaultResponse;
+            }
+
+            $result = json_decode($output, true);
+            if ($result) {
+                return [
+                    'verified' => $result['verified'] ?? false,
+                    'similarity' => ($result['similarity'] ?? 0.0) * 100.0,
+                    'message' => $result['message'] ?? 'Verifikasi berhasil'
+                ];
+            }
+
+            return $defaultResponse;
+        } catch (\Exception $e) {
+            return array_merge($defaultResponse, ['message' => 'Exception: ' . $e->getMessage()]);
+        }
     }
 }

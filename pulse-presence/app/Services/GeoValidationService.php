@@ -37,7 +37,10 @@ class GeoValidationService
         Branch $branch
     ): array {
         // Use calibrated geofence radius threshold from Control Panel settings
-        $radius = cache()->get('settings.radius', 200);
+        $radius = cache()->get('settings.radius');
+        if (is_null($radius) || $radius === '' || $radius <= 0) {
+            $radius = (float) ($branch->radius ?? 200);
+        }
 
         $distance = $this->calculateDistance(
             $branch->latitude,

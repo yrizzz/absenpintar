@@ -3,6 +3,7 @@
 namespace App\Livewire\Attendance;
 
 use App\Services\AttendanceService;
+use App\Services\GeoValidationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
@@ -13,21 +14,35 @@ use Livewire\Component;
 #[Title('Check In')]
 class CheckIn extends Component
 {
+    // GPS Coordinates
     public $latitude;
     public $longitude;
     public $accuracy;
+    public $locationValid = false;
+    public $locationMessage = 'Melacak koordinat GPS...';
+    public $distanceFromBranch = 0.0;
+    public $maxRadius = 200;
+    public $branchLatitude;
+    public $branchLongitude;
+    public $resolvedAddress = '';
+
+    // Biometric Face
     public $selfieData;
+    public $faceSimilarity = 0.0;
+    public $faceValid = false;
+    public $faceStatusMessage = 'Menunggu umpan kamera...';
+
+    // Device Fingerprint
     public $deviceFingerprint = [];
-    
-    public $step = 1; // 1: location, 2: selfie, 3: confirm
-    public $locationGranted = false;
-    public $cameraGranted = false;
+    public $isSubmitting = false;
 
     protected AttendanceService $attendanceService;
+    protected GeoValidationService $geoValidation;
 
-    public function boot(AttendanceService $attendanceService)
+    public function boot(AttendanceService $attendanceService, GeoValidationService $geoValidation)
     {
         $this->attendanceService = $attendanceService;
+        $this->geoValidation = $geoValidation;
     }
 
     public function mount()
@@ -43,22 +58,104 @@ class CheckIn extends Component
             session()->flash('error', 'Anda sudah melakukan absen masuk hari ini.');
             return redirect()->route('dashboard');
         }
+
+        // Set max radius from cache
+        $this->maxRadius = (float) cache()->get('settings.radius', 200);
+
+        // Fetch office branch location
+        $branch = Auth::user()->branch;
+        if ($branch) {
+            $this->branchLatitude = (float) $branch->latitude;
+            $this->branchLongitude = (float) $branch->longitude;
+        } else {
+            // Default to center if no branch is configured
+            $this->branchLatitude = -6.200000;
+            $this->branchLongitude = 106.816666;
+        }
     }
 
-    public function captureLocation($latitude, $longitude, $accuracy)
+    public function updateLocation($lat, $lng, $accuracy)
     {
-        $this->latitude = $latitude;
-        $this->longitude = $longitude;
-        $this->accuracy = $accuracy;
-        $this->locationGranted = true;
-        $this->step = 2;
+        try {
+            $this->latitude = $lat;
+            $this->longitude = $lng;
+            $this->accuracy = $accuracy;
+
+            $branch = Auth::user()->branch;
+            if (!$branch) {
+                $this->locationValid = false;
+                $this->locationMessage = 'Branch tidak ditemukan untuk user.';
+                return;
+            }
+
+            // Run geofence validation
+            $geofence = $this->geoValidation->validateGeofence($lat, $lng, $branch);
+            $this->distanceFromBranch = $geofence['distance'];
+            $this->locationValid = $geofence['valid'];
+            $this->locationMessage = $geofence['message'];
+
+            // Reverse Geocode coordinates to street address
+            if (empty($this->resolvedAddress)) {
+                try {
+                    $response = \Illuminate\Support\Facades\Http::withHeaders([
+                        'User-Agent' => 'AbsenPintar/1.0 (contact@yrizzz.com)'
+                    ])->timeout(5)->get("https://nominatim.openstreetmap.org/reverse", [
+                        'format' => 'jsonv2',
+                        'lat' => $lat,
+                        'lon' => $lng,
+                        'zoom' => 18,
+                        'addressdetails' => 1
+                    ]);
+                    
+                    if ($response->successful()) {
+                        $resData = $response->json();
+                        $this->resolvedAddress = $resData['display_name'] ?? '';
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning("Reverse geocoding failed: " . $e->getMessage());
+                }
+            }
+
+        } catch (\Exception $e) {
+            $this->locationValid = false;
+            $this->locationMessage = 'Gagal memverifikasi lokasi: ' . $e->getMessage();
+        }
     }
 
-    public function captureSelfie($imageData)
+    public function compareLiveFace($imageData)
     {
-        $this->selfieData = $imageData;
-        $this->cameraGranted = true;
-        $this->step = 3;
+        try {
+            $this->selfieData = $imageData;
+
+            // Decode base64 image temporarily
+            $rawImg = str_replace('data:image/jpeg;base64,', '', $imageData);
+            $rawImg = str_replace(' ', '+', $rawImg);
+            $imageDecoded = base64_decode($rawImg);
+
+            $tempPath = 'selfies/' . Auth::id() . '/live_checkin_temp.jpg';
+            Storage::disk('public')->put($tempPath, $imageDecoded);
+
+            $masterPath = 'master_face/user_' . Auth::id() . '.jpg';
+            
+            // Get current calibrated threshold from settings
+            $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
+            $calibratedThreshold = $settingThreshold * 0.70;
+
+            $verification = $this->attendanceService->compareFaceSimilarity($masterPath, $tempPath, $calibratedThreshold);
+
+            // Clean up temporary image
+            Storage::disk('public')->delete($tempPath);
+
+            $this->faceSimilarity = round($verification['similarity'], 1);
+            $this->faceValid = $verification['verified'];
+            $this->faceStatusMessage = $verification['message'];
+
+
+
+        } catch (\Exception $e) {
+            $this->faceValid = false;
+            $this->faceStatusMessage = 'Error verifikasi: ' . $e->getMessage();
+        }
     }
 
     public function captureDeviceFingerprint($fingerprint)
@@ -68,20 +165,38 @@ class CheckIn extends Component
 
     public function submit()
     {
+        if ($this->isSubmitting) {
+            return;
+        }
+        $this->isSubmitting = true;
+
         try {
-            // Validate required data
-            if (!$this->latitude || !$this->longitude || !$this->selfieData) {
-                session()->flash('error', 'Silakan selesaikan semua langkah terlebih dahulu.');
+            // Hard gate server-side checks
+            if (!$this->locationValid) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Anda harus berada di dalam radius lokasi kantor yang ditentukan.');
                 return;
             }
 
-            // Save selfie image
+            if (!$this->faceValid) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Verifikasi wajah belum terkonfirmasi.');
+                return;
+            }
+
+            if (!$this->selfieData) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Gambar selfie biometrik belum terekam.');
+                return;
+            }
+
+            // Save final selfie image for audit trail
             $imageData = str_replace('data:image/jpeg;base64,', '', $this->selfieData);
             $imageData = str_replace(' ', '+', $imageData);
             $imageDecoded = base64_decode($imageData);
             
             $fileName = 'selfies/' . Auth::id() . '/' . now()->format('Y-m-d_His') . '.jpg';
-            Storage::disk('local')->put($fileName, $imageDecoded);
+            Storage::disk('public')->put($fileName, $imageDecoded);
 
             // Prepare attendance data
             $data = [
@@ -92,6 +207,7 @@ class CheckIn extends Component
                 'selfie_path' => $fileName,
                 'device_fingerprint' => $this->deviceFingerprint,
                 'shift_id' => Auth::user()->shifts()->first()?->id,
+                'resolved_address' => $this->resolvedAddress,
             ];
 
             // Process check-in
@@ -106,6 +222,7 @@ class CheckIn extends Component
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
+            $this->isSubmitting = false;
             session()->flash('error', 'Gagal melakukan absen masuk: ' . $e->getMessage());
         }
     }

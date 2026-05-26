@@ -75,4 +75,38 @@ class History extends Component
             'attendances' => $attendances,
         ]);
     }
+
+    public function approveAttendance($logId)
+    {
+        if (!$this->isAdmin) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $log = AttendanceLog::findOrFail($logId);
+        $log->status = 'approved';
+        $log->save();
+
+        // Also update any linked pending suspicious events
+        \App\Models\SuspiciousEvent::where('attendance_log_id', $log->id)
+            ->update(['status' => 'resolved']);
+        
+        session()->flash('success', 'Absensi ' . ($log->user->name ?? 'Karyawan') . ' berhasil disetujui.');
+    }
+
+    public function rejectAttendance($logId)
+    {
+        if (!$this->isAdmin) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $log = AttendanceLog::findOrFail($logId);
+        $log->status = 'rejected';
+        $log->save();
+
+        // Also update any linked pending suspicious events
+        \App\Models\SuspiciousEvent::where('attendance_log_id', $log->id)
+            ->update(['status' => 'rejected']);
+
+        session()->flash('success', 'Absensi ' . ($log->user->name ?? 'Karyawan') . ' berhasil ditolak.');
+    }
 }

@@ -4,6 +4,9 @@ namespace App\Livewire\Settings;
 
 use App\Models\User;
 use App\Models\Branch;
+use App\Models\AttendanceLog;
+use App\Models\SuspiciousEvent;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -26,6 +29,7 @@ class SettingsIndex extends Component
     public $work_hour_start = '08:00';
     public $work_hour_end = '17:00';
     public $grace_period = 15;
+    public $timezone = 'Asia/Jakarta';
     public $overtime_min_hours = 1.0;
     public $overtime_full_day_hours = 8.0;
 
@@ -90,6 +94,7 @@ class SettingsIndex extends Component
         $this->work_hour_start = cache()->get('settings.work_hour_start', '08:00');
         $this->work_hour_end = cache()->get('settings.work_hour_end', '17:00');
         $this->grace_period = cache()->get('settings.grace_period', 15);
+        $this->timezone = cache()->get('settings.timezone', 'Asia/Jakarta');
         $this->overtime_min_hours = cache()->get('settings.overtime_min_hours', 1.0);
         $this->overtime_full_day_hours = cache()->get('settings.overtime_full_day_hours', 8.0);
 
@@ -108,6 +113,7 @@ class SettingsIndex extends Component
         cache()->forever('settings.work_hour_start', $this->work_hour_start);
         cache()->forever('settings.work_hour_end', $this->work_hour_end);
         cache()->forever('settings.grace_period', $this->grace_period);
+        cache()->forever('settings.timezone', $this->timezone);
         cache()->forever('settings.overtime_min_hours', $this->overtime_min_hours);
         cache()->forever('settings.overtime_full_day_hours', $this->overtime_full_day_hours);
 
@@ -129,6 +135,7 @@ class SettingsIndex extends Component
                 'work_hour_start' => $this->work_hour_start,
                 'work_hour_end' => $this->work_hour_end,
                 'grace_period' => $this->grace_period,
+                'timezone' => $this->timezone,
                 'overtime_min_hours' => $this->overtime_min_hours,
                 'overtime_full_day_hours' => $this->overtime_full_day_hours,
                 'permission_max_late_hours' => $this->permission_max_late_hours,
@@ -291,6 +298,36 @@ class SettingsIndex extends Component
         $this->userDevices = $user->deviceFingerprints()->get()->toArray();
 
         $this->showUserEditModal = true;
+    }
+
+    public function toggleDeviceTrust($deviceId)
+    {
+        $device = \App\Models\DeviceFingerprint::findOrFail($deviceId);
+        $device->trusted = !$device->trusted;
+        $device->save();
+
+        // Refresh user devices list
+        if ($this->selectedUserId) {
+            $user = User::findOrFail($this->selectedUserId);
+            $this->userDevices = $user->deviceFingerprints()->get()->toArray();
+        }
+
+        // Add a system audit log for security purposes
+        \App\Models\AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'device.trust_toggled',
+            'model_type' => \App\Models\DeviceFingerprint::class,
+            'model_id' => $device->id,
+            'new_values' => [
+                'device_hash' => $device->device_hash,
+                'trusted' => $device->trusted,
+                'employee' => $device->user->name
+            ],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        session()->flash('success', $device->trusted ? 'Perangkat berhasil disetujui (Trusted).' : 'Status persetujuan perangkat berhasil dicabut.');
     }
 
     public function saveUser()
@@ -519,6 +556,69 @@ class SettingsIndex extends Component
         ]);
 
         session()->flash('success', $msg);
+    }
+
+    // ==========================================
+    // SYSTEM RESET (SUPER ADMIN ONLY)
+    // ==========================================
+
+    public function resetAttendanceToday()
+    {
+        if (!auth()->user()->hasRole('super_admin')) {
+            session()->flash('error', 'Akses ditolak. Hanya Super Admin yang dapat mereset data sistem.');
+            return;
+        }
+
+        $today = now()->toDateString();
+        $logs = AttendanceLog::withTrashed()->whereDate('timestamp', $today)->get();
+        $count = $logs->count();
+
+        foreach ($logs as $log) {
+            if ($log->selfie_path) Storage::disk('public')->delete($log->selfie_path);
+            if ($log->selfie_compressed_path) Storage::disk('public')->delete($log->selfie_compressed_path);
+            if ($log->selfie_watermarked_path) Storage::disk('public')->delete($log->selfie_watermarked_path);
+            $log->suspiciousEvents()->delete();
+            $log->forceDelete();
+        }
+
+        \App\Models\AuditLog::create([
+            'user_id'    => auth()->id(),
+            'action'     => 'system.reset_attendance_today',
+            'new_values' => ['deleted_count' => $count, 'date' => $today],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        session()->flash('success', "Reset berhasil. {$count} data presensi hari ini ({$today}) telah dihapus permanen.");
+    }
+
+    public function resetAttendanceAll()
+    {
+        if (!auth()->user()->hasRole('super_admin')) {
+            session()->flash('error', 'Akses ditolak. Hanya Super Admin yang dapat mereset data sistem.');
+            return;
+        }
+
+        $logs = AttendanceLog::withTrashed()->get();
+        $count = $logs->count();
+
+        foreach ($logs as $log) {
+            if ($log->selfie_path) Storage::disk('public')->delete($log->selfie_path);
+            if ($log->selfie_compressed_path) Storage::disk('public')->delete($log->selfie_compressed_path);
+            if ($log->selfie_watermarked_path) Storage::disk('public')->delete($log->selfie_watermarked_path);
+            $log->suspiciousEvents()->delete();
+            $log->forceDelete();
+        }
+
+        \App\Models\AuditLog::create([
+            'user_id'    => auth()->id(),
+            'action'     => 'system.reset_attendance_all',
+            'new_values' => ['deleted_count' => $count],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        session()->flash('success', "Reset total berhasil. {$count} seluruh data presensi telah dihapus permanen dari sistem.");
     }
 
     public function render()

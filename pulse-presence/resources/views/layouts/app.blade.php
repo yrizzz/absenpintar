@@ -39,7 +39,7 @@
                             <div class="flex flex-shrink-0 items-center">
                                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
                                      <div
-                                        class="w-9 h-9 bg-gradient-to-tr from-blue-600 via-sky-500 to-emerald-400 rounded-xl flex items-center justify-center shadow-md shadow-blue-600/10 group-hover:scale-[1.03] transition-all">
+                                        class="w-9 h-9 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-600/10 group-hover:scale-[1.03] transition-all">
                                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -47,59 +47,59 @@
                                         </svg>
                                     </div>
                                     <span class="text-xl font-black text-white tracking-tight font-display">Absen<span
-                                            class="text-sky-400">Pintar</span></span>
+                                            class="text-blue-500">Pintar</span></span>
                                 </a>
                             </div>
 
                             <!-- Navigation Links (Desktop) -->
-                            <div class="hidden space-x-1 sm:-my-px sm:ml-10 sm:flex">
+                            <div class="hidden space-x-1 lg:-my-px lg:ml-6 xl:ml-10 lg:flex">
                                 <a href="{{ route('dashboard') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('dashboard') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('dashboard') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Dasbor
                                 </a>
 
                                 <a href="{{ route('attendance.index') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('attendance.*') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('attendance.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Ruang Absensi
                                 </a>
 
                                 <a href="{{ route('leaves.index') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('leaves.*') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('leaves.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Manajemen Cuti
                                 </a>
 
                                 <a href="{{ route('permissions.index') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('permissions.*') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('permissions.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Izin Kerja
                                 </a>
 
                                 <a href="{{ route('reports.index') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('reports.*') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('reports.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Laporan & Telemetri
                                 </a>
 
                                 <a href="{{ route('settings.index') }}"
-                                    class="inline-flex items-center border-b-[3px] px-3.5 pt-1 text-sm font-semibold transition-all duration-200 {{ request()->routeIs('settings.*') ? 'border-sky-400 text-sky-400' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
+                                    class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('settings.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Panel Kontrol
                                 </a>
                             </div>
                         </div>
 
                         <!-- User Profile Dropdown -->
-                        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                        <div class="hidden lg:ml-6 lg:flex lg:items-center">
                             <div class="relative ml-3" x-data="{ open: false }">
                                 <button @click="open = !open"
                                     class="flex items-center rounded-2xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 p-1.5 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all">
                                     <div class="flex items-center space-x-3.5 pr-2">
                                         <div
-                                            class="h-8.5 w-8.5 rounded-xl bg-gradient-to-tr from-blue-600 via-sky-500 to-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            class="h-9 w-9 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                                             {{ substr(auth()->user()->name, 0, 1) }}
                                         </div>
                                         <div class="text-left">
-                                            <div class="text-sm font-bold text-white leading-tight">
+                                            <div class="label-md font-bold text-white">
                                                 {{ auth()->user()->name }}</div>
                                             <div
-                                                class="text-[10px] font-black uppercase text-sky-400 tracking-wider mt-0.5">
+                                                class="label-xs text-blue-400 mt-0.5">
                                                 {{ auth()->user()->employee_id }}</div>
                                         </div>
                                         <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor"
@@ -121,7 +121,7 @@
                                     style="display: none;">
                                     <a href="{{ route('profile') }}"
                                         class="flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-150">
-                                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor"
+                                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -145,7 +145,7 @@
                         </div>
 
                         <!-- Mobile menu button -->
-                        <div class="flex items-center sm:hidden" x-data="{ mobileOpen: false }">
+                        <div class="flex items-center lg:hidden" x-data="{ mobileOpen: false }">
                             <button @click="mobileOpen = !mobileOpen"
                                 class="inline-flex items-center justify-center rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors duration-150">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,20 +161,20 @@
                                 style="display: none;">
                                 <div class="space-y-1.5 pb-3.5 pt-2.5 px-4">
                                     <a href="{{ route('dashboard') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('dashboard') ? 'text-sky-400' : 'text-slate-300' }}">Dasbor</a>
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-300' }}">Dasbor</a>
                                     <a href="{{ route('attendance.index') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('attendance.*') ? 'text-sky-400' : 'text-slate-300' }}">Ruang
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('attendance.*') ? 'text-white' : 'text-slate-300' }}">Ruang
                                         Absensi</a>
                                     <a href="{{ route('leaves.index') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('leaves.*') ? 'text-sky-400' : 'text-slate-300' }}">Manajemen
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('leaves.*') ? 'text-white' : 'text-slate-300' }}">Manajemen
                                         Cuti</a>
                                     <a href="{{ route('permissions.index') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'text-sky-400' : 'text-slate-300' }}">Izin Kerja</a>
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'text-white' : 'text-slate-300' }}">Izin Kerja</a>
                                     <a href="{{ route('reports.index') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('reports.*') ? 'text-sky-400' : 'text-slate-300' }}">Laporan
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('reports.*') ? 'text-white' : 'text-slate-300' }}">Laporan
                                         & Telemetri</a>
                                     <a href="{{ route('settings.index') }}"
-                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('settings.*') ? 'text-sky-400' : 'text-slate-300' }}">Panel
+                                        class="block py-2 text-sm font-semibold {{ request()->routeIs('settings.*') ? 'text-white' : 'text-slate-300' }}">Panel
                                         Kontrol</a>
                                 </div>
                                 <div class="border-t border-white/5 pb-3.5 pt-3.5 px-4">
@@ -241,22 +241,134 @@
         @endif
 
         <!-- Page Content -->
-        <main class="flex-grow relative z-10">
+        <main class="flex-grow relative">
             {{ $slot }}
         </main>
 
         <!-- Footer -->
-        <footer class="bg-[#121d33]/40 border-t border-white/5 py-6 mt-12 relative z-10">
-            <div
-                class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-medium">
-                <div>© 2026 Platform AbsenPintar. Terverifikasi aman.</div>
-                <div class="flex space-x-6 mt-3 sm:mt-0">
-                    <a href="#" class="hover:text-sky-400 transition-colors">Kebijakan Privasi</a>
-                    <a href="#" class="hover:text-sky-400 transition-colors">Ketentuan Layanan</a>
-                    <a href="#" class="hover:text-sky-400 transition-colors">Hubungi Dukungan</a>
+        <footer class="bg-[#0b1324] border-t border-white/5 py-10 mt-16 relative z-10 hidden lg:block">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/5">
+                    <!-- Logo / Brand Info -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-600/10">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-base font-extrabold text-white tracking-tight font-display">Absen<span class="text-blue-500">Pintar</span></span>
+                            <span class="text-[10px] text-slate-500 block">Enterprise Presence System</span>
+                        </div>
+                    </div>
+
+                    <!-- System Status Badge -->
+                    <div class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-400">Sistem online & terverifikasi</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-medium pt-6 gap-4">
+                    <div>
+                        © {{ date('Y') }} Platform AbsenPintar. Hak Cipta Dilindungi Undang-Undang.
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                        <a href="#" class="hover:text-blue-400 transition-colors">Kebijakan privasi</a>
+                        <a href="#" class="hover:text-blue-400 transition-colors">Ketentuan layanan</a>
+                        <a href="#" class="hover:text-blue-400 transition-colors">Hubungi dukungan</a>
+                    </div>
                 </div>
             </div>
         </footer>
+
+        {{-- Spacer: prevent content from hiding behind fixed mobile bottom nav --}}
+        <div class="h-24 lg:hidden" aria-hidden="true"></div>
+
+        @auth
+            <!-- Mobile Floating Bottom Navigation Dock -->
+            <div class="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#0d1627]/90 backdrop-blur-xl border-t border-white/5 py-2 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+                <div class="flex items-center justify-around h-14 w-full">
+                    <!-- Tab 1: Dasbor -->
+                    <a href="{{ route('dashboard') }}" 
+                        class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('dashboard') ? 'text-blue-400' : 'text-slate-400 hover:text-slate-200' }}">
+                        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="text-[9px] font-bold tracking-tight">Dasbor</span>
+                        @if(request()->routeIs('dashboard'))
+                            <span class="w-1 h-1 rounded-full bg-blue-500 mt-0.5"></span>
+                        @endif
+                    </a>
+
+                    <!-- Tab 2: Absen -->
+                    <a href="{{ route('attendance.index') }}" 
+                        class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('attendance.*') ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200' }}">
+                        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="text-[9px] font-bold tracking-tight">Presensi</span>
+                        @if(request()->routeIs('attendance.*'))
+                            <span class="w-1 h-1 rounded-full bg-emerald-500 mt-0.5"></span>
+                        @endif
+                    </a>
+
+                    <!-- Tab 3: Cuti/Izin -->
+                    <a href="{{ route('leaves.index') }}" 
+                        class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('leaves.*') || request()->routeIs('permissions.*') ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200' }}">
+                        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="text-[9px] font-bold tracking-tight">Izin/Cuti</span>
+                        @if(request()->routeIs('leaves.*') || request()->routeIs('permissions.*'))
+                            <span class="w-1 h-1 rounded-full bg-amber-500 mt-0.5"></span>
+                        @endif
+                    </a>
+
+                    <!-- Tab 4: Admin / Laporan -->
+                    @if(auth()->user()->hasRole('super_admin'))
+                        <a href="{{ route('settings.index') }}" 
+                            class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('settings.*') ? 'text-purple-400' : 'text-slate-400 hover:text-slate-200' }}">
+                            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span class="text-[9px] font-bold tracking-tight">Admin</span>
+                            @if(request()->routeIs('settings.*'))
+                                <span class="w-1 h-1 rounded-full bg-purple-500 mt-0.5"></span>
+                            @endif
+                        </a>
+                    @else
+                        <a href="{{ route('reports.index') }}" 
+                            class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('reports.*') ? 'text-purple-400' : 'text-slate-400 hover:text-slate-200' }}">
+                            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span class="text-[9px] font-bold tracking-tight">Laporan</span>
+                            @if(request()->routeIs('reports.*'))
+                                <span class="w-1 h-1 rounded-full bg-purple-500 mt-0.5"></span>
+                            @endif
+                        </a>
+                    @endif
+
+                    <!-- Tab 5: Profil -->
+                    <a href="{{ route('profile') }}" 
+                        class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('profile') ? 'text-pink-400' : 'text-slate-400 hover:text-slate-200' }}">
+                        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span class="text-[9px] font-bold tracking-tight">Profil</span>
+                        @if(request()->routeIs('profile'))
+                            <span class="w-1 h-1 rounded-full bg-pink-500 mt-0.5"></span>
+                        @endif
+                    </a>
+                </div>
+            </div>
+        @endauth
     </div>
 
     @livewireScripts

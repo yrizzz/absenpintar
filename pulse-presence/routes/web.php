@@ -5,6 +5,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\Attendance\CheckIn;
 use App\Livewire\Attendance\CheckOut;
 use App\Livewire\Attendance\History;
+use App\Livewire\Attendance\BiometricDemo;
 use Illuminate\Support\Facades\Route;
 
 // Guest routes
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', History::class)->name('index');
         Route::get('/checkin', CheckIn::class)->name('checkin');
         Route::get('/checkout', CheckOut::class)->name('checkout');
+        Route::get('/demo', BiometricDemo::class)->name('demo');
     });
     
     // Leaves routes

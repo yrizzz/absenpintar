@@ -3,6 +3,7 @@
 namespace App\Livewire\Attendance;
 
 use App\Services\AttendanceService;
+use App\Services\GeoValidationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
@@ -13,35 +14,43 @@ use Livewire\Component;
 #[Title('Check Out')]
 class CheckOut extends Component
 {
+    // GPS Coordinates
     public $latitude;
     public $longitude;
     public $accuracy;
+    public $locationValid = false;
+    public $locationMessage = 'Melacak koordinat GPS...';
+    public $distanceFromBranch = 0.0;
+    public $maxRadius = 200;
+    public $branchLatitude;
+    public $branchLongitude;
+    public $resolvedAddress = '';
+
+    // Biometric Face
     public $selfieData;
+    public $faceSimilarity = 0.0;
+    public $faceValid = false;
+    public $faceStatusMessage = 'Menunggu umpan kamera...';
+
+    // Device Fingerprint
     public $deviceFingerprint = [];
-    
-    public $step = 1;
-    public $locationGranted = false;
-    public $cameraGranted = false;
+    public $isSubmitting = false;
 
     protected AttendanceService $attendanceService;
+    protected GeoValidationService $geoValidation;
 
-    public function boot(AttendanceService $attendanceService)
+    public function boot(AttendanceService $attendanceService, GeoValidationService $geoValidation)
     {
         $this->attendanceService = $attendanceService;
+        $this->geoValidation = $geoValidation;
     }
 
     public function mount()
     {
         // Enforce strict face biometric gating
         if (!Auth::user()->hasRegisteredFace()) {
-            session()->flash('error', 'Kunci biometrik wajah Anda belum terdaftar. Anda wajib mendaftarkan diri di menu profil terlebih dahulu atau hubungi HR untuk mendaftarkannya.');
+            session()->flash('error', 'Kunci biometrik wajah Anda belum terdaftar. Anda wajib mendaftarkan diri di profil terlebih dahulu atau hubungi HR.');
             return redirect()->route('profile');
-        }
-
-        // Check if not checked in today
-        if (!$this->attendanceService->hasCheckedInToday(Auth::user())) {
-            session()->flash('error', 'Anda harus melakukan absen masuk terlebih dahulu.');
-            return redirect()->route('dashboard');
         }
 
         // Check if already checked out today
@@ -49,22 +58,129 @@ class CheckOut extends Component
             session()->flash('error', 'Anda sudah melakukan absen keluar hari ini.');
             return redirect()->route('dashboard');
         }
+
+        // 🛡️ STRICT GATING: Proactive Early Check-out Prevention
+        $shift = Auth::user()->shifts()->first();
+        if ($shift) {
+            $timezoneSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
+            $workEndSetting = cache()->get('settings.work_hour_end', '17:00');
+            $currentTimeStr = now()->timezone($timezoneSetting)->format('H:i:s');
+            $isEarlyLeave = $currentTimeStr < $workEndSetting;
+
+            // If early checkout and no permission request exists
+            if ($isEarlyLeave) {
+                $hasApproval = Auth::user()->leaveRequests()
+                    ->where('status', 'approved')
+                    ->whereDate('start_date', '<=', now())
+                    ->whereDate('end_date', '>=', now())
+                    ->whereIn('leave_type', ['ijin_pulang_awal', 'ijin_setengah_hari', 'ijin_tidak_masuk'])
+                    ->exists();
+
+                if (!$hasApproval) {
+                    $workEnd = cache()->get('settings.work_hour_end', '17:00');
+                    session()->flash('error', "Akses Ditolak: Anda belum memasuki jam pulang kerja ({$workEnd}). Anda wajib mengajukan permohonan ijin pulang awal terlebih dahulu jika ingin keluar lebih cepat.");
+                    return redirect()->route('dashboard');
+                }
+            }
+        }
+
+        // Set max radius from cache
+        $this->maxRadius = (float) cache()->get('settings.radius', 200);
+
+        // Fetch office branch location
+        $branch = Auth::user()->branch;
+        if ($branch) {
+            $this->branchLatitude = (float) $branch->latitude;
+            $this->branchLongitude = (float) $branch->longitude;
+        } else {
+            // Default to center if no branch is configured
+            $this->branchLatitude = -6.200000;
+            $this->branchLongitude = 106.816666;
+        }
     }
 
-    public function captureLocation($latitude, $longitude, $accuracy)
+    public function updateLocation($lat, $lng, $accuracy)
     {
-        $this->latitude = $latitude;
-        $this->longitude = $longitude;
-        $this->accuracy = $accuracy;
-        $this->locationGranted = true;
-        $this->step = 2;
+        try {
+            $this->latitude = $lat;
+            $this->longitude = $lng;
+            $this->accuracy = $accuracy;
+
+            $branch = Auth::user()->branch;
+            if (!$branch) {
+                $this->locationValid = false;
+                $this->locationMessage = 'Branch tidak ditemukan untuk user.';
+                return;
+            }
+
+            // Run geofence validation
+            $geofence = $this->geoValidation->validateGeofence($lat, $lng, $branch);
+            $this->distanceFromBranch = $geofence['distance'];
+            $this->locationValid = $geofence['valid'];
+            $this->locationMessage = $geofence['message'];
+
+            // Reverse Geocode coordinates to street address
+            if (empty($this->resolvedAddress)) {
+                try {
+                    $response = \Illuminate\Support\Facades\Http::withHeaders([
+                        'User-Agent' => 'AbsenPintar/1.0 (contact@yrizzz.com)'
+                    ])->timeout(5)->get("https://nominatim.openstreetmap.org/reverse", [
+                        'format' => 'jsonv2',
+                        'lat' => $lat,
+                        'lon' => $lng,
+                        'zoom' => 18,
+                        'addressdetails' => 1
+                    ]);
+                    
+                    if ($response->successful()) {
+                        $resData = $response->json();
+                        $this->resolvedAddress = $resData['display_name'] ?? '';
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning("Reverse geocoding failed: " . $e->getMessage());
+                }
+            }
+
+        } catch (\Exception $e) {
+            $this->locationValid = false;
+            $this->locationMessage = 'Gagal memverifikasi lokasi: ' . $e->getMessage();
+        }
     }
 
-    public function captureSelfie($imageData)
+    public function compareLiveFace($imageData)
     {
-        $this->selfieData = $imageData;
-        $this->cameraGranted = true;
-        $this->step = 3;
+        try {
+            $this->selfieData = $imageData;
+
+            // Decode base64 image temporarily
+            $rawImg = str_replace('data:image/jpeg;base64,', '', $imageData);
+            $rawImg = str_replace(' ', '+', $rawImg);
+            $imageDecoded = base64_decode($rawImg);
+
+            $tempPath = 'selfies/' . Auth::id() . '/live_checkout_temp.jpg';
+            Storage::disk('public')->put($tempPath, $imageDecoded);
+
+            $masterPath = 'master_face/user_' . Auth::id() . '.jpg';
+            
+            // Get current calibrated threshold from settings
+            $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
+            $calibratedThreshold = $settingThreshold * 0.70;
+
+            $verification = $this->attendanceService->compareFaceSimilarity($masterPath, $tempPath, $calibratedThreshold);
+
+            // Clean up temporary image
+            Storage::disk('public')->delete($tempPath);
+
+            $this->faceSimilarity = round($verification['similarity'], 1);
+            $this->faceValid = $verification['verified'];
+            $this->faceStatusMessage = $verification['message'];
+
+
+
+        } catch (\Exception $e) {
+            $this->faceValid = false;
+            $this->faceStatusMessage = 'Error verifikasi: ' . $e->getMessage();
+        }
     }
 
     public function captureDeviceFingerprint($fingerprint)
@@ -74,19 +190,38 @@ class CheckOut extends Component
 
     public function submit()
     {
+        if ($this->isSubmitting) {
+            return;
+        }
+        $this->isSubmitting = true;
+
         try {
-            if (!$this->latitude || !$this->longitude || !$this->selfieData) {
-                session()->flash('error', 'Silakan selesaikan semua langkah terlebih dahulu.');
+            // Hard gate server-side checks
+            if (!$this->locationValid) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Anda harus berada di dalam radius lokasi kantor yang ditentukan.');
                 return;
             }
 
-            // Save selfie image
+            if (!$this->faceValid) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Verifikasi wajah belum terkonfirmasi.');
+                return;
+            }
+
+            if (!$this->selfieData) {
+                $this->isSubmitting = false;
+                session()->flash('error', 'Gagal: Gambar selfie biometrik belum terekam.');
+                return;
+            }
+
+            // Save final selfie image for audit trail
             $imageData = str_replace('data:image/jpeg;base64,', '', $this->selfieData);
             $imageData = str_replace(' ', '+', $imageData);
             $imageDecoded = base64_decode($imageData);
             
             $fileName = 'selfies/' . Auth::id() . '/' . now()->format('Y-m-d_His') . '_checkout.jpg';
-            Storage::disk('local')->put($fileName, $imageDecoded);
+            Storage::disk('public')->put($fileName, $imageDecoded);
 
             // Prepare attendance data
             $data = [
@@ -97,26 +232,19 @@ class CheckOut extends Component
                 'selfie_path' => $fileName,
                 'device_fingerprint' => $this->deviceFingerprint,
                 'shift_id' => Auth::user()->shifts()->first()?->id,
+                'resolved_address' => $this->resolvedAddress,
             ];
 
             // Process check-out
             $attendance = $this->attendanceService->checkOut(Auth::user(), $data);
 
             $durationStr = $attendance->metadata['working_duration'] ?? 'Belum terhitung';
-            $overtimeLabel = $attendance->metadata['overtime']['overtime_label'] ?? null;
-            $flashMsg = "Absen Keluar Berhasil! Durasi Kerja Hari Ini: {$durationStr}.";
-            if ($overtimeLabel) {
-                $flashMsg .= " ({$overtimeLabel})";
-            }
-            session()->flash('success', $flashMsg);
-            
-            if ($attendance->risk_level === 'high') {
-                session()->flash('warning', 'Absensi Anda ditandai untuk ditinjau karena skor risiko terdeteksi tinggi.');
-            }
+            session()->flash('success', "Absen keluar berhasil dilakukan! Durasi kerja hari ini: {$durationStr}.");
 
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
+            $this->isSubmitting = false;
             session()->flash('error', 'Gagal melakukan absen keluar: ' . $e->getMessage());
         }
     }
