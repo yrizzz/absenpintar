@@ -9,9 +9,22 @@
                     {{ $isAdmin ? 'Telusuri, verifikasi, dan filter log kehadiran semua karyawan secara mendalam' : 'Telusuri, verifikasi, dan filter log kehadiran historis Anda secara mendalam' }}
                 </p>
             </div>
-            <div class="mt-4 sm:mt-0">
+            <div class="mt-4 sm:mt-0 flex flex-wrap gap-2.5">
+                @php
+                    $start = $filterMonth ? \Carbon\Carbon::parse($filterMonth . '-01')->startOfMonth()->toDateString() : now()->startOfMonth()->toDateString();
+                    $end = $filterMonth ? \Carbon\Carbon::parse($filterMonth . '-01')->endOfMonth()->toDateString() : now()->toDateString();
+                @endphp
+                <a href="{{ route('letters.attendance-certificate', ['start_date' => $start, 'end_date' => $end]) }}" 
+                   target="_blank"
+                   class="btn-sm btn-secondary flex items-center gap-1.5">
+                    <svg class="w-4.5 h-4.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Cetak Suket Kehadiran</span>
+                </a>
+
                 <a href="{{ route('attendance.checkin') }}" 
-                   class="btn-sm btn-primary">
+                   class="btn-sm btn-primary flex items-center">
                     <svg class="-ml-1 mr-2 h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -156,16 +169,39 @@
                                             'status' => $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
                                             'status_class' => $attendance->status,
                                             'is_late' => $attendance->is_late,
-                                            'selfie_url' => $attendance->selfie_path ? asset('storage/' . $attendance->selfie_path) : null,
-                                            'notes' => $attendance->notes ?? 'Tidak ada catatan tambahan.',
-                                            'branch_name' => $attendance->branch->name ?? 'HQ Workspace',
-                                            'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
-                                            'employee_name' => $attendance->user->name ?? 'Karyawan',
-                                            'resolved_address' => $attendance->metadata['resolved_address'] ?? null
-                                        ]) }}; showModal = true;"
-                                        class="label-sm font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">
-                                            Lihat Detail
-                                        </button>
+                                        <div class="flex items-center gap-3">
+                                            <button @click="selectedLog = {{ json_encode([
+                                                'id' => $attendance->id,
+                                                'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
+                                                'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
+                                                'latitude' => $attendance->latitude,
+                                                'longitude' => $attendance->longitude,
+                                                'accuracy' => $attendance->accuracy,
+                                                'ip_address' => $attendance->ip_address,
+                                                'work_mode' => strtoupper($attendance->work_mode ?? 'office'),
+                                                'risk_score' => $attendance->risk_score ?? 0,
+                                                'risk_level' => $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
+                                                'risk_class' => $attendance->risk_level,
+                                                'status' => $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
+                                                'status_class' => $attendance->status,
+                                                'is_late' => $attendance->is_late,
+                                                'selfie_url' => $attendance->selfie_path ? asset('storage/' . $attendance->selfie_path) : null,
+                                                'notes' => $attendance->notes ?? 'Tidak ada catatan tambahan.',
+                                                'branch_name' => $attendance->branch->name ?? 'HQ Workspace',
+                                                'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
+                                                'employee_name' => $attendance->user->name ?? 'Karyawan',
+                                                'resolved_address' => $attendance->metadata['resolved_address'] ?? null
+                                            ]) }}; showModal = true;"
+                                            class="label-sm font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">
+                                                Detail
+                                            </button>
+                                            <span class="text-white/10">|</span>
+                                            <a href="{{ route('letters.attendance-certificate', ['user_id' => $attendance->user_id, 'start_date' => $attendance->timestamp->startOfMonth()->toDateString(), 'end_date' => $attendance->timestamp->endOfMonth()->toDateString()]) }}" 
+                                               target="_blank"
+                                               class="label-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                                Cetak
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

@@ -149,6 +149,7 @@
                                     <th class="pb-3 w-[100px]" style="width: 100px;">Durasi</th>
                                     <th class="pb-3 w-[250px]" style="width: 250px;">Alasan</th>
                                     <th class="pb-3 w-[120px] text-right" style="width: 120px;">Status</th>
+                                    <th class="pb-3 w-[80px] text-right" style="width: 80px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/5 text-xs text-slate-300">
@@ -167,6 +168,15 @@
                                             @else
                                                 <span class="badge-rect-danger">Ditolak</span>
                                             @endif
+                                        </td>
+                                        <td class="py-4 text-right">
+                                            <a href="{{ route('letters.leave', $ml->id) }}" target="_blank"
+                                                class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-bold transition-colors text-[11px]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                </svg>
+                                                Cetak
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach

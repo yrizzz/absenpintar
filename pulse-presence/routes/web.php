@@ -100,6 +100,59 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', \App\Livewire\Settings\SettingsIndex::class)->name('index');
     });
     
+    // ========================================================
+    // Official Letter Print Routes (Surat Resmi PDF)
+    // ========================================================
+    Route::prefix('letters')->name('letters.')->group(function () {
+
+        // Surat Permohonan Cuti
+        Route::get('/leave/{id}', function ($id) {
+            $leave = \App\Models\LeaveRequest::with(['user.branch', 'user.roles', 'manager', 'hr'])->findOrFail($id);
+
+            // Authorization: only the owner or admin can print
+            $user = auth()->user();
+            if ($leave->user_id !== $user->id && !$user->hasAnyRole(['super_admin', 'hr_admin'])) {
+                abort(403, 'Anda tidak memiliki akses untuk mencetak surat ini.');
+            }
+
+            return view('letters.leave-letter', compact('leave'));
+        })->name('leave');
+
+        // Surat Izin Kerja / Dispensasi
+        Route::get('/permission/{id}', function ($id) {
+            $permission = \App\Models\PermissionRequest::with(['user.branch', 'user.roles', 'deptHead', 'hr'])->findOrFail($id);
+
+            $user = auth()->user();
+            if ($permission->user_id !== $user->id && !$user->hasAnyRole(['super_admin', 'hr_admin', 'manager'])) {
+                abort(403, 'Anda tidak memiliki akses untuk mencetak surat ini.');
+            }
+
+            return view('letters.permission-letter', compact('permission'));
+        })->name('permission');
+
+        // Surat Keterangan Kehadiran
+        Route::get('/attendance-certificate', function () {
+            $targetUserId = request('user_id', auth()->id());
+            $startDate = request('start_date', now()->startOfMonth()->toDateString());
+            $endDate = request('end_date', now()->toDateString());
+
+            $authUser = auth()->user();
+            // Regular employees can only print their own certificate
+            if ((int)$targetUserId !== $authUser->id && !$authUser->hasAnyRole(['super_admin', 'hr_admin'])) {
+                abort(403, 'Anda tidak memiliki akses untuk mencetak surat keterangan karyawan lain.');
+            }
+
+            $user = \App\Models\User::with(['branch', 'roles'])->findOrFail($targetUserId);
+            $logs = \App\Models\AttendanceLog::with('branch')
+                ->where('user_id', $targetUserId)
+                ->whereBetween('timestamp', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->orderBy('timestamp', 'asc')
+                ->get();
+
+            return view('letters.attendance-certificate', compact('user', 'logs', 'startDate', 'endDate'));
+        })->name('attendance-certificate');
+    });
+
     // Profile route
     Route::get('/profile', \App\Livewire\Profile\ProfileIndex::class)->name('profile');
     
