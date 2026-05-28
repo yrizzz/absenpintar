@@ -327,23 +327,64 @@ html.light .glass-panel[class*="hover:"]:hover {
   box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.08) !important;
 }
 
+/* Soft themed color gradient cards in Light Mode (replaces monochrome white cards) */
+html.light div[class*="border-blue-500"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 246, 255, 0.65) 100%) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.04) !important;
+}
+
+html.light div[class*="border-emerald-500"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 250, 0.65) 100%) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.04) !important;
+}
+
+html.light div[class*="border-rose-500"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 241, 242, 0.65) 100%) !important;
+  border-color: rgba(244, 63, 94, 0.25) !important;
+  box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.04) !important;
+}
+
+html.light div[class*="border-purple-500"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 245, 255, 0.65) 100%) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.04) !important;
+}
+
+html.light div[class*="border-amber-500"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 243, 199, 0.45) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.04) !important;
+}
+
 /* Metrics Cards Coloring in Light Mode */
-html.light div[class*="border-blue-500"] p.text-transparent,
+html.light div[class*="border-blue-500"] .text-transparent,
+html.light div[class*="border-blue-500"] div[class*="text-transparent"],
 html.light div[class*="border-blue-500"] p {
   color: #1d4ed8 !important;
 }
 
-html.light div[class*="border-emerald-500"] p.text-transparent,
+html.light div[class*="border-emerald-500"] .text-transparent,
+html.light div[class*="border-emerald-500"] div[class*="text-transparent"],
 html.light div[class*="border-emerald-500"] p {
   color: #047857 !important;
 }
 
-html.light div[class*="border-rose-500"] p.text-transparent,
+html.light div[class*="border-rose-500"] .text-transparent,
+html.light div[class*="border-rose-500"] div[class*="text-transparent"],
 html.light div[class*="border-rose-500"] p {
   color: #b91c1c !important;
 }
 
-html.light div[class*="border-amber-500"] p.text-transparent,
+html.light div[class*="border-purple-500"] .text-transparent,
+html.light div[class*="border-purple-500"] div[class*="text-transparent"],
+html.light div[class*="border-purple-500"] p {
+  color: #7e22ce !important;
+}
+
+html.light div[class*="border-amber-500"] .text-transparent,
+html.light div[class*="border-amber-500"] div[class*="text-transparent"],
 html.light div[class*="border-amber-500"] p {
   color: #b45309 !important;
 }
@@ -402,6 +443,21 @@ html.light .label-xs {
 html.light .text-white,
 html.light .text-slate-100 {
   color: #0f172a !important;
+}
+
+/* Keep text and SVGs white on primary blue/success/danger buttons */
+html.light .btn-primary,
+html.light .btn-success,
+html.light .btn-danger,
+html.light .btn-primary *,
+html.light .btn-success *,
+html.light .btn-danger *,
+html.light button[type="submit"],
+html.light button[type="submit"] *,
+html.light button.bg-blue-600,
+html.light button.bg-blue-600 * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
 html.light .text-slate-300 {
@@ -586,10 +642,11 @@ html.light div[class*="bg-slate-900/65"] {
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08) !important;
 }
 
-html.light div[class*="bg-[#17223b]"] {
-  background-color: #f1f5f9 !important;
-  border-color: rgba(15, 23, 42, 0.06) !important;
-  color: #475569 !important;
+html.light div[class*="bg-[#17223b]"],
+html.light span[class*="bg-[#17223b]"] {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
 html.light button[onclick*="admin@absenpintar.com"],
@@ -668,5 +725,175 @@ html.light button[title="Ganti Tema"]:hover {
   color: #0f172a !important;
   border-color: rgba(37, 99, 235, 0.25) !important;
 }
+
+/* ==========================================
+   TABLE WIDTH & GRID OVERLAY OPTIMIZATIONS
+   ========================================== */
+html.light table,
+html.dark table {
+  width: 100% !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+}
+
+html.light .overflow-x-auto,
+html.dark .overflow-x-auto {
+  width: 100% !important;
+}
+
+/* Fine grid lines in Light Mode (replaces white lines) */
+html.light div[class*="bg-[linear-gradient"] {
+  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
+}
+
+/* Soften heavy glows inside light mode to prevent dark blobs */
+html.light div[class*="bg-blue-500/25"],
+html.light div[class*="bg-indigo-500/25"],
+html.light div[class*="bg-blue-500/10"],
+html.light div[class*="bg-indigo-500/10"] {
+  opacity: 0.18 !important;
+}
+
+/* Premium WCAG status badge contrast overrides in Light Mode */
+html.light .badge-rect-info,
+html.light .badge-info {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+  color: #1d4ed8 !important;
+}
+
+html.light .badge-rect-success,
+html.light .badge-success {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #047857 !important;
+}
+
+html.light .badge-rect-warning,
+html.light .badge-warning {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+  color: #b45309 !important;
+}
+
+html.light .badge-rect-danger,
+html.light .badge-danger {
+  background-color: rgba(244, 63, 94, 0.08) !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  color: #b91c1c !important;
+}
+
+html.light .badge-rect-neutral {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #334155 !important;
+}
+
+/* ==========================================
+   HIGH-READABILITY ACCESSIBLE TYPOGRAPHY SCALES
+   ========================================== */
+.text-xs,
+[class*="text-xs"],
+.label-xs,
+.badge-rect-info,
+.badge-rect-success,
+.badge-rect-warning,
+.badge-rect-danger,
+.badge-rect-neutral,
+.badge-info,
+.badge-success,
+.badge-warning,
+.badge-danger {
+  font-size: 0.825rem !important; /* Scaled from 10px/12px to high legibility 13.2px! */
+  line-height: 1.4 !important;
+}
+
+.text-\[10px\] {
+  font-size: 0.8rem !important; /* Scaled from 10px to comfortable 12.8px! */
+}
+
+.text-\[11px\] {
+  font-size: 0.8rem !important; /* Scaled from 11px to comfortable 12.8px! */
+}
+
+.label-sm,
+[class*="label-sm"] {
+  font-size: 0.9rem !important; /* Scaled from 12px/13px to beautiful 14.4px! */
+  line-height: 1.5 !important;
+}
+
+/* Adjust empty states specifically so they look incredibly premium and readable */
+.bg-\[\#0d1527\]\/50,
+div[class*="bg-[#0d1527]"] {
+  font-size: 0.95rem !important; /* Scaled for beautiful, readable empty state message! */
+  padding-top: 2.25rem !important;
+  padding-bottom: 2.25rem !important;
+  color: #475569 !important; /* Slate-600 */
+}
+
+/* ==========================================
+   MODAL REDESIGN & PROFESSIONAL STYLING OVERRIDES
+   ========================================== */
+html.light .label-value-white {
+  color: #0f172a !important; /* Pristine readable dark slate */
+}
+
+html.light .label-value-blue {
+  color: #1d4ed8 !important; /* Professional royal blue */
+}
+
+/* Photo and Selfie frame in Light Mode */
+html.light div[class*="bg-[#0d1527]"] img {
+  border-radius: 1rem !important;
+}
+
+/* Mini indicator tags in Light Mode modal */
+html.light div[class*="bottom-3"] span {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #1e293b !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  font-size: 0.75rem !important; /* Scaled for perfect visibility */
+  padding: 0.25rem 0.6rem !important;
+}
+
+html.light div[class*="bottom-3"] span:first-child {
+  color: #047857 !important; /* Deep emerald for GPS terkunci */
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  background-color: rgba(240, 253, 250, 0.95) !important;
+}
+
+html.light div[class*="bottom-3"] span:last-child {
+  color: #1d4ed8 !important; /* Deep blue for MFA aman */
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  background-color: rgba(239, 246, 255, 0.95) !important;
+}
+
+/* Modal detail tables backgrounds in Light Mode */
+html.light div[class*="bg-[#0d1527]/90"],
+html.light div[class*="bg-[#0d1527]"] {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02) !important;
+}
+
+html.light div[class*="divide-white/5"] {
+  --tw-divide-y-reverse: 0 !important;
+  border-top-width: 0px !important;
+  border-bottom-width: 0px !important;
+}
+
+html.light div[class*="divide-white/5"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Modus Kerja tag text inside light mode */
+html.light span.badge-neutral span.text-blue-400 {
+  color: #1d4ed8 !important;
+}
+
+
+
 
 

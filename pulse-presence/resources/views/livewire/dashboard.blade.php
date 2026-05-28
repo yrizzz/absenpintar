@@ -459,9 +459,7 @@
                             </div>
                         </template>
 
-                        <!-- Cyber Scan HUD Sweep -->
-                        <div class="absolute inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_10px_#3b82f6] pointer-events-none z-10 animate-scan"
-                            style="animation: scanLine 3s linear infinite;"></div>
+
 
                         <!-- Mini indicator tags overlay -->
                         <div class="absolute bottom-3 left-3 right-3 flex justify-between z-10 pointer-events-none">
