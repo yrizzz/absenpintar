@@ -906,6 +906,42 @@ html.light span.badge-neutral span.text-blue-400 {
   color: #1d4ed8 !important;
 }
 
+/* ==========================================
+   GLOBAL INPUT, SELECT, TEXTAREA THIN BORDERS
+   ========================================== */
+html.light input,
+html.light select,
+html.light textarea {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+
 
 
 
