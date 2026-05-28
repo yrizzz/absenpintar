@@ -1,3 +1,7 @@
+<!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <div class="py-8 min-h-screen text-slate-100 bg-transparent" x-data="{
     selectedLog: null,
     showModal: false,
@@ -61,9 +65,6 @@
         });
     }
 }"
-    <!-- Inject Leaflet Assets directly to avoid bundle overhead -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     @attendance-updated.window="
          const eventDetail = $event.detail[0] || {};
          const eventType = eventDetail.type === 'checkin' ? 'Masuk' : 'Keluar';
