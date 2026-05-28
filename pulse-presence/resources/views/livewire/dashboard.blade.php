@@ -121,8 +121,7 @@
                     </div>
                     <div>
                         <h4 class="text-sm font-bold text-white leading-tight">Absensi Berhasil Terverifikasi!</h4>
-                        <p class="text-xs text-slate-400 mt-1">Sistem biometrik & geofencing pintar berhasil mendata
-                            sesi Anda secara akurat.</p>
+                        <p class="text-xs text-slate-400 mt-1">Sistem biometrik & geofencing pintar berhasil mendata sesi Anda secara akurat.</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -215,8 +214,9 @@
             </div>
         </div>
 
-        <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
-            <div class="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+        <div class="relative overflow-hidden bg-gradient-to-b from-[#121d33]/85 to-[#0b1222]/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-white/15">
+            <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
+            <div class="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 bg-white/[0.01]">
                 <div class="flex-1 min-w-0">
                     <h3 class="heading-2 text-lg sm:text-xl font-bold text-white">Kehadiran Hari Ini</h3>
                     <p class="label-sm mt-1">Status kehadiran real-time dan parameter telemetri (Klik kartu untuk detail absensi)</p>
@@ -283,7 +283,7 @@
                                 'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
                                 'employee_name' => $attendance->user->name ?? 'Karyawan',
                             ]) }}; showModal = true; initDetailMap();"
-                                class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-[#0d1527]/55 border border-white/10 rounded-2xl hover:border-white/20 hover:bg-[#121d33]/45 hover:scale-[1.008] cursor-pointer transition-all duration-200 group">
+                                class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-[#0d1527]/40 border border-white/5 rounded-2xl hover:border-blue-500/35 hover:bg-blue-500/[0.02] hover:scale-[1.004] hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] cursor-pointer transition-all duration-200 group">
                                 <div class="flex items-start space-x-3.5 w-full sm:w-auto">
                                     @if ($attendance->type === 'checkin')
                                         <div
