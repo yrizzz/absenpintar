@@ -960,6 +960,24 @@ html.light .from-blue-600.to-indigo-600 svg {
   fill: none !important;
 }
 
+/* ==========================================
+   NATIVE CALENDAR PICKER INDICATOR STYLING
+   ========================================== */
+html.light input[type="month"]::-webkit-calendar-picker-indicator,
+html.light input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0) !important;
+  opacity: 0.75 !important;
+  cursor: pointer !important;
+}
+
+html.dark input[type="month"]::-webkit-calendar-picker-indicator,
+html.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+  opacity: 0.85 !important;
+  cursor: pointer !important;
+}
+
+
 
 
 

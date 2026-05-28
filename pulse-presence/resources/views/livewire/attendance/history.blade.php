@@ -54,7 +54,8 @@
                     <input wire:model.live="filterMonth" 
                            type="month" 
                            id="filterMonth"
-                           class="w-full px-4 py-2.5 bg-[#0d1527]/80 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all">
+                           onclick="this.showPicker()"
+                           class="w-full px-4 py-2.5 bg-[#0d1527]/80 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all cursor-pointer">
                 </div>
                 <div class="space-y-1.5">
                     <label for="filterType" class="block label-xs">Tipe Absen</label>
