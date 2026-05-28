@@ -1329,7 +1329,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-4 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Cabang Kantor</label>
                                 <select wire:model="edit_branch_id" required
@@ -1367,6 +1367,15 @@
                                     <option value="super_admin">Super Admin</option>
                                 </select>
                                 @error('edit_role')
+                                    <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block label-xs mb-1.5">Kuota Cuti Tahunan</label>
+                                <input wire:model="edit_annual_leave_quota" type="number" required min="0" max="100"
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                @error('edit_annual_leave_quota')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
                             </div>

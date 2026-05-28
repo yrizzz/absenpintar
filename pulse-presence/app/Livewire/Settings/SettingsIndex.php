@@ -66,6 +66,7 @@ class SettingsIndex extends Component
     public $edit_is_active = true;
     public $edit_date_of_birth = '';
     public $edit_joined_at = '';
+    public $edit_annual_leave_quota = 12;
     public $userDevices = [];
 
     // Branch CRUD Modal properties
@@ -293,6 +294,7 @@ class SettingsIndex extends Component
         $this->edit_role = $user->roles->first()?->name ?? 'employee';
         $this->edit_date_of_birth = $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '';
         $this->edit_joined_at = $user->joined_at ? $user->joined_at->format('Y-m-d') : '';
+        $this->edit_annual_leave_quota = $user->annual_leave_quota ?? 12;
         
         // Fetch devices
         $this->userDevices = $user->deviceFingerprints()->get()->toArray();
@@ -342,6 +344,7 @@ class SettingsIndex extends Component
             'edit_role' => 'required|in:employee,manager,hr_admin,super_admin',
             'edit_date_of_birth' => 'nullable|date',
             'edit_joined_at' => 'nullable|date',
+            'edit_annual_leave_quota' => 'required|integer|min:0|max:100',
         ]);
 
         $user = User::findOrFail($this->selectedUserId);
@@ -355,6 +358,7 @@ class SettingsIndex extends Component
             'is_active' => $this->edit_is_active,
             'date_of_birth' => $this->edit_date_of_birth ?: null,
             'joined_at' => $this->edit_joined_at ?: null,
+            'annual_leave_quota' => $this->edit_annual_leave_quota,
         ];
 
         if (!empty($this->edit_password)) {
@@ -382,6 +386,7 @@ class SettingsIndex extends Component
                 'role' => $this->edit_role,
                 'date_of_birth' => $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : null,
                 'joined_at' => $user->joined_at ? $user->joined_at->format('Y-m-d') : null,
+                'annual_leave_quota' => $user->annual_leave_quota,
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),

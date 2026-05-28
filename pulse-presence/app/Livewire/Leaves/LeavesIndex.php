@@ -118,23 +118,30 @@ class LeavesIndex extends Component
         $user = auth()->user();
         $isAdmin = $user->hasRole('hr_admin') || $user->hasRole('super_admin');
 
-        // Compute balances based on actual records
+        // Compute balances based on actual records for the current calendar year
+        $currentYear = now()->year;
+        
         $approvedAnnual = \App\Models\LeaveRequest::where('user_id', $user->id)
             ->where('leave_type', 'annual')
             ->where('status', 'hr_approved')
+            ->whereYear('start_date', $currentYear)
             ->sum('total_days');
 
         $sickDays = \App\Models\LeaveRequest::where('user_id', $user->id)
             ->where('leave_type', 'sick')
             ->where('status', 'hr_approved')
+            ->whereYear('start_date', $currentYear)
             ->sum('total_days');
 
         $specialDays = \App\Models\LeaveRequest::where('user_id', $user->id)
             ->where('leave_type', 'custom')
             ->where('status', 'hr_approved')
+            ->whereYear('start_date', $currentYear)
             ->sum('total_days');
 
-        $annualBalance = max(12 - $approvedAnnual, 0);
+        // Dynamic quota per employee, defaults to 12
+        $quota = $user->annual_leave_quota ?? 12;
+        $annualBalance = max($quota - $approvedAnnual, 0);
 
         // Fetch user's own history
         $myLeaves = \App\Models\LeaveRequest::where('user_id', $user->id)

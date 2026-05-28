@@ -28,7 +28,8 @@ use Spatie\Permission\Traits\HasRoles;
     'status',
     'work_mode',
     'two_factor_enabled',
-    'two_factor_secret'
+    'two_factor_secret',
+    'annual_leave_quota'
 ])]
 #[Hidden(['password', 'remember_token', 'two_factor_secret'])]
 class User extends Authenticatable
