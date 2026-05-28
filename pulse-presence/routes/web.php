@@ -30,13 +30,13 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', \App\Livewire\Leaves\LeavesIndex::class)->name('index');
     });
     
-    // Permissions routes
-    Route::prefix('permissions')->name('permissions.')->group(function () {
+    // Permissions routes (manager, hr_admin, super_admin only)
+    Route::middleware(['role:super_admin|hr_admin|manager'])->prefix('permissions')->name('permissions.')->group(function () {
         Route::get('/', \App\Livewire\Permissions\PermissionsIndex::class)->name('index');
     });
     
-    // Reports routes
-    Route::prefix('reports')->name('reports.')->group(function () {
+    // Reports routes (hr_admin, super_admin only)
+    Route::middleware(['role:super_admin|hr_admin'])->prefix('reports')->name('reports.')->group(function () {
         Route::get('/', \App\Livewire\Reports\ReportsIndex::class)->name('index');
         Route::get('/print', function () {
             $report_type = request('type', 'presence_summary');
@@ -95,8 +95,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         })->name('print');
     });
     
-    // Settings routes
-    Route::prefix('settings')->name('settings.')->group(function () {
+    // Settings routes (hr_admin, super_admin only)
+    Route::middleware(['role:super_admin|hr_admin'])->prefix('settings')->name('settings.')->group(function () {
         Route::get('/', \App\Livewire\Settings\SettingsIndex::class)->name('index');
     });
     

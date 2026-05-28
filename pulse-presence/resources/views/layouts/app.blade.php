@@ -68,11 +68,14 @@
                                     Manajemen Cuti
                                 </a>
 
+                                @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager']))
                                 <a href="{{ route('permissions.index') }}"
                                     class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('permissions.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Izin Kerja
                                 </a>
+                                @endif
 
+                                @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin']))
                                 <a href="{{ route('reports.index') }}"
                                     class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('reports.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Laporan & Telemetri
@@ -82,6 +85,7 @@
                                     class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('settings.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Panel Kontrol
                                 </a>
+                                @endif
                             </div>
                         </div>
 
@@ -168,14 +172,18 @@
                                     <a href="{{ route('leaves.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('leaves.*') ? 'text-white' : 'text-slate-300' }}">Manajemen
                                         Cuti</a>
+                                    @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager']))
                                     <a href="{{ route('permissions.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'text-white' : 'text-slate-300' }}">Izin Kerja</a>
+                                    @endif
+                                    @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin']))
                                     <a href="{{ route('reports.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('reports.*') ? 'text-white' : 'text-slate-300' }}">Laporan
                                         & Telemetri</a>
                                     <a href="{{ route('settings.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('settings.*') ? 'text-white' : 'text-slate-300' }}">Panel
                                         Kontrol</a>
+                                    @endif
                                 </div>
                                 <div class="border-t border-white/5 pb-3.5 pt-3.5 px-4">
                                     <div class="text-sm font-bold text-white">{{ auth()->user()->name }}</div>
