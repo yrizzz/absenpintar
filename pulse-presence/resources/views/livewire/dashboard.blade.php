@@ -36,7 +36,7 @@
                     </span>
                     <h1 class="heading-1 text-2xl sm:text-3xl font-black text-white">Selamat datang kembali,
                         {{ auth()->user()->name }}</h1>
-                    <p class="mt-1.5 text-xs sm:text-sm text-slate-300">Ruang Karyawan:
+                    <p class="mt-1.5 label-sm">Ruang Karyawan:
                         <strong class="text-white">{{ auth()->user()->branch->name ?? 'HQ Workspace' }}</strong> • {{ now()->translatedFormat('l, d F Y') }}
                     </p>
                 </div>
@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['total_attendance'] }}</p>
-                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Log kehadiran tercatat</div>
+                <div class="mt-1.5 sm:mt-2 label-sm truncate">Log kehadiran tercatat</div>
             </div>
 
             <!-- On Time -->
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['on_time'] }}</p>
-                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Absensi tepat waktu</div>
+                <div class="mt-1.5 sm:mt-2 label-sm truncate">Absensi tepat waktu</div>
             </div>
 
             <!-- Late -->
@@ -134,7 +134,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['late'] }}</p>
-                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Keterlambatan kedatangan</div>
+                <div class="mt-1.5 sm:mt-2 label-sm truncate">Keterlambatan kedatangan</div>
             </div>
 
             <!-- Alerts -->
@@ -151,7 +151,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['suspicious_events'] }}</p>
-                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Anomali terdeteksi</div>
+                <div class="mt-1.5 sm:mt-2 label-sm truncate">Anomali terdeteksi</div>
             </div>
         </div>
 
@@ -159,7 +159,7 @@
             <div class="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
                 <div class="flex-1 min-w-0">
                     <h3 class="heading-2 text-lg sm:text-xl font-bold text-white">Kehadiran Hari Ini</h3>
-                    <p class="text-xs sm:text-sm text-slate-300 mt-1">Status kehadiran real-time dan parameter telemetri (Klik kartu untuk detail absensi)</p>
+                    <p class="label-sm mt-1">Status kehadiran real-time dan parameter telemetri (Klik kartu untuk detail absensi)</p>
                 </div>
                 <div class="flex-shrink-0 self-start sm:self-auto">
                     <span
@@ -180,7 +180,7 @@
                             </svg>
                         </div>
                         <h4 class="heading-3 text-base sm:text-lg font-bold text-white">Gerbang Absensi Terbuka</h4>
-                        <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">Anda belum mencatat kehadiran hari ini. Pastikan izin GPS aktif pada perangkat Anda sebelum memulai absensi.</p>
+                        <p class="mt-2 label-sm">Anda belum mencatat kehadiran hari ini. Pastikan izin GPS aktif pada perangkat Anda sebelum memulai absensi.</p>
                         <div class="mt-6">
                             <a href="{{ route('attendance.checkin') }}"
                                 class="btn-sm btn-primary">

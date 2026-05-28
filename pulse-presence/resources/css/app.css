@@ -101,7 +101,7 @@ button,
 }
 
 .heading-3 {
-  @apply text-sm sm:text-base font-bold text-white tracking-tight font-sans;
+  @apply text-sm sm:text-base md:text-lg font-bold text-white tracking-tight font-sans;
 }
 
 .heading-value {
@@ -220,11 +220,11 @@ button,
 }
 
 .label-sm {
-  @apply text-xs text-slate-200 font-semibold;
+  @apply text-xs sm:text-sm text-slate-300 font-medium leading-relaxed;
 }
 
 .label-xs {
-  @apply text-[11px] font-semibold text-slate-300;
+  @apply text-xs text-slate-400 font-semibold;
 }
 
 .label-value-white {
