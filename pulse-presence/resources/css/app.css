@@ -941,6 +941,22 @@ html.dark textarea:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
 }
 
+/* ==========================================
+   LOGO SHIELD & PROFILE AVATAR WHITE OVERRIDES
+   ========================================== */
+html.light .from-blue-600.to-indigo-600,
+html.light .from-blue-600.to-indigo-600 * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+html.light .from-blue-600.to-indigo-600 svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+
 
 
 
