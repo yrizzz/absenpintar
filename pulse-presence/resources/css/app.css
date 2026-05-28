@@ -341,64 +341,84 @@ html.light .glass-panel:hover {
 }
 
 /* Soft themed color gradient cards in Light Mode (replaces monochrome white cards) */
-html.light div[class*="border-blue-500"] {
+html.light .border-blue-500,
+html.light .border-blue-500\/20 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 246, 255, 0.65) 100%) !important;
   border-color: rgba(59, 130, 246, 0.25) !important;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.04) !important;
 }
 
-html.light div[class*="border-emerald-500"] {
+html.light .border-emerald-500,
+html.light .border-emerald-500\/20 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 250, 0.65) 100%) !important;
   border-color: rgba(16, 185, 129, 0.25) !important;
   box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.04) !important;
 }
 
-html.light div[class*="border-rose-500"] {
+html.light .border-rose-500,
+html.light .border-rose-500\/20 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 241, 242, 0.65) 100%) !important;
   border-color: rgba(244, 63, 94, 0.25) !important;
   box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.04) !important;
 }
 
-html.light div[class*="border-purple-500"] {
+html.light .border-purple-500,
+html.light .border-purple-500\/20 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 245, 255, 0.65) 100%) !important;
   border-color: rgba(168, 85, 247, 0.25) !important;
   box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.04) !important;
 }
 
-html.light div[class*="border-amber-500"] {
+html.light .border-amber-500,
+html.light .border-amber-500\/20 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 243, 199, 0.45) 100%) !important;
   border-color: rgba(245, 158, 11, 0.25) !important;
   box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.04) !important;
 }
 
 /* Metrics Cards Coloring in Light Mode */
-html.light div[class*="border-blue-500"] .text-transparent,
-html.light div[class*="border-blue-500"] div[class*="text-transparent"],
-html.light div[class*="border-blue-500"] p {
+html.light .border-blue-500 .text-transparent,
+html.light .border-blue-500\/20 .text-transparent,
+html.light .border-blue-500 div[class*="text-transparent"],
+html.light .border-blue-500\/20 div[class*="text-transparent"],
+html.light .border-blue-500 p,
+html.light .border-blue-500\/20 p {
   color: #1d4ed8 !important;
 }
 
-html.light div[class*="border-emerald-500"] .text-transparent,
-html.light div[class*="border-emerald-500"] div[class*="text-transparent"],
-html.light div[class*="border-emerald-500"] p {
+html.light .border-emerald-500 .text-transparent,
+html.light .border-emerald-500\/20 .text-transparent,
+html.light .border-emerald-500 div[class*="text-transparent"],
+html.light .border-emerald-500\/20 div[class*="text-transparent"],
+html.light .border-emerald-500 p,
+html.light .border-emerald-500\/20 p {
   color: #047857 !important;
 }
 
-html.light div[class*="border-rose-500"] .text-transparent,
-html.light div[class*="border-rose-500"] div[class*="text-transparent"],
-html.light div[class*="border-rose-500"] p {
+html.light .border-rose-500 .text-transparent,
+html.light .border-rose-500\/20 .text-transparent,
+html.light .border-rose-500 div[class*="text-transparent"],
+html.light .border-rose-500\/20 div[class*="text-transparent"],
+html.light .border-rose-500 p,
+html.light .border-rose-500\/20 p {
   color: #b91c1c !important;
 }
 
-html.light div[class*="border-purple-500"] .text-transparent,
-html.light div[class*="border-purple-500"] div[class*="text-transparent"],
-html.light div[class*="border-purple-500"] p {
+html.light .border-purple-500 .text-transparent,
+html.light .border-purple-500\/20 .text-transparent,
+html.light .border-purple-500 div[class*="text-transparent"],
+html.light .border-purple-500\/20 div[class*="text-transparent"],
+html.light .border-purple-500 p,
+html.light .border-purple-500\/20 p {
   color: #7e22ce !important;
 }
 
-html.light div[class*="border-amber-500"] .text-transparent,
-html.light div[class*="border-amber-500"] div[class*="text-transparent"],
-html.light div[class*="border-amber-500"] p {
+html.light .border-amber-500 .text-transparent,
+html.light .border-amber-500\/20 .text-transparent,
+html.light .border-amber-500 div[class*="text-transparent"],
+html.light .border-amber-500\/20 div[class*="text-transparent"],
+html.light .border-amber-500 p,
+html.light .border-amber-500\/20 p {
   color: #b45309 !important;
 }
 
@@ -647,8 +667,8 @@ html.light footer {
 /* ==========================================
    LOGIN & AUTH PAGE LIGHT MODE OVERRIDES
    ========================================== */
-html.light div[class*="bg-[#081229]"],
-html.light div[class*="from-[#0c1b40]"] {
+html.light .bg-\[\#081229\],
+html.light .from-\[\#0c1b40\] {
   background-color: #f8fafc !important;
   background-image: linear-gradient(135deg, #f1f5f9 0%, #f8fafc 50%, #e2e8f0 100%) !important;
   --tw-gradient-from: #f1f5f9 !important;
@@ -657,19 +677,19 @@ html.light div[class*="from-[#0c1b40]"] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
 }
 
-html.light div[class*="bg-[#081229]/65"] {
+html.light .bg-\[\#081229\]\/65 {
   background-color: rgba(255, 255, 255, 0.65) !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
 }
 
-html.light div[class*="bg-slate-900/65"] {
+html.light .bg-slate-900\/65 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%) !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08) !important;
 }
 
-html.light div[class*="bg-[#17223b]"],
-html.light span[class*="bg-[#17223b]"] {
+html.light .bg-\[\#17223b\],
+html.light .span.bg-\[\#17223b\] {
   background-color: #e2e8f0 !important;
   color: #334155 !important;
   border-color: rgba(15, 23, 42, 0.1) !important;
@@ -723,16 +743,16 @@ html.light .text-slate-400 {
   color: #64748b !important;
 }
 
-html.light div[class*="bg-blue-500/15"] {
+html.light .bg-blue-500\/15 {
   background-color: rgba(37, 99, 235, 0.08) !important;
   border-color: rgba(37, 99, 235, 0.2) !important;
 }
 
-html.light div[class*="bg-blue-500/15"] span {
+html.light .bg-blue-500\/15 span {
   color: #1d4ed8 !important;
 }
 
-html.light div[class*="bg-blue-500/20"] {
+html.light .bg-blue-500\/20 {
   background-color: rgba(37, 99, 235, 0.08) !important;
   border-color: rgba(37, 99, 235, 0.2) !important;
   color: #1d4ed8 !important;
@@ -768,16 +788,16 @@ html.dark .overflow-x-auto {
 }
 
 /* Fine grid lines in Light Mode (replaces white lines) */
-html.light div[class*="bg-[linear-gradient"] {
+html.light .bg-\[linear-gradient\(to_right\,rgba\(255\,255\,255\,0\.02\)_1px\,transparent_1px\)\,linear-gradient\(to_bottom\,rgba\(255\,255\,255\,0\.02\)_1px\,transparent_1px\)\] {
   background-image: linear-gradient(to right, rgba(15, 23, 42, 0.025) 1px, transparent 1px),
                     linear-gradient(to bottom, rgba(15, 23, 42, 0.025) 1px, transparent 1px) !important;
 }
 
 /* Soften heavy glows inside light mode to prevent dark blobs */
-html.light div[class*="bg-blue-500/25"],
-html.light div[class*="bg-indigo-500/25"],
-html.light div[class*="bg-blue-500/10"],
-html.light div[class*="bg-indigo-500/10"] {
+html.light .bg-blue-500\/25,
+html.light .bg-indigo-500\/25,
+html.light .bg-blue-500\/10,
+html.light .bg-indigo-500\/10 {
   opacity: 0.18 !important;
 }
 
