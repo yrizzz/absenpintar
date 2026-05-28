@@ -134,7 +134,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <span class="label-xs font-bold text-slate-400">Semua bersih! Tidak ada antrean persetujuan izin.</span>
+                                <span class="label-sm font-bold text-slate-300">Semua bersih! Tidak ada antrean persetujuan izin.</span>
                             </div>
                         @else
                             <div class="overflow-x-auto">
@@ -260,7 +260,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
                                     </svg>
                                 </div>
-                                <span class="label-xs font-bold text-slate-400">Belum ada data pengajuan izin kerja.</span>
+                                <span class="label-sm font-bold text-slate-300">Belum ada data pengajuan izin kerja.</span>
                         </div>
                     @else
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
