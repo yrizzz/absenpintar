@@ -1,16 +1,16 @@
-<div class="min-h-screen flex flex-col lg:flex-row bg-[#0b0f19] bg-gradient-to-tr from-[#0b0f19] via-[#111827] to-[#1e293b] font-sans text-slate-200 relative overflow-hidden">
-    <!-- Ambient background light glows (Brightened and enhanced) -->
-    <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-500/20 blur-[120px] pointer-events-none animate-pulse-subtle"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-500/20 blur-[120px] pointer-events-none animate-pulse-subtle" style="animation-delay: 3s;"></div>
+<div class="min-h-screen flex flex-col lg:flex-row bg-[#081229] bg-gradient-to-br from-[#0c1b40] via-[#081229] to-[#030612] font-sans text-slate-200 relative overflow-hidden">
+    <!-- Ambient background light glows (Brightened and enhanced blue-indigo glows) -->
+    <div class="absolute top-[-10%] left-[-10%] w-[650px] h-[650px] rounded-full bg-blue-500/25 blur-[120px] pointer-events-none animate-pulse-subtle"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[650px] h-[650px] rounded-full bg-indigo-500/25 blur-[120px] pointer-events-none animate-pulse-subtle" style="animation-delay: 3s;"></div>
 
     <!-- Fine Tech Grid Overlay -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none"></div>
 
     <!-- Left Column: Informative System Flow & Status -->
-    <div class="hidden lg:flex lg:w-[45%] bg-[#0e1629]/60 border-r border-white/5 p-10 flex-col justify-between relative overflow-y-auto backdrop-blur-md">
+    <div class="hidden lg:flex lg:w-[45%] bg-[#081229]/65 border-r border-white/10 p-10 flex-col justify-between relative overflow-y-auto backdrop-blur-md">
         <!-- Logo -->
         <div class="relative z-10 flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <svg class="w-5.5 h-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -18,65 +18,65 @@
             </div>
             <div>
                 <span class="text-xl font-black tracking-tight text-white font-display block leading-none">Absen<span class="text-blue-500">Pintar</span></span>
-                <span class="text-[9px] text-blue-400 font-extrabold tracking-widest uppercase mt-1 block">Enterprise Presence</span>
+                <span class="text-[10px] text-blue-400 font-extrabold tracking-widest uppercase mt-1 block">Enterprise Presence</span>
             </div>
         </div>
 
         <!-- Info Center / Tech Guide -->
         <div class="relative z-10 my-auto pr-6 space-y-8">
             <div class="space-y-3">
-                <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
+                <div class="inline-flex items-center space-x-2 bg-blue-500/15 border border-blue-500/30 px-3 py-1 rounded-full">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span class="text-[10px] font-bold text-blue-300 uppercase tracking-wider">Sistem Validasi Multi-Tahap</span>
+                    <span class="text-[11px] font-bold text-blue-300 uppercase tracking-wider">Sistem Validasi Multi-Tahap</span>
                 </div>
                 <h1 class="text-4xl lg:text-4.5xl font-black text-white leading-[1.15] font-display tracking-tight">
                     Verifikasi Kehadiran<br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-200 to-indigo-300">Aman & Terdesentralisasi</span>
                 </h1>
-                <p class="text-sm text-slate-400 leading-relaxed max-w-sm mt-2">
+                <p class="text-sm text-slate-350 leading-relaxed max-w-sm mt-2">
                     Akses aman ke dashboard administrasi dan manajemen absensi karyawan terintegrasi.
                 </p>
             </div>
 
-            <!-- Workflow Flowchart (Compact & Elegant) -->
+            <!-- Workflow Flowchart (Enlarged and brightened text for high readability) -->
             <div class="space-y-4 max-w-sm">
                 <!-- Step 1 -->
-                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm flex-shrink-0 border border-blue-500/20">
                         1
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Autentikasi Akun</h4>
-                        <p class="text-[11px] text-slate-400 mt-1">Memeriksa kredensial terdaftar & hak akses berdasarkan peran sistem.</p>
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Autentikasi Akun</h4>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">Memeriksa kredensial terdaftar & hak akses berdasarkan peran sistem.</p>
                     </div>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm flex-shrink-0 border border-blue-500/20">
                         2
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Pencocokan Geofence</h4>
-                        <p class="text-[11px] text-slate-400 mt-1">Memastikan koordinat GPS perangkat berada di dalam perimeter cabang aktif.</p>
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Pencocokan Geofence</h4>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">Memastikan koordinat GPS perangkat berada di dalam perimeter cabang aktif.</p>
                     </div>
                 </div>
 
                 <!-- Step 3 -->
-                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                    <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                <div class="flex items-start space-x-3.5 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm flex-shrink-0 border border-blue-500/20">
                         3
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Liveness & Biometrik</h4>
-                        <p class="text-[11px] text-slate-400 mt-1">Pencocokan foto selfie real-time dengan model anti-manipulasi media virtual.</p>
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Liveness & Biometrik</h4>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">Pencocokan foto selfie real-time dengan model anti-manipulasi media virtual.</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Live Indicators -->
-        <div class="relative z-10 flex items-center space-x-6 text-[10px] text-slate-500">
+        <div class="relative z-10 flex items-center space-x-6 text-xs text-slate-400">
             <div class="flex items-center space-x-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="font-medium">Server API Aktif</span>
@@ -94,7 +94,7 @@
             <!-- Mobile Header Logo -->
             <div class="lg:hidden text-center mb-8">
                 <div class="inline-flex items-center space-x-3 mb-1.5">
-                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
                         <svg class="w-5.5 h-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -105,11 +105,11 @@
                 <p class="text-xs font-bold text-blue-400 tracking-widest uppercase">Sistem Kehadiran Biometrik</p>
             </div>
 
-            <!-- Login Form Container (Brightened Translucent Slate Glass Card) -->
-            <div class="bg-slate-900/55 border border-white/10 rounded-2xl p-7 md:p-8 shadow-2xl backdrop-blur-2xl">
+            <!-- Login Form Container (Brightened Translucent Slate Glass Card with Blue tint) -->
+            <div class="bg-slate-900/65 border border-white/15 rounded-2xl p-7 md:p-8 shadow-2xl backdrop-blur-2xl">
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold text-white tracking-tight font-display">Sign In</h2>
-                    <p class="text-xs text-slate-400 mt-1.5">Akses panel verifikasi ruang kerja Anda.</p>
+                    <p class="text-xs text-slate-350 mt-1.5">Akses panel verifikasi ruang kerja Anda.</p>
                 </div>
 
                 <form wire:submit="login" class="space-y-5">
@@ -126,7 +126,7 @@
                                 </svg>
                             </span>
                             <input wire:model="email" id="email" type="email" required autofocus
-                                class="w-full pl-10 pr-4 py-2.5 bg-slate-950/50 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 @error('email') border-red-500/40 focus:border-red-500 @enderror"
+                                class="w-full pl-10 pr-4 py-2.5 bg-[#050b1a]/70 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 @error('email') border-red-500/40 focus:border-red-500 @enderror"
                                 placeholder="nama@perusahaan.com">
                         </div>
                         @error('email')
@@ -155,7 +155,7 @@
                                 </svg>
                             </span>
                             <input wire:model="password" id="password" :type="showPassword ? 'text' : 'password'" required
-                                class="w-full pl-10 pr-12 py-2.5 bg-slate-950/50 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 @error('password') border-red-500/40 focus:border-red-500 @enderror"
+                                class="w-full pl-10 pr-12 py-2.5 bg-[#050b1a]/70 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 @error('password') border-red-500/40 focus:border-red-500 @enderror"
                                 placeholder="••••••••">
                             <button type="button" @click="showPassword = !showPassword"
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-200 transition-colors focus:outline-none cursor-pointer">
@@ -209,7 +209,7 @@
                         <div class="w-full border-t border-white/5"></div>
                     </div>
                     <div class="relative flex justify-center text-[10px] uppercase font-black tracking-wider">
-                        <span class="px-2.5 bg-[#17223b] text-slate-400 rounded-full border border-white/5">Pilih Role Simulasi</span>
+                        <span class="px-2.5 bg-[#17223b] text-slate-350 rounded-full border border-white/5">Pilih Role Simulasi</span>
                     </div>
                 </div>
 
@@ -217,30 +217,30 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <button type="button" 
                         onclick="document.getElementById('email').value = 'admin@absenpintar.com'; document.getElementById('email').dispatchEvent(new Event('input'))"
-                        class="text-xs py-2.5 px-3 bg-slate-950/40 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
-                        <span class="font-bold text-slate-350 group-hover:text-blue-400">Super Admin</span>
-                        <span class="text-[11px] text-slate-500 font-mono mt-0.5 truncate">admin@absenpintar.com</span>
+                        class="text-xs py-2.5 px-3 bg-[#050b1a]/60 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
+                        <span class="font-bold text-slate-300 group-hover:text-blue-400">Super Admin</span>
+                        <span class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">admin@absenpintar.com</span>
                     </button>
 
                     <button type="button" 
                         onclick="document.getElementById('email').value = 'hr@absenpintar.com'; document.getElementById('email').dispatchEvent(new Event('input'))"
-                        class="text-xs py-2.5 px-3 bg-slate-950/40 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
-                        <span class="font-bold text-slate-350 group-hover:text-blue-400">HR Manager</span>
-                        <span class="text-[11px] text-slate-500 font-mono mt-0.5 truncate">hr@absenpintar.com</span>
+                        class="text-xs py-2.5 px-3 bg-[#050b1a]/60 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
+                        <span class="font-bold text-slate-300 group-hover:text-blue-400">HR Manager</span>
+                        <span class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">hr@absenpintar.com</span>
                     </button>
 
                     <button type="button" 
                         onclick="document.getElementById('email').value = 'manager@absenpintar.com'; document.getElementById('email').dispatchEvent(new Event('input'))"
-                        class="text-xs py-2.5 px-3 bg-slate-950/40 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
-                        <span class="font-bold text-slate-350 group-hover:text-blue-400">Branch Head</span>
-                        <span class="text-[11px] text-slate-500 font-mono mt-0.5 truncate">manager@absenpintar.com</span>
+                        class="text-xs py-2.5 px-3 bg-[#050b1a]/60 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
+                        <span class="font-bold text-slate-300 group-hover:text-blue-400">Branch Head</span>
+                        <span class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">manager@absenpintar.com</span>
                     </button>
 
                     <button type="button" 
                         onclick="document.getElementById('email').value = 'employee4@absenpintar.com'; document.getElementById('email').dispatchEvent(new Event('input'))"
-                        class="text-xs py-2.5 px-3 bg-slate-950/40 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
-                        <span class="font-bold text-slate-350 group-hover:text-blue-400">Employee</span>
-                        <span class="text-[11px] text-slate-500 font-mono mt-0.5 truncate">employee4@absenpintar.com</span>
+                        class="text-xs py-2.5 px-3 bg-[#050b1a]/60 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 rounded-xl text-left transition-all flex flex-col justify-between group">
+                        <span class="font-bold text-slate-300 group-hover:text-blue-400">Employee</span>
+                        <span class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">employee4@absenpintar.com</span>
                     </button>
                 </div>
 
