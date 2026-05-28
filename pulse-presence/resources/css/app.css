@@ -445,7 +445,7 @@ html.light .text-slate-100 {
   color: #0f172a !important;
 }
 
-/* Keep text and SVGs white on primary blue/success/danger buttons */
+/* Keep text and SVGs white on primary blue/success/danger buttons & solid blue background panels */
 html.light .btn-primary,
 html.light .btn-success,
 html.light .btn-danger,
@@ -455,9 +455,22 @@ html.light .btn-danger *,
 html.light button[type="submit"],
 html.light button[type="submit"] *,
 html.light button.bg-blue-600,
-html.light button.bg-blue-600 * {
+html.light button.bg-blue-600 *,
+html.light [class*="bg-blue-"]:not([class*="/"]):not([class*="-50"]):not([class*="-100"]),
+html.light [class*="bg-blue-"]:not([class*="/"]):not([class*="-50"]):not([class*="-100"]) * {
   color: #ffffff !important;
   fill: #ffffff !important;
+}
+
+html.light .btn-primary svg,
+html.light .btn-success svg,
+html.light .btn-danger svg,
+html.light button[type="submit"] svg,
+html.light button.bg-blue-600 svg,
+html.light [class*="bg-blue-"]:not([class*="/"]):not([class*="-50"]):not([class*="-100"]) svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important; /* Keep icon fills transparent if stroke-based */
 }
 
 html.light .text-slate-300 {
