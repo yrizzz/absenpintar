@@ -154,21 +154,6 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4.5 whitespace-nowrap text-xs">
-                                        <button @click="selectedLog = {{ json_encode([
-                                            'id' => $attendance->id,
-                                            'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
-                                            'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
-                                            'latitude' => $attendance->latitude,
-                                            'longitude' => $attendance->longitude,
-                                            'accuracy' => $attendance->accuracy,
-                                            'ip_address' => $attendance->ip_address,
-                                            'work_mode' => strtoupper($attendance->work_mode ?? 'office'),
-                                            'risk_score' => $attendance->risk_score ?? 0,
-                                            'risk_level' => $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
-                                            'risk_class' => $attendance->risk_level,
-                                            'status' => $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
-                                            'status_class' => $attendance->status,
-                                            'is_late' => $attendance->is_late,
                                         <div class="flex items-center gap-3">
                                             <button @click="selectedLog = {{ json_encode([
                                                 'id' => $attendance->id,
