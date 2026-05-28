@@ -562,3 +562,111 @@ html.light footer {
   border-color: rgba(15, 23, 42, 0.06) !important;
 }
 
+/* ==========================================
+   LOGIN & AUTH PAGE LIGHT MODE OVERRIDES
+   ========================================== */
+html.light div[class*="bg-[#081229]"],
+html.light div[class*="from-[#0c1b40]"] {
+  background-color: #f8fafc !important;
+  background-image: linear-gradient(135deg, #f1f5f9 0%, #f8fafc 50%, #e2e8f0 100%) !important;
+  --tw-gradient-from: #f1f5f9 !important;
+  --tw-gradient-via: #f8fafc !important;
+  --tw-gradient-to: #e2e8f0 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+html.light div[class*="bg-[#081229]/65"] {
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light div[class*="bg-slate-900/65"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light div[class*="bg-[#17223b]"] {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+  color: #475569 !important;
+}
+
+html.light button[onclick*="admin@absenpintar.com"],
+html.light button[onclick*="hr@absenpintar.com"],
+html.light button[onclick*="manager@absenpintar.com"],
+html.light button[onclick*="employee4@absenpintar.com"] {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light button[onclick*="admin@absenpintar.com"]:hover,
+html.light button[onclick*="hr@absenpintar.com"]:hover,
+html.light button[onclick*="manager@absenpintar.com"]:hover,
+html.light button[onclick*="employee4@absenpintar.com"]:hover {
+  background-color: rgba(37, 99, 235, 0.05) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+html.light button[onclick*="admin@absenpintar.com"] span,
+html.light button[onclick*="hr@absenpintar.com"] span,
+html.light button[onclick*="manager@absenpintar.com"] span,
+html.light button[onclick*="employee4@absenpintar.com"] span {
+  color: #1e293b !important;
+}
+
+html.light button[onclick*="admin@absenpintar.com"]:hover span,
+html.light button[onclick*="hr@absenpintar.com"]:hover span,
+html.light button[onclick*="manager@absenpintar.com"]:hover span,
+html.light button[onclick*="employee4@absenpintar.com"]:hover span {
+  color: #1d4ed8 !important;
+}
+
+html.light .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .bg-white\/5:hover {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .text-slate-350,
+html.light .text-slate-300 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light div[class*="bg-blue-500/15"] {
+  background-color: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+html.light div[class*="bg-blue-500/15"] span {
+  color: #1d4ed8 !important;
+}
+
+html.light div[class*="bg-blue-500/20"] {
+  background-color: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  color: #1d4ed8 !important;
+}
+
+/* Floating Toggle Specifics */
+html.light button[title="Ganti Tema"] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  color: #475569 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light button[title="Ganti Tema"]:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
+  color: #0f172a !important;
+  border-color: rgba(37, 99, 235, 0.25) !important;
+}
+
+

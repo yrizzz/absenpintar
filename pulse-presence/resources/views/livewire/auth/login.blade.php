@@ -1,4 +1,29 @@
 <div class="min-h-screen flex flex-col lg:flex-row bg-[#081229] bg-gradient-to-br from-[#0c1b40] via-[#081229] to-[#030612] font-sans text-slate-200 relative overflow-hidden">
+    <!-- Floating Theme Toggle Button -->
+    <div class="absolute top-5 right-5 z-50" x-data="{ 
+        isLight: localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches),
+        toggleTheme() {
+            this.isLight = !this.isLight;
+            if (this.isLight) {
+                document.documentElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    }">
+        <button @click="toggleTheme()" 
+            class="flex items-center justify-center w-10 h-10 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all focus:outline-none backdrop-blur-md shadow-lg"
+            title="Ganti Tema">
+            <svg x-show="isLight" class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20" style="display: none;">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+            <svg x-show="!isLight" class="w-5.5 h-5.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+            </svg>
+        </button>
+    </div>
     <!-- Ambient background light glows (Brightened and enhanced blue-indigo glows) -->
     <div class="absolute top-[-10%] left-[-10%] w-[650px] h-[650px] rounded-full bg-blue-500/25 blur-[120px] pointer-events-none animate-pulse-subtle"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[650px] h-[650px] rounded-full bg-indigo-500/25 blur-[120px] pointer-events-none animate-pulse-subtle" style="animation-delay: 3s;"></div>
