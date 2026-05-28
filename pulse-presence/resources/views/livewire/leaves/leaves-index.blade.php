@@ -92,35 +92,38 @@
             <!-- Overview Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <!-- Annual Balance -->
-                <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-blue-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(59,130,246,0.05)] hover:shadow-[0_0_25px_rgba(59,130,246,0.2)] hover:border-blue-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                    <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 opacity-80"></div>
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/5 rounded-full blur-xl"></div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="label-xs">Saldo Cuti Tahunan</span>
+                        <span class="label-xs font-black uppercase tracking-wider text-blue-400/90 group-hover:text-blue-300 transition-colors">Saldo Cuti Tahunan</span>
                         <span class="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold label-sm">{{ $annualBalance }}</span>
                     </div>
-                    <div class="heading-value-white">{{ $annualBalance }} <span class="label-sm font-medium">hari tersisa</span></div>
+                    <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-blue-200 drop-shadow-[0_0_8px_rgba(59,130,246,0.45)]">{{ $annualBalance }} <span class="label-sm font-medium text-slate-400">hari tersisa</span></div>
                     <p class="label-xs mt-2 font-medium">Berlaku s/d 31 Des 2026. Diperbarui otomatis setiap tahun.</p>
                 </div>
 
                 <!-- Sick Leaves -->
-                <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-emerald-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] hover:border-emerald-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                    <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-green-400 opacity-80"></div>
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl"></div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="label-xs">Cuti Sakit Terpakai</span>
+                        <span class="label-xs font-black uppercase tracking-wider text-emerald-400/90 group-hover:text-emerald-300 transition-colors">Cuti Sakit Terpakai</span>
                         <span class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold label-sm">{{ $sickDays }}</span>
                     </div>
-                    <div class="heading-value-white">{{ $sickDays }} <span class="label-sm font-medium">hari diambil</span></div>
+                    <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-200 drop-shadow-[0_0_8px_rgba(16,185,129,0.45)]">{{ $sickDays }} <span class="label-sm font-medium text-slate-400">hari diambil</span></div>
                     <p class="label-xs mt-2 font-medium">Tidak terbatas dengan melampirkan surat keterangan dokter.</p>
                 </div>
 
                 <!-- Special Leaves -->
-                <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-purple-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(168,85,247,0.05)] hover:shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:border-purple-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                    <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-400 opacity-80"></div>
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-500/5 rounded-full blur-xl"></div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="label-xs">Cuti Khusus Terpakai</span>
+                        <span class="label-xs font-black uppercase tracking-wider text-purple-400/90 group-hover:text-purple-300 transition-colors">Cuti Khusus Terpakai</span>
                         <span class="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold label-sm">{{ $specialDays }}</span>
                     </div>
-                    <div class="heading-value-white">{{ $specialDays }} <span class="label-sm font-medium">hari diambil</span></div>
+                    <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-purple-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.45)]">{{ $specialDays }} <span class="label-sm font-medium text-slate-400">hari diambil</span></div>
                     <p class="label-xs mt-2 font-medium">Mencakup pelatihan, berita duka, dan acara keluarga besar.</p>
                 </div>
             </div>

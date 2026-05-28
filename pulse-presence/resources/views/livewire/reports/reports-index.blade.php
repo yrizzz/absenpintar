@@ -10,10 +10,11 @@
         <!-- Telemetry Key Metrics Grid -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <!-- Avg Accuracy -->
-            <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden h-full">
-                <span class="label-xs block mb-2">Rata-rata Akurasi GPS</span>
-                <div class="heading-value-white">± {{ $avg_accuracy }} <span class="label-sm text-slate-400 font-medium">meter</span></div>
-                <div class="mt-2 label-xs text-emerald-400 font-bold flex items-center">
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-blue-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(59,130,246,0.05)] hover:shadow-[0_0_25px_rgba(59,130,246,0.2)] hover:border-blue-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 opacity-80"></div>
+                <span class="label-xs font-black uppercase tracking-wider text-blue-400/90 group-hover:text-blue-300 transition-colors">Rata-rata Akurasi GPS</span>
+                <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-blue-200 drop-shadow-[0_0_8px_rgba(59,130,246,0.455)] mt-2">± {{ $avg_accuracy }} <span class="label-sm text-slate-400 font-medium">meter</span></div>
+                <div class="mt-4 label-xs text-emerald-400 font-bold flex items-center">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
@@ -22,10 +23,11 @@
             </div>
 
             <!-- Total Present -->
-            <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden h-full">
-                <span class="label-xs block mb-2">Total Log Hadir (WFO)</span>
-                <div class="heading-value-white">{{ $total_presence_logs }} <span class="label-sm text-slate-400 font-medium">absen</span></div>
-                <div class="mt-2 label-xs text-emerald-400 font-bold flex items-center">
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-emerald-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] hover:border-emerald-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-green-400 opacity-80"></div>
+                <span class="label-xs font-black uppercase tracking-wider text-emerald-400/90 group-hover:text-emerald-300 transition-colors">Total Log Hadir (WFO)</span>
+                <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-200 drop-shadow-[0_0_8px_rgba(16,185,129,0.455)] mt-2">{{ $total_presence_logs }} <span class="label-sm text-slate-400 font-medium">absen</span></div>
+                <div class="mt-4 label-xs text-emerald-400 font-bold flex items-center">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                     </svg>
@@ -34,19 +36,21 @@
             </div>
 
             <!-- Risk Events -->
-            <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden h-full">
-                <span class="label-xs block mb-2">Deteksi Pelanggaran</span>
-                <div class="heading-value-white {{ $risk_events > 0 ? 'text-rose-400' : 'text-emerald-400' }}">{{ $risk_events }} <span class="label-sm text-slate-400 font-medium">kasus</span></div>
-                <div class="mt-2 label-xs font-bold text-slate-400">
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-rose-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(244,63,94,0.05)] hover:shadow-[0_0_25px_rgba(244,63,94,0.2)] hover:border-rose-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 via-pink-500 to-red-400 opacity-80"></div>
+                <span class="label-xs font-black uppercase tracking-wider text-rose-400/90 group-hover:text-rose-300 transition-colors">Deteksi Pelanggaran</span>
+                <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-rose-200 drop-shadow-[0_0_8px_rgba(244,63,94,0.455)] mt-2 {{ $risk_events > 0 ? 'text-rose-400' : 'text-emerald-400' }}">{{ $risk_events }} <span class="label-sm text-slate-400 font-medium text-slate-400">kasus</span></div>
+                <div class="mt-4 label-xs font-bold text-slate-400">
                     Tingkat Keamanan: {{ $risk_events > 0 ? 'Waspada' : 'Sangat Aman' }}
                 </div>
             </div>
 
             <!-- Overtime -->
-            <div class="bg-[#121d33]/55 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-sm relative overflow-hidden h-full">
-                <span class="label-xs block mb-2">Akumulasi Lembur</span>
-                <div class="heading-value-white">{{ $overtime_hours }} <span class="label-sm text-slate-400 font-medium">jam</span></div>
-                <div class="mt-2 label-xs font-bold text-blue-400">Terhitung Otomatis</div>
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-purple-500/20 rounded-2xl p-6 shadow-[0_0_15px_rgba(168,85,247,0.05)] hover:shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:border-purple-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-400 opacity-80"></div>
+                <span class="label-xs font-black uppercase tracking-wider text-purple-400/90 group-hover:text-purple-300 transition-colors">Akumulasi Lembur</span>
+                <div class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-purple-200 drop-shadow-[0_0_8px_rgba(168,85,247,0.455)] mt-2">{{ $overtime_hours }} <span class="label-sm text-slate-400 font-medium">jam</span></div>
+                <div class="mt-4 label-xs font-bold text-blue-400">Terhitung Otomatis</div>
             </div>
         </div>
 
