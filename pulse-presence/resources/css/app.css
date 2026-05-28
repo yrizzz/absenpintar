@@ -911,17 +911,21 @@ html.light span.badge-neutral span.text-blue-400 {
    ========================================== */
 html.light input,
 html.light select,
-html.light textarea {
-  border-width: 1px !important;
-  border-style: solid !important;
-  border-color: rgba(15, 23, 42, 0.15) !important;
+html.light textarea,
+html.light input[class],
+html.light select[class],
+html.light textarea[class] {
+  border: 1px solid rgba(15, 23, 42, 0.16) !important;
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
 html.light input:focus,
 html.light select:focus,
-html.light textarea:focus {
+html.light textarea:focus,
+html.light input[class]:focus,
+html.light select[class]:focus,
+html.light textarea[class]:focus {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
 }
