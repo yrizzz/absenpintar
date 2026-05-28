@@ -7,8 +7,63 @@
         this.toast.type = type;
         this.toast.show = true;
         setTimeout(() => { this.toast.show = false; }, 5000);
+    },
+    detailMap: null,
+    detailUserMarker: null,
+    initDetailMap() {
+        this.$nextTick(() => {
+            if (!this.selectedLog) return;
+            const lat = parseFloat(this.selectedLog.latitude);
+            const lng = parseFloat(this.selectedLog.longitude);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            // Wait until map element exists in DOM
+            setTimeout(() => {
+                const mapEl = document.getElementById('detail-map');
+                if (!mapEl) return;
+
+                if (this.detailMap) {
+                    try {
+                        this.detailMap.remove();
+                    } catch (e) { console.error(e); }
+                    this.detailMap = null;
+                    this.detailUserMarker = null;
+                }
+
+                this.detailMap = L.map('detail-map', {
+                    zoomControl: true,
+                    attributionControl: false
+                }).setView([lat, lng], 16);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(this.detailMap);
+
+                // Google Maps style blue pulsing location dot
+                const userIcon = L.divIcon({
+                    className: 'custom-user-dot',
+                    html: `<div class='relative flex items-center justify-center'>
+                             <div class='absolute w-8 h-8 rounded-full bg-blue-500/35 animate-ping'></div>
+                             <div class='relative w-3.5 h-3.5 bg-blue-600 rounded-full border-2 border-white shadow-[0_0_8px_rgba(37,99,235,0.7)]'></div>
+                           </div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                this.detailUserMarker = L.marker([lat, lng], { icon: userIcon }).addTo(this.detailMap);
+                this.detailUserMarker.bindPopup('<strong class=\'text-xs text-slate-800\'>Lokasi Absensi</strong>').openPopup();
+
+                // Recalculate size to render properly
+                setTimeout(() => {
+                    if (this.detailMap) this.detailMap.invalidateSize();
+                }, 250);
+            }, 100);
+        });
     }
 }"
+    <!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     @attendance-updated.window="
          const eventDetail = $event.detail[0] || {};
          const eventType = eventDetail.type === 'checkin' ? 'Masuk' : 'Keluar';
@@ -222,7 +277,7 @@
                                 'branch_name' => $attendance->branch->name ?? 'HQ Workspace',
                                 'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
                                 'employee_name' => $attendance->user->name ?? 'Karyawan',
-                            ]) }}; showModal = true;"
+                            ]) }}; showModal = true; initDetailMap();"
                                 class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-[#0d1527]/55 border border-white/10 rounded-2xl hover:border-white/20 hover:bg-[#121d33]/45 hover:scale-[1.008] cursor-pointer transition-all duration-200 group">
                                 <div class="flex items-start space-x-3.5 w-full sm:w-auto">
                                     @if ($attendance->type === 'checkin')
@@ -530,6 +585,13 @@
                     </div>
 
                 </div>
+
+                <!-- Interactive Leaflet map spanning full-width on bottom of the grid! -->
+                <div class="md:col-span-12 space-y-2 mt-2" wire:ignore>
+                    <span class="label-xs block text-slate-400">Peta Lokasi Presensi (Leaflet Live)</span>
+                    <div id="detail-map" class="h-48 w-full rounded-2xl border border-white/10 overflow-hidden z-0"></div>
+                </div>
+
             </div>
 
             </div>

@@ -36,10 +36,10 @@ class GeoValidationService
         float $longitude,
         Branch $branch
     ): array {
-        // Use calibrated geofence radius threshold from Control Panel settings
-        $radius = cache()->get('settings.radius');
-        if (is_null($radius) || $radius === '' || $radius <= 0) {
-            $radius = (float) ($branch->radius ?? 200);
+        // Prioritize branch-specific radius first, falling back to cached global settings.radius, then absolute default 200.
+        $radius = (float) ($branch->radius ?? cache()->get('settings.radius', 200));
+        if ($radius <= 0) {
+            $radius = 200.0;
         }
 
         $distance = $this->calculateDistance(

@@ -84,11 +84,10 @@ class CheckOut extends Component
             }
         }
 
-        // Set max radius from cache
-        $this->maxRadius = (float) cache()->get('settings.radius', 200);
-
-        // Fetch office branch location
+        // Fetch office branch location and prioritize custom radius
         $branch = Auth::user()->branch;
+        $this->maxRadius = (float) ($branch?->radius ?? cache()->get('settings.radius', 200));
+
         if ($branch) {
             $this->branchLatitude = (float) $branch->latitude;
             $this->branchLongitude = (float) $branch->longitude;
