@@ -292,19 +292,19 @@ html.light body {
   color: #1e293b !important;
 }
 
-html.light div[class*="bg-[#121d33]"],
-html.light div[class*="bg-[#0d1527]"],
-html.light div[class*="bg-[#121c32]"],
-html.light div[class*="bg-[#0c1527]"],
-html.light div[class*="bg-[#17243e]"],
-html.light div[class*="from-[#121d33]"],
-html.light div[class*="from-[#0d1527]"],
-html.light div[class*="from-[#121c32]"],
-html.light div[class*="from-[#0c1527]"],
-html.light div[class*="from-[#17243e]"],
-html.light div[class*="to-[#0b1222]"],
-html.light div[class*="to-[#0b1324]"],
-html.light div[class*="to-[#0d1527]"],
+html.light .bg-\[\#121d33\],
+html.light .bg-\[\#0d1527\],
+html.light .bg-\[\#121c32\],
+html.light .bg-\[\#0c1527\],
+html.light .bg-\[\#17243e\],
+html.light .from-\[\#121d33\],
+html.light .from-\[\#0d1527\],
+html.light .from-\[\#121c32\],
+html.light .from-\[\#0c1527\],
+html.light .from-\[\#17243e\],
+html.light .to-\[\#0b1222\],
+html.light .to-\[\#0b1324\],
+html.light .to-\[\#0d1527\],
 html.light .glass-panel {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 244, 246, 0.98) 100%) !important;
   backdrop-filter: blur(24px) !important;
@@ -318,11 +318,11 @@ html.light .glass-panel {
   background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 244, 246, 0.98) 100%) !important;
 }
 
-html.light div[class*="bg-[#121d33]"][class*="hover:"]:hover,
-html.light div[class*="bg-[#0d1527]"][class*="hover:"]:hover,
-html.light div[class*="from-[#121d33]"][class*="hover:"]:hover,
-html.light div[class*="from-[#0d1527]"][class*="hover:"]:hover,
-html.light .glass-panel[class*="hover:"]:hover {
+html.light .bg-\[\#121d33\]:hover,
+html.light .bg-\[\#0d1527\]:hover,
+html.light .from-\[\#121d33\]:hover,
+html.light .from-\[\#0d1527\]:hover,
+html.light .glass-panel:hover {
   border-color: rgba(37, 99, 235, 0.25) !important;
   box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.08) !important;
 }
