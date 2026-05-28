@@ -144,70 +144,74 @@
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
             <!-- Total Attendance -->
             <div
-                class="bg-[#121d33]/55 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 shadow-premium hover:shadow-premium-hover hover:border-white/20 hover:translate-y-[-2px] transition-all duration-300 group">
+                class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-blue-500/20 rounded-2xl p-4 sm:p-6 shadow-[0_0_15px_rgba(59,130,246,0.05)] hover:shadow-[0_0_25px_rgba(59,130,246,0.2)] hover:border-blue-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 opacity-80"></div>
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                     <span
-                        class="label-xs group-hover:text-blue-400 transition-colors">Bulan Ini</span>
-                    <div class="p-2 sm:p-3 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20 flex-shrink-0">
+                        class="label-xs font-black uppercase tracking-wider text-blue-400/90 group-hover:text-blue-300 transition-colors">Bulan Ini</span>
+                    <div class="p-2 sm:p-2.5 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20 flex-shrink-0 group-hover:bg-blue-500/20 transition-all">
                         <svg class="h-4.5 w-4.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                 </div>
-                <p class="heading-value">{{ $stats['total_attendance'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm truncate">Log kehadiran tercatat</div>
+                <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-blue-200 drop-shadow-[0_0_8px_rgba(59,130,246,0.45)]">{{ $stats['total_attendance'] }}</p>
+                <div class="mt-2 label-sm truncate font-medium text-slate-400">Log kehadiran tercatat</div>
             </div>
 
             <!-- On Time -->
             <div
-                class="bg-[#121d33]/55 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 shadow-premium hover:shadow-premium-hover hover:border-white/20 hover:translate-y-[-2px] transition-all duration-300 group">
+                class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-emerald-500/20 rounded-2xl p-4 sm:p-6 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] hover:border-emerald-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-500 to-green-400 opacity-80"></div>
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                     <span
-                        class="label-xs group-hover:text-emerald-400 transition-colors">Tepat Waktu</span>
-                    <div class="p-2 sm:p-3 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20 flex-shrink-0">
+                        class="label-xs font-black uppercase tracking-wider text-emerald-400/90 group-hover:text-emerald-300 transition-colors">Tepat Waktu</span>
+                    <div class="p-2 sm:p-2.5 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20 flex-shrink-0 group-hover:bg-emerald-500/20 transition-all">
                         <svg class="h-4.5 w-4.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
-                <p class="heading-value">{{ $stats['on_time'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm truncate">Absensi tepat waktu</div>
+                <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-200 drop-shadow-[0_0_8px_rgba(16,185,129,0.45)]">{{ $stats['on_time'] }}</p>
+                <div class="mt-2 label-sm truncate font-medium text-slate-400">Absensi tepat waktu</div>
             </div>
 
             <!-- Late -->
             <div
-                class="bg-[#121d33]/55 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 shadow-premium hover:shadow-premium-hover hover:border-white/20 hover:translate-y-[-2px] transition-all duration-300 group">
+                class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-rose-500/20 rounded-2xl p-4 sm:p-6 shadow-[0_0_15px_rgba(244,63,94,0.05)] hover:shadow-[0_0_25px_rgba(244,63,94,0.2)] hover:border-rose-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 via-red-500 to-pink-400 opacity-80"></div>
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                     <span
-                        class="label-xs group-hover:text-rose-400 transition-colors">Terlambat</span>
-                    <div class="p-2 sm:p-3 bg-rose-500/10 rounded-xl text-rose-400 border border-rose-500/20 flex-shrink-0">
+                        class="label-xs font-black uppercase tracking-wider text-rose-400/90 group-hover:text-rose-300 transition-colors">Terlambat</span>
+                    <div class="p-2 sm:p-2.5 bg-rose-500/10 rounded-xl text-rose-400 border border-rose-500/20 flex-shrink-0 group-hover:bg-rose-500/20 transition-all">
                         <svg class="h-4.5 w-4.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 </div>
-                <p class="heading-value">{{ $stats['late'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm truncate">Keterlambatan kedatangan</div>
+                <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-rose-200 drop-shadow-[0_0_8px_rgba(244,63,94,0.45)]">{{ $stats['late'] }}</p>
+                <div class="mt-2 label-sm truncate font-medium text-slate-400">Keterlambatan kedatangan</div>
             </div>
 
             <!-- Alerts -->
             <div
-                class="bg-[#121d33]/55 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 shadow-premium hover:shadow-premium-hover hover:border-white/20 hover:translate-y-[-2px] transition-all duration-300 group">
+                class="relative overflow-hidden bg-gradient-to-br from-[#121d33]/85 to-[#0b1222]/95 border border-amber-500/20 rounded-2xl p-4 sm:p-6 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] hover:border-amber-500/40 hover:translate-y-[-4px] transition-all duration-300 group">
+                <div class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-400 opacity-80"></div>
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                     <span
-                        class="label-xs group-hover:text-amber-400 transition-colors">Peringatan</span>
-                    <div class="p-2 sm:p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20 flex-shrink-0">
+                        class="label-xs font-black uppercase tracking-wider text-amber-400/90 group-hover:text-amber-300 transition-colors">Peringatan</span>
+                    <div class="p-2 sm:p-2.5 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20 flex-shrink-0 group-hover:bg-amber-500/20 transition-all">
                         <svg class="h-4.5 w-4.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
                 </div>
-                <p class="heading-value">{{ $stats['suspicious_events'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm truncate">Anomali terdeteksi</div>
+                <p class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-amber-200 drop-shadow-[0_0_8px_rgba(245,158,11,0.45)]">{{ $stats['suspicious_events'] }}</p>
+                <div class="mt-2 label-sm truncate font-medium text-slate-400">Anomali terdeteksi</div>
             </div>
         </div>
 
