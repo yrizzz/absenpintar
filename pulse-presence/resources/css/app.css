@@ -283,3 +283,282 @@ div[class*="bg-[#0d1527]"][class*="hover:"]:hover,
   border-color: rgba(59, 130, 246, 0.3) !important;
   box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.12) !important;
 }
+
+/* ==========================================
+   PREMIUM LIGHT MODE CORE STYLING
+   ========================================== */
+html.light body {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html.light div[class*="bg-[#121d33]"],
+html.light div[class*="bg-[#0d1527]"],
+html.light div[class*="bg-[#121c32]"],
+html.light div[class*="bg-[#0c1527]"],
+html.light div[class*="bg-[#17243e]"],
+html.light div[class*="from-[#121d33]"],
+html.light div[class*="from-[#0d1527]"],
+html.light div[class*="from-[#121c32]"],
+html.light div[class*="from-[#0c1527]"],
+html.light div[class*="from-[#17243e]"],
+html.light div[class*="to-[#0b1222]"],
+html.light div[class*="to-[#0b1324]"],
+html.light div[class*="to-[#0d1527]"],
+html.light .glass-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 244, 246, 0.98) 100%) !important;
+  backdrop-filter: blur(24px) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.05) !important;
+  --tw-gradient-from: rgba(255, 255, 255, 0.96) !important;
+  --tw-gradient-to: rgba(243, 244, 246, 0.98) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 244, 246, 0.98) 100%) !important;
+}
+
+html.light div[class*="bg-[#121d33]"][class*="hover:"]:hover,
+html.light div[class*="bg-[#0d1527]"][class*="hover:"]:hover,
+html.light div[class*="from-[#121d33]"][class*="hover:"]:hover,
+html.light div[class*="from-[#0d1527]"][class*="hover:"]:hover,
+html.light .glass-panel[class*="hover:"]:hover {
+  border-color: rgba(37, 99, 235, 0.25) !important;
+  box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.08) !important;
+}
+
+/* Metrics Cards Coloring in Light Mode */
+html.light div[class*="border-blue-500"] p.text-transparent,
+html.light div[class*="border-blue-500"] p {
+  color: #1d4ed8 !important;
+}
+
+html.light div[class*="border-emerald-500"] p.text-transparent,
+html.light div[class*="border-emerald-500"] p {
+  color: #047857 !important;
+}
+
+html.light div[class*="border-rose-500"] p.text-transparent,
+html.light div[class*="border-rose-500"] p {
+  color: #b91c1c !important;
+}
+
+html.light div[class*="border-amber-500"] p.text-transparent,
+html.light div[class*="border-amber-500"] p {
+  color: #b45309 !important;
+}
+
+html.light p.text-transparent,
+html.light span.text-transparent,
+html.light h1.text-transparent,
+html.light h2.text-transparent,
+html.light h3.text-transparent,
+html.light h4.text-transparent,
+html.light a.text-transparent {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  color: #0f172a !important;
+}
+
+html.light .text-blue-400,
+html.light .text-blue-400\/90 {
+  color: #1d4ed8 !important;
+}
+
+html.light .text-emerald-400,
+html.light .text-emerald-400\/90 {
+  color: #047857 !important;
+}
+
+html.light .text-rose-400,
+html.light .text-rose-400\/90 {
+  color: #b91c1c !important;
+}
+
+html.light .text-amber-400,
+html.light .text-amber-400\/90 {
+  color: #b45309 !important;
+}
+
+/* Text & Typography Overrides */
+html.light .heading-1,
+html.light .heading-2,
+html.light .heading-3,
+html.light .heading-value,
+html.light .label-lg,
+html.light .label-md {
+  color: #0f172a !important;
+}
+
+html.light .label-sm {
+  color: #334155 !important;
+}
+
+html.light .label-xs {
+  color: #64748b !important;
+}
+
+html.light .text-white,
+html.light .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+/* Nav & Profile Custom styles */
+html.light nav {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light nav .text-white {
+  color: #0f172a !important;
+}
+
+html.light nav .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light nav .text-slate-400:hover {
+  color: #0f172a !important;
+}
+
+html.light nav button {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light nav button:hover {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light nav button .text-white {
+  color: #0f172a !important;
+}
+
+html.light nav button .text-slate-400 {
+  color: #475569 !important;
+}
+
+/* Form Inputs, Select & Textarea Overrides */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Badges & Accents in Light Mode */
+html.light .badge-neutral {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #334155 !important;
+}
+
+html.light .badge-rect-neutral {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #334155 !important;
+}
+
+/* Table and Border Overrides */
+html.light table thead {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+
+html.light table th {
+  color: #475569 !important;
+}
+
+html.light table tbody tr {
+  border-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light table tbody tr:hover {
+  background-color: rgba(15, 23, 42, 0.02) !important;
+}
+
+html.light .divide-white\/5 > * + * {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light .border-white\/5 {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light .border-white\/10 {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .border-white\/20 {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+html.light .btn-secondary {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #1e293b !important;
+}
+
+html.light .btn-secondary:hover {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+html.light .text-slate-500 {
+  color: #475569 !important;
+}
+
+html.light .bg-black\/20 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Custom Scrollbars in Light Mode */
+html.light .overflow-x-auto,
+html.light .overflow-y-auto {
+  scrollbar-color: rgba(15, 23, 42, 0.15) transparent !important;
+}
+
+html.light .overflow-x-auto::-webkit-scrollbar-thumb,
+html.light .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.15) !important;
+}
+
+html.light .overflow-x-auto::-webkit-scrollbar-thumb:hover,
+html.light .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.3) !important;
+}
+
+html.light .bg-premium-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%) !important;
+}
+
+html.light footer {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+

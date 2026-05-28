@@ -15,6 +15,15 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
 
+    <!-- Theme Initializer Script to prevent flashing -->
+    <script>
+        if (localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -90,8 +99,34 @@
                         </div>
 
                         <!-- User Profile Dropdown -->
-                        <div class="hidden lg:ml-6 lg:flex lg:items-center">
-                            <div class="relative ml-3" x-data="{ open: false }">
+                        <div class="hidden lg:ml-6 lg:flex lg:items-center space-x-3">
+                            <!-- Theme Toggle Button (Desktop) -->
+                            <div x-data="{ 
+                                isLight: localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches),
+                                toggleTheme() {
+                                    this.isLight = !this.isLight;
+                                    if (this.isLight) {
+                                        document.documentElement.classList.add('light');
+                                        localStorage.setItem('theme', 'light');
+                                    } else {
+                                        document.documentElement.classList.remove('light');
+                                        localStorage.setItem('theme', 'dark');
+                                    }
+                                }
+                            }">
+                                <button @click="toggleTheme()" 
+                                    class="flex items-center justify-center w-9 h-9 rounded-2xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 text-slate-300 hover:text-white transition-all focus:outline-none"
+                                    title="Ganti Tema">
+                                    <svg x-show="isLight" class="w-4.5 h-4.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20" style="display: none;">
+                                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                                    </svg>
+                                    <svg x-show="!isLight" class="w-4.5 h-4.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open"
                                     class="flex items-center rounded-2xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 p-1.5 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all">
                                     <div class="flex items-center space-x-3.5 pr-2">
@@ -149,7 +184,33 @@
                         </div>
 
                         <!-- Mobile menu button -->
-                        <div class="flex items-center lg:hidden" x-data="{ mobileOpen: false }">
+                        <div class="flex items-center lg:hidden space-x-2" x-data="{ mobileOpen: false }">
+                            <!-- Theme Toggle Button (Mobile) -->
+                            <div x-data="{ 
+                                isLight: localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches),
+                                toggleTheme() {
+                                    this.isLight = !this.isLight;
+                                    if (this.isLight) {
+                                        document.documentElement.classList.add('light');
+                                        localStorage.setItem('theme', 'light');
+                                    } else {
+                                        document.documentElement.classList.remove('light');
+                                        localStorage.setItem('theme', 'dark');
+                                    }
+                                }
+                            }">
+                                <button @click="toggleTheme()" 
+                                    class="flex items-center justify-center w-9 h-9 rounded-xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 text-slate-300 hover:text-white transition-all focus:outline-none"
+                                    title="Ganti Tema">
+                                    <svg x-show="isLight" class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20" style="display: none;">
+                                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                                    </svg>
+                                    <svg x-show="!isLight" class="w-4.5 h-4.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
                             <button @click="mobileOpen = !mobileOpen"
                                 class="inline-flex items-center justify-center rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors duration-150">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
