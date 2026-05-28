@@ -34,10 +34,10 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping mr-1.5"></span>
                         <span>Workspace Aktif</span>
                     </span>
-                    <h1 class="heading-1">Selamat datang kembali,
+                    <h1 class="heading-1 text-2xl sm:text-3xl font-black text-white">Selamat datang kembali,
                         {{ auth()->user()->name }}</h1>
-                    <p class="mt-1 label-sm">Ruang Karyawan:
-                        {{ auth()->user()->branch->name ?? 'HQ Workspace' }} • {{ now()->translatedFormat('l, d F Y') }}
+                    <p class="mt-1.5 text-xs sm:text-sm text-slate-300">Ruang Karyawan:
+                        <strong class="text-white">{{ auth()->user()->branch->name ?? 'HQ Workspace' }}</strong> • {{ now()->translatedFormat('l, d F Y') }}
                     </p>
                 </div>
                 <div class="mt-4 sm:mt-0">
@@ -158,8 +158,8 @@
         <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
             <div class="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
                 <div class="flex-1 min-w-0">
-                    <h3 class="heading-2">Kehadiran Hari Ini</h3>
-                    <p class="label-sm mt-0.5">Status kehadiran real-time dan parameter telemetri (Klik kartu untuk detail absensi)</p>
+                    <h3 class="heading-2 text-lg sm:text-xl font-bold text-white">Kehadiran Hari Ini</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1">Status kehadiran real-time dan parameter telemetri (Klik kartu untuk detail absensi)</p>
                 </div>
                 <div class="flex-shrink-0 self-start sm:self-auto">
                     <span
