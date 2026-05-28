@@ -35,7 +35,8 @@ export default defineConfig({
     ],
     server: {
         host: '0.0.0.0',
-        origin: `http://${localIp}:5173`,
+        port: 5100,
+        origin: `http://${localIp}:5100`,
         cors: true,
         headers: {
             'Access-Control-Allow-Origin': '*',
