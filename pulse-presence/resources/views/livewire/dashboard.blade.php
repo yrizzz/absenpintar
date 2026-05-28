@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['total_attendance'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm text-slate-400 truncate">Log kehadiran tercatat</div>
+                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Log kehadiran tercatat</div>
             </div>
 
             <!-- On Time -->
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['on_time'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm text-slate-400 truncate">Absensi tepat waktu</div>
+                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Absensi tepat waktu</div>
             </div>
 
             <!-- Late -->
@@ -134,7 +134,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['late'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm text-slate-400 truncate">Keterlambatan kedatangan</div>
+                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Keterlambatan kedatangan</div>
             </div>
 
             <!-- Alerts -->
@@ -151,7 +151,7 @@
                     </div>
                 </div>
                 <p class="heading-value">{{ $stats['suspicious_events'] }}</p>
-                <div class="mt-1.5 sm:mt-2 label-sm text-slate-400 truncate">Anomali terdeteksi</div>
+                <div class="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-300 truncate">Anomali terdeteksi</div>
             </div>
         </div>
 
@@ -179,8 +179,8 @@
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h4 class="heading-3">Gerbang Absensi Terbuka</h4>
-                        <p class="mt-1.5 label-sm leading-relaxed">Anda belum mencatat kehadiran hari ini. Pastikan izin GPS aktif pada perangkat Anda sebelum memulai absensi.</p>
+                        <h4 class="heading-3 text-base sm:text-lg font-bold text-white">Gerbang Absensi Terbuka</h4>
+                        <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">Anda belum mencatat kehadiran hari ini. Pastikan izin GPS aktif pada perangkat Anda sebelum memulai absensi.</p>
                         <div class="mt-6">
                             <a href="{{ route('attendance.checkin') }}"
                                 class="btn-sm btn-primary">
