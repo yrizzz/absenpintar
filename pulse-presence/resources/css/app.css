@@ -293,16 +293,23 @@ html.light body {
 }
 
 html.light .bg-\[\#121d33\],
+html.light .bg-\[\#121d33\]\/65,
+html.light .bg-\[\#121d33\]\/80,
+html.light .bg-\[\#121d33\]\/90,
 html.light .bg-\[\#0d1527\],
+html.light .bg-\[\#0d1527\]\/80,
+html.light .bg-\[\#0d1527\]\/90,
 html.light .bg-\[\#121c32\],
 html.light .bg-\[\#0c1527\],
 html.light .bg-\[\#17243e\],
 html.light .from-\[\#121d33\],
+html.light .from-\[\#121d33\]\/85,
 html.light .from-\[\#0d1527\],
 html.light .from-\[\#121c32\],
 html.light .from-\[\#0c1527\],
 html.light .from-\[\#17243e\],
 html.light .to-\[\#0b1222\],
+html.light .to-\[\#0b1222\]\/95,
 html.light .to-\[\#0b1324\],
 html.light .to-\[\#0d1527\],
 html.light .glass-panel {
@@ -319,8 +326,14 @@ html.light .glass-panel {
 }
 
 html.light .bg-\[\#121d33\]:hover,
+html.light .bg-\[\#121d33\]\/65:hover,
+html.light .bg-\[\#121d33\]\/80:hover,
+html.light .bg-\[\#121d33\]\/90:hover,
 html.light .bg-\[\#0d1527\]:hover,
+html.light .bg-\[\#0d1527\]\/80:hover,
+html.light .bg-\[\#0d1527\]\/90:hover,
 html.light .from-\[\#121d33\]:hover,
+html.light .from-\[\#121d33\]\/85:hover,
 html.light .from-\[\#0d1527\]:hover,
 html.light .glass-panel:hover {
   border-color: rgba(37, 99, 235, 0.25) !important;
