@@ -396,12 +396,12 @@
                                         <thead>
                                             <tr
                                                 class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                                <th class="px-5 py-3.5">Nama & Kode Cabang</th>
-                                                <th class="px-5 py-3.5">Alamat Kantor</th>
-                                                <th class="px-5 py-3.5">Koordinat (Lat / Lng)</th>
-                                                <th class="px-5 py-3.5 text-center">Batas Radius</th>
-                                                <th class="px-5 py-3.5 text-center">Status</th>
-                                                <th class="px-5 py-3.5 text-right">Aksi</th>
+                                                <th class="px-5 py-3.5" style="width: 220px;">Nama & Kode Cabang</th>
+                                                <th class="px-5 py-3.5" style="width: 320px;">Alamat Kantor</th>
+                                                <th class="px-5 py-3.5" style="width: 220px;">Koordinat (Lat / Lng)</th>
+                                                <th class="px-5 py-3.5 text-center" style="width: 120px;">Batas Radius</th>
+                                                <th class="px-5 py-3.5 text-center" style="width: 110px;">Status</th>
+                                                <th class="px-5 py-3.5 text-right" style="width: 120px;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-white/5 font-medium text-slate-300">
@@ -601,11 +601,11 @@
                                     <thead>
                                         <tr
                                             class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                            <th class="px-5 py-3.5">Karyawan</th>
-                                            <th class="px-5 py-3.5">Cabang & Mode Kerja</th>
-                                            <th class="px-5 py-3.5 text-center">Status Registrasi Wajah</th>
-                                            <th class="px-5 py-3.5 text-center">Sudut Telemetri</th>
-                                            <th class="px-5 py-3.5 text-right">Aksi</th>
+                                            <th class="px-5 py-3.5" style="width: 280px;">Karyawan</th>
+                                            <th class="px-5 py-3.5" style="width: 220px;">Cabang & Mode Kerja</th>
+                                            <th class="px-5 py-3.5 text-center" style="width: 200px;">Status Registrasi Wajah</th>
+                                            <th class="px-5 py-3.5 text-center" style="width: 150px;">Sudut Telemetri</th>
+                                            <th class="px-5 py-3.5 text-right" style="width: 140px;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-white/5 font-medium text-slate-300">
@@ -621,8 +621,8 @@
                                                             </div>
                                                         @else
                                                             <div
-                                                                class="w-9 h-9 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center font-bold text-slate-400 flex-shrink-0">
-                                                                {{ substr($u->name, 0, 1) }}
+                                                                class="w-9 h-9 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center font-bold text-slate-400 flex-shrink-0 uppercase">
+                                                                {{ strtoupper(substr($u->name, 0, 1)) }}
                                                             </div>
                                                         @endif
                                                         <div>
@@ -798,9 +798,9 @@
                                     <thead>
                                         <tr
                                             class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                            <th class="px-5 py-4">Kunci Kapabilitas / Izin Sistem</th>
+                                            <th class="px-5 py-4" style="width: 40%;">Kunci Kapabilitas / Izin Sistem</th>
                                             @foreach ($roles as $r)
-                                                <th class="px-5 py-4 text-center font-bold">
+                                                <th class="px-5 py-4 text-center font-bold" style="width: 15%;">
                                                     <span
                                                         class="label-sm font-bold text-white block">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</span>
                                                     <span

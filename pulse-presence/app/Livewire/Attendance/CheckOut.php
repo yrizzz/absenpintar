@@ -118,22 +118,38 @@ class CheckOut extends Component
             $this->locationValid = $geofence['valid'];
             $this->locationMessage = $geofence['message'];
 
-            // Reverse Geocode coordinates to street address
+            // Reverse Geocode coordinates to street address via Google Maps
             if (empty($this->resolvedAddress)) {
                 try {
-                    $response = \Illuminate\Support\Facades\Http::withHeaders([
-                        'User-Agent' => 'AbsenPintar/1.0 (contact@yrizzz.com)'
-                    ])->timeout(5)->get("https://nominatim.openstreetmap.org/reverse", [
-                        'format' => 'jsonv2',
-                        'lat' => $lat,
-                        'lon' => $lng,
-                        'zoom' => 18,
-                        'addressdetails' => 1
+                    $response = \Illuminate\Support\Facades\Http::timeout(5)->get("https://maps.googleapis.com/maps/api/geocode/json", [
+                        'latlng' => $lat . ',' . $lng,
+                        'language' => 'id',
+                        'result_type' => 'street_address|route|sublocality|locality',
+                        'key' => config('services.google_maps.key', ''),
                     ]);
                     
                     if ($response->successful()) {
                         $resData = $response->json();
-                        $this->resolvedAddress = $resData['display_name'] ?? '';
+                        if (!empty($resData['results'][0]['formatted_address'])) {
+                            $this->resolvedAddress = $resData['results'][0]['formatted_address'];
+                        }
+                    }
+
+                    // Fallback to Nominatim if Google fails or no API key
+                    if (empty($this->resolvedAddress)) {
+                        $fallback = \Illuminate\Support\Facades\Http::withHeaders([
+                            'User-Agent' => 'AbsenPintar/1.0 (contact@yrizzz.com)'
+                        ])->timeout(5)->get("https://nominatim.openstreetmap.org/reverse", [
+                            'format' => 'jsonv2',
+                            'lat' => $lat,
+                            'lon' => $lng,
+                            'zoom' => 18,
+                            'addressdetails' => 1
+                        ]);
+                        
+                        if ($fallback->successful()) {
+                            $this->resolvedAddress = $fallback->json()['display_name'] ?? '';
+                        }
                     }
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::warning("Reverse geocoding failed: " . $e->getMessage());

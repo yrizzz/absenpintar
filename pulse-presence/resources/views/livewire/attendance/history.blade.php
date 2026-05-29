@@ -1,4 +1,74 @@
-<div class="py-8 min-h-screen text-slate-100 bg-transparent" x-data="{ selectedLog: null, showModal: false }">
+<!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<div class="py-8 min-h-screen text-slate-100 bg-transparent" x-data="{
+    selectedLog: null,
+    showModal: false,
+    init() {
+        this.$watch('showModal', value => {
+            if (value) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+    },
+    detailMap: null,
+    detailUserMarker: null,
+    initDetailMap() {
+        this.$nextTick(() => {
+            if (!this.selectedLog) return;
+            const lat = parseFloat(this.selectedLog.latitude);
+            const lng = parseFloat(this.selectedLog.longitude);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            // Wait for Alpine x-if to insert DOM, then init Leaflet
+            setTimeout(() => {
+                const mapEl = document.getElementById('detail-map');
+                if (!mapEl) { console.warn('[Map] detail-map element not found'); return; }
+
+                if (this.detailMap) {
+                    try {
+                        this.detailMap.remove();
+                    } catch (e) { console.error(e); }
+                    this.detailMap = null;
+                    this.detailUserMarker = null;
+                }
+
+                this.detailMap = L.map('detail-map', {
+                    zoomControl: true,
+                    attributionControl: false
+                }).setView([lat, lng], 16);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(this.detailMap);
+
+                // Google Maps style blue pulsing location dot
+                const userIcon = L.divIcon({
+                    className: 'custom-user-dot',
+                    html: `<div class='relative flex items-center justify-center'>
+                             <div class='absolute w-8 h-8 rounded-full bg-blue-500/35 animate-ping'></div>
+                             <div class='relative w-3.5 h-3.5 bg-blue-600 rounded-full border-2 border-white shadow-[0_0_8px_rgba(37,99,235,0.7)]'></div>
+                           </div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                this.detailUserMarker = L.marker([lat, lng], { icon: userIcon }).addTo(this.detailMap);
+                this.detailUserMarker.bindPopup('<strong class=\'text-xs text-slate-800\'>Lokasi Absensi</strong>').openPopup();
+
+                // Staggered size recalculations to handle the transition animation perfectly
+                [100, 300, 600, 1200, 2000].forEach(delay => {
+                    setTimeout(() => {
+                        if (this.detailMap) this.detailMap.invalidateSize();
+                    }, delay);
+                });
+            }, 250);
+        });
+    }
+}">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         <!-- Header Section -->
@@ -177,7 +247,7 @@
                                                 'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
                                                 'employee_name' => $attendance->user->name ?? 'Karyawan',
                                                 'resolved_address' => $attendance->metadata['resolved_address'] ?? null
-                                            ]) }}; showModal = true;"
+                                            ]) }}; showModal = true; initDetailMap();"
                                             class="label-sm font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">
                                                 Detail
                                             </button>
@@ -204,228 +274,8 @@
 
     </div>
 
-    <!-- Modal Backdrop Overlay -->
-    <div x-show="showModal"
-         class="fixed inset-0 z-[100] bg-[#090e1a]/45 backdrop-blur-md transition-all duration-300"
-         style="display: none;"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"></div>
-
-    <!-- Gorgeous Glassmorphic Popup Modal for Attendance Details -->
-    <div x-show="showModal" 
-         class="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
-         style="display: none;">
-        
-        <div class="relative w-full max-w-3xl max-h-[85vh] bg-[#121d33]/90 border border-white/15 rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 transform transition-all duration-300 flex flex-col"
-             @click.away="showModal = false"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="scale-95 translate-y-4 opacity-0"
-             x-transition:enter-end="scale-100 translate-y-0 opacity-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="scale-100 translate-y-0 opacity-100"
-             x-transition:leave-end="scale-95 translate-y-4 opacity-0">
-            
-            <!-- Absolute decoration background -->
-            <div class="absolute -right-24 -top-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-24 -bottom-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between pb-5 border-b border-white/10 mb-6">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-inner">
-                        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="heading-3 font-black" x-text="'Detail ' + (selectedLog ? selectedLog.type : '')"></h3>
-                        <p class="label-sm mt-0.5">Telemetri Kehadiran Resmi Terenkripsi</p>
-                    </div>
-                </div>
-                <button @click="showModal = false" class="text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all border border-white/5 cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Scrollable Content Body -->
-            <div class="flex-1 overflow-y-auto pr-1.5 space-y-6 min-h-0 scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20">
-
-                <!-- Modal Content Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-6" x-if="selectedLog">
-                
-                <!-- Left Column: Biometric Selfie Photo -->
-                <div class="md:col-span-5 flex flex-col items-center">
-                    <div class="relative w-full aspect-square max-w-[240px] bg-[#0d1527] border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center group shadow-xl">
-                        
-                        <template x-if="selectedLog && selectedLog.selfie_url">
-                            <img :src="selectedLog.selfie_url" class="w-full h-full object-cover transform scaleX(-1)">
-                        </template>
-
-                        <template x-if="selectedLog && !selectedLog.selfie_url">
-                            <div class="text-center text-slate-500 p-6 flex flex-col items-center">
-                                <div class="relative w-24 h-24 mb-4 flex items-center justify-center">
-                                    <div class="absolute inset-0 border border-blue-400/40 rounded-full animate-pulse"></div>
-                                    <div class="absolute inset-2 border border-dashed border-blue-400/30 rounded-full animate-spin" style="animation-duration: 10s"></div>
-                                    <svg class="w-12 h-12 text-blue-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <span class="text-[10px] font-black text-blue-400">Baseline Face Match</span>
-                                <span class="text-[8px] font-medium text-slate-500 mt-1 block">Foto Fisik Terenkripsi Aman</span>
-                            </div>
-                        </template>
-
-
-
-                        <!-- Mini indicator tags overlay -->
-                        <div class="absolute bottom-3 left-3 right-3 flex justify-between z-10 pointer-events-none">
-                            <span class="px-2 py-0.5 bg-black/60 backdrop-blur-md rounded text-[8px] font-bold text-emerald-400 border border-white/5">GPS terkunci</span>
-                            <span class="px-2 py-0.5 bg-black/60 backdrop-blur-md rounded text-[8px] font-bold text-blue-400 border border-white/5">MFA aman</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 text-center">
-                        <span class="badge-neutral">
-                            Modus Kerja: <span class="text-blue-400 font-extrabold ml-1" x-text="selectedLog ? selectedLog.work_mode : ''"></span>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Right Column: Interactive Parameter Table -->
-                <div class="md:col-span-7 space-y-4.5">
-                    
-                    <!-- Top stats section -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="p-3 sm:p-4 bg-[#0d1527]/90 border border-white/5 rounded-2xl">
-                            <span class="label-xs block">Status Waktu</span>
-                            <div class="mt-1 flex items-center">
-                                <template x-if="selectedLog && selectedLog.is_late">
-                                    <span class="badge-rect-danger">Terlambat</span>
-                                </template>
-                                <template x-if="selectedLog && !selectedLog.is_late">
-                                    <span class="badge-rect-success">Tepat Waktu</span>
-                                </template>
-                            </div>
-                        </div>
-
-                        <div class="p-3 sm:p-4 bg-[#0d1527]/90 border border-white/5 rounded-2xl">
-                            <span class="label-xs block">Validitas Sistem</span>
-                            <div class="mt-1">
-                                <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[9px] sm:text-[10px] font-bold border" 
-                                      :class="selectedLog && selectedLog.status_class === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : (selectedLog && selectedLog.status_class === 'flagged' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400')" 
-                                      x-text="selectedLog ? selectedLog.status : ''"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Telemetry Data table -->
-                    <div class="bg-[#0d1527]/90 border border-white/5 rounded-2xl divide-y divide-white/5 text-xs">
-                        
-                        <!-- Employee Name -->
-                        <div class="flex justify-between items-start gap-3 p-3" x-show="selectedLog && selectedLog.employee_name">
-                            <span class="label-xs shrink-0">Nama Karyawan</span>
-                            <span class="label-value-white text-right" x-text="selectedLog ? selectedLog.employee_name : ''"></span>
-                        </div>
-
-                        <!-- Precise Time -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">Waktu Absen</span>
-                            <span class="label-value-white text-right" x-text="selectedLog ? selectedLog.timestamp : ''"></span>
-                        </div>
-
-                        <!-- Branch Name -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">Lokasi Cabang</span>
-                            <span class="label-value-blue text-right" x-text="selectedLog ? selectedLog.branch_name : ''"></span>
-                        </div>
-
-                        <!-- Resolved Address -->
-                        <div class="flex justify-between items-start gap-3 p-3" x-show="selectedLog && selectedLog.resolved_address">
-                            <span class="label-xs shrink-0">Alamat Terdeteksi</span>
-                            <span class="font-semibold text-slate-300 text-[10px] sm:text-xs text-right leading-relaxed" x-text="selectedLog ? selectedLog.resolved_address : ''"></span>
-                        </div>
-
-                        <!-- Coordinates -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">Koordinat GPS</span>
-                            <span class="font-mono font-semibold text-white text-[10px] sm:text-xs text-right break-all" x-text="selectedLog ? selectedLog.latitude + ', ' + selectedLog.longitude : ''"></span>
-                        </div>
-
-                        <!-- Accuracy -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">Presisi GPS</span>
-                            <div class="text-right">
-                                <span class="font-bold text-emerald-400 text-xs" x-text="selectedLog ? '± ' + selectedLog.accuracy + ' m' : ''"></span>
-                                <div class="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden border border-white/5 mt-1 ml-auto">
-                                    <div class="bg-gradient-to-r from-emerald-500 to-green-500 h-full rounded-full" :style="selectedLog ? `width: ${Math.max(10, Math.min(100, 100 - (selectedLog.accuracy * 1.5)))}%` : 'width: 0%'"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Network parameters -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">IP & Perangkat</span>
-                            <div class="text-right space-y-0.5">
-                                <span class="font-semibold text-white block text-xs" x-text="selectedLog ? selectedLog.ip_address : ''"></span>
-                                <span class="font-mono text-[9px] text-slate-500 block" x-text="selectedLog ? '#' + selectedLog.device_hash : ''"></span>
-                            </div>
-                        </div>
-
-                        <!-- Risk Score -->
-                        <div class="flex justify-between items-start gap-3 p-3">
-                            <span class="label-xs shrink-0">Skor Risiko</span>
-                            <span class="font-bold text-xs text-right" :class="selectedLog && selectedLog.risk_class === 'high' ? 'text-rose-400' : (selectedLog && selectedLog.risk_class === 'medium' ? 'text-amber-400' : 'text-emerald-400')" x-text="selectedLog ? selectedLog.risk_score + '% (' + selectedLog.risk_level + ')' : ''"></span>
-                        </div>
-                    </div>
-
-                    <!-- Notes Section -->
-                    <div class="p-3 sm:p-4 bg-white/5 border border-white/10 rounded-2xl">
-                        <span class="label-xs block mb-1">Catatan Kehadiran</span>
-                        <p class="text-xs text-slate-300 leading-relaxed font-medium italic" x-text="selectedLog ? selectedLog.notes : ''"></p>
-                    </div>
-
-                </div>
-            </div>
-
-            </div>
-
-            <!-- Action buttons -->
-            <div class="mt-6 pt-5 border-t border-white/10 flex justify-between items-center">
-                <div>
-                    @if ($isAdmin)
-                        <template x-if="selectedLog && selectedLog.status_class !== 'approved' && selectedLog.status_class !== 'rejected'">
-                            <div class="flex space-x-2.5">
-                                <button type="button" @click="$wire.approveAttendance(selectedLog.id).then(() => { showModal = false; })"
-                                    class="px-4 py-2 text-xs font-black rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 transition-all border border-emerald-400/20 flex items-center space-x-1.5 cursor-pointer shadow-lg shadow-emerald-950/20">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>Setujui</span>
-                                </button>
-                                <button type="button" @click="$wire.rejectAttendance(selectedLog.id).then(() => { showModal = false; })"
-                                    class="px-4 py-2 text-xs font-black rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all border border-rose-500/25 flex items-center space-x-1.5 cursor-pointer">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <span>Tolak</span>
-                                </button>
-                            </div>
-                        </template>
-                    @endif
-                </div>
-                <button @click="showModal = false" class="btn-sm btn-primary">
-                    Tutup Detail
-                </button>
-            </div>
-
-        </div>
-    </div>
+    <!-- Reusable Glassmorphic Popup Modal for Attendance Details -->
+    <x-attendance.detail-modal :is-admin="$isAdmin" />
 
 </div>
 

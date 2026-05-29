@@ -246,15 +246,15 @@
                                 <th class="pb-3" style="width: 40px;">
                                     <input type="checkbox" wire:model.live="selectAll" class="rounded border-white/10 bg-[#0d1527] text-blue-500 focus:ring-blue-500 cursor-pointer">
                                 </th>
-                                <th class="pb-3" style="width: 60px;">Foto selfie</th>
-                                <th class="pb-3">Karyawan</th>
-                                <th class="pb-3">Waktu kehadiran</th>
-                                <th class="pb-3">Aksi</th>
-                                <th class="pb-3">Lokasi / cabang</th>
-                                <th class="pb-3">Presisi GPS</th>
-                                <th class="pb-3">IP address</th>
-                                <th class="pb-3">Kerawanan</th>
-                                <th class="pb-3 text-right">Status</th>
+                                <th class="pb-3" style="width: 80px;">Foto selfie</th>
+                                <th class="pb-3" style="width: 180px;">Karyawan</th>
+                                <th class="pb-3" style="width: 160px;">Waktu kehadiran</th>
+                                <th class="pb-3" style="width: 90px;">Aksi</th>
+                                <th class="pb-3" style="width: 150px;">Lokasi / cabang</th>
+                                <th class="pb-3" style="width: 100px;">Presisi GPS</th>
+                                <th class="pb-3" style="width: 120px;">IP address</th>
+                                <th class="pb-3" style="width: 100px;">Kerawanan</th>
+                                <th class="pb-3 text-right" style="width: 110px;">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5 text-xs text-slate-300">

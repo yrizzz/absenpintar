@@ -15,6 +15,7 @@ class PermissionsIndex extends Component
     use WithFileUploads;
 
     public $step = 'index'; // 'index' or 'create'
+    public $activeTab = 'my'; // 'my' or 'review'
     
     // Form fields
     public $type = 'ijin_datang_terlambat';

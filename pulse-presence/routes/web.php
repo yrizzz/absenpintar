@@ -30,8 +30,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', \App\Livewire\Leaves\LeavesIndex::class)->name('index');
     });
     
-    // Permissions routes (manager, hr_admin, super_admin only)
-    Route::middleware(['role:super_admin|hr_admin|manager'])->prefix('permissions')->name('permissions.')->group(function () {
+    // Permissions routes (employee, manager, hr_admin, super_admin)
+    Route::middleware(['role:super_admin|hr_admin|manager|employee'])->prefix('permissions')->name('permissions.')->group(function () {
         Route::get('/', \App\Livewire\Permissions\PermissionsIndex::class)->name('index');
     });
     

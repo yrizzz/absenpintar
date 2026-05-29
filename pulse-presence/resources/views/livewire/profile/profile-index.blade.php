@@ -34,8 +34,8 @@
                     <!-- Avatar with glowing border -->
                     <div class="relative w-28 h-28 mx-auto mb-6">
                         <div class="absolute inset-0 bg-gradient-to-tr from-blue-600 via-blue-400 to-emerald-400 rounded-2xl blur-[8px] opacity-75"></div>
-                        <div class="relative w-full h-full bg-[#0d1527] border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center text-3xl font-black text-white font-display">
-                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                        <div class="relative w-full h-full bg-[#0d1527] border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center text-5xl font-black text-white font-display uppercase">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
                     </div>
 

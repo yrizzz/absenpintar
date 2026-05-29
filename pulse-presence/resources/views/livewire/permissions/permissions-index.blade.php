@@ -62,7 +62,15 @@
                                 <option value="ijin_tidak_masuk">Izin Tidak Masuk</option>
                                 <option value="ijin_setengah_hari">Izin Setengah Hari</option>
                             </select>
-                            <span class="label-xs text-slate-500 mt-1 block">Pilih kategori dispensasi izin kerja.</span>
+                            <span class="label-xs text-slate-500 mt-1.5 block">Pilih kategori dispensasi izin kerja yang diajukan.</span>
+                            
+                            @if($type === 'ijin_datang_terlambat')
+                                <span class="label-xs text-amber-400 font-bold mt-1.5 block">⚠️ Batas toleransi datang terlambat maksimal {{ cache()->get('settings.permission_max_late_hours', 2.0) }} jam.</span>
+                            @elseif($type === 'ijin_pulang_awal')
+                                <span class="label-xs text-amber-400 font-bold mt-1.5 block">⚠️ Batas toleransi pulang awal maksimal {{ cache()->get('settings.permission_max_early_hours', 2.0) }} jam.</span>
+                            @elseif($type === 'ijin_setengah_hari')
+                                <span class="label-xs text-amber-400 font-bold mt-1.5 block">⚠️ Batas toleransi setengah hari maksimal {{ cache()->get('settings.permission_max_half_day_hours', 4.0) }} jam.</span>
+                            @endif
                         </div>
 
                         <div>
@@ -87,7 +95,7 @@
 
                     <div>
                         <label class="block label-xs mb-2">Alasan Izin</label>
-                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan izin Anda di sini..." class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all resize-none"></textarea>
+                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan izin Anda di sini secara jelas..." class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all resize-none"></textarea>
                     </div>
 
                     <div>
@@ -112,18 +120,123 @@
         <!-- DAFTAR & TINJAUAN UTAMA -->
         <!-- ========================================== -->
         @else
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Stats KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl relative overflow-hidden flex items-center space-x-4">
+                    <div class="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-black text-slate-400 tracking-wider">Total Pengajuan Izin</div>
+                        <div class="text-2xl font-bold text-white mt-0.5">{{ auth()->user()->permissionRequests()->count() }} <span class="text-xs text-slate-500 font-normal">Sesi</span></div>
+                    </div>
+                </div>
+
+                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl relative overflow-hidden flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-black text-slate-400 tracking-wider">Disetujui Resmi</div>
+                        <div class="text-2xl font-bold text-emerald-400 mt-0.5">{{ auth()->user()->permissionRequests()->where('status', 'approved')->count() }} <span class="text-xs text-slate-500 font-normal">Sesi</span></div>
+                    </div>
+                </div>
+
+                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl relative overflow-hidden flex items-center space-x-4">
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-black text-slate-400 tracking-wider">Menunggu Persetujuan</div>
+                        <div class="text-2xl font-bold text-amber-400 mt-0.5">{{ auth()->user()->permissionRequests()->where('status', 'pending')->count() }} <span class="text-xs text-slate-500 font-normal">Sesi</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alur Persetujuan Section -->
+            <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-7 shadow-xl relative overflow-hidden mb-8">
+                <div class="flex items-center space-x-2.5 mb-5">
+                    <div class="h-6 w-1 bg-blue-500 rounded-full"></div>
+                    <h4 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">Alur Persetujuan Ganda (Double-Level Verification)</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div class="p-4 bg-[#0d1527]/40 border border-white/5 rounded-2xl relative">
+                        <span class="absolute right-4 top-4 text-[10px] font-bold text-slate-600">01</span>
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">A</div>
+                        <h5 class="text-xs font-bold text-white mt-3">Karyawan Mengajukan</h5>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Mengisi tipe izin (telat, pulang awal, setengah hari, tidak masuk) disertai alasan & berkas.</p>
+                    </div>
+
+                    <div class="p-4 bg-[#0d1527]/40 border border-white/5 rounded-2xl relative">
+                        <span class="absolute right-4 top-4 text-[10px] font-bold text-slate-600">02</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">B</div>
+                        <h5 class="text-xs font-bold text-white mt-3">Kepala Divisi (Kadiv)</h5>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Melakukan review kesesuaian operasional & beban kerja di divisi terkait.</p>
+                    </div>
+
+                    <div class="p-4 bg-[#0d1527]/40 border border-white/5 rounded-2xl relative">
+                        <span class="absolute right-4 top-4 text-[10px] font-bold text-slate-600">03</span>
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">C</div>
+                        <h5 class="text-xs font-bold text-white mt-3">HR Manager (HRD)</h5>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Persetujuan akhir & sinkronisasi data dispensasi kehadiran sistem.</p>
+                    </div>
+
+                    <div class="p-4 bg-[#0d1527]/40 border border-white/5 rounded-2xl relative">
+                        <span class="absolute right-4 top-4 text-[10px] font-bold text-slate-600">04</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">D</div>
+                        <h5 class="text-xs font-bold text-white mt-3">Cetak Surat Resmi</h5>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">Sistem menerbitkan surat izin resmi bertanda tangan digital ber-barkod pengaman.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Selector for Admins/Managers -->
+            @if($isAdmin)
+                <div class="permission-tab-container mb-6 flex space-x-1.5 p-1 bg-[#0d1527]/85 border border-white/5 rounded-2xl max-w-md">
+                    <button wire:click="$set('activeTab', 'my')" type="button" 
+                        class="permission-tab-btn flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-2 {{ $activeTab === 'my' ? 'tab-active' : 'text-slate-350 hover:text-slate-900 dark:hover:text-white hover:bg-white/5' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Riwayat Izin Saya</span>
+                    </button>
+                    <button wire:click="$set('activeTab', 'review')" type="button" 
+                        class="permission-tab-btn flex-1 py-3 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-2 relative {{ $activeTab === 'review' ? 'tab-active' : 'text-slate-350 hover:text-slate-900 dark:hover:text-white hover:bg-white/5' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span>Tinjau Izin Karyawan</span>
+                        @if($pendingRequests->count() > 0)
+                            <span class="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-rose-600 text-[9px] font-black text-white ring-2 ring-[#0d1527]">
+                                {{ $pendingRequests->count() }}
+                            </span>
+                        @endif
+                    </button>
+                </div>
+            @endif
+
+            <!-- Main Panel Content -->
+            <div class="grid grid-cols-1 gap-8">
                 
-                <!-- Left: Tinjau Pengajuan Karyawan (Dept Head & HR ACC) -->
-                @if($isAdmin)
-                    <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden lg:col-span-3">
+                <!-- Tab: Tinjau Pengajuan Karyawan (Only active when selected and user is Admin) -->
+                @if($isAdmin && $activeTab === 'review')
+                    <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                            <div>
-                                <h3 class="heading-3">Tinjau Pengajuan Izin Karyawan</h3>
-                                <p class="label-sm mt-0.5">Lakukan verifikasi, ACC Kepala Divisi, dan ACC HR Manager untuk permohonan aktif.</p>
+                            <div class="flex items-center space-x-3">
+                                <div class="h-6 w-1 bg-indigo-500 rounded-full"></div>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-bold text-white">Tinjau Pengajuan Izin Karyawan</h3>
+                                    <p class="text-xs text-slate-400 mt-0.5">Daftar permohonan aktif yang memerlukan verifikasi Kepala Divisi dan HR Manager.</p>
+                                </div>
                             </div>
-                            <span class="badge-info self-start sm:self-auto">
-                                Total Menunggu: {{ $pendingRequests->count() }}
+                            <span class="badge-info self-start sm:self-auto font-black text-xs px-3.5 py-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl">
+                                Total Antrean: {{ $pendingRequests->count() }}
                             </span>
                         </div>
 
@@ -134,91 +247,109 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <span class="label-sm font-bold text-slate-300">Semua bersih! Tidak ada antrean persetujuan izin.</span>
+                                <span class="text-xs font-bold text-slate-400">Antrean bersih! Belum ada pengajuan baru yang butuh verifikasi.</span>
                             </div>
                         @else
                             <div class="overflow-x-auto">
                                 <table class="w-full min-w-max text-left border-collapse">
                                     <thead>
-                                        <tr class="border-b border-white/5 label-xs font-bold text-slate-400">
-                                            <th class="pb-3 w-[200px]" style="width: 200px;">Karyawan</th>
-                                            <th class="pb-3 w-[120px]" style="width: 120px;">Tipe izin</th>
-                                            <th class="pb-3 w-[150px]" style="width: 150px;">Tanggal & waktu</th>
-                                            <th class="pb-3 w-[250px]" style="width: 250px;">Alasan</th>
-                                            <th class="pb-3 w-[110px] text-center" style="width: 110px;">Acc divisi</th>
-                                            <th class="pb-3 w-[110px] text-center" style="width: 110px;">Acc HR</th>
-                                            <th class="pb-3 w-[120px] text-right" style="width: 120px;">Aksi</th>
+                                        <tr class="border-b border-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                            <th class="pb-3" style="width: 220px;">Karyawan</th>
+                                            <th class="pb-3" style="width: 130px;">Tipe Izin</th>
+                                            <th class="pb-3" style="width: 170px;">Waktu Izin</th>
+                                            <th class="pb-3" style="width: 250px;">Alasan / Lampiran</th>
+                                            <th class="pb-3 text-center" style="width: 140px;">Persetujuan Ganda</th>
+                                            <th class="pb-3 text-right" style="width: 150px;">Aksi Cepat</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-white/5 text-slate-200">
                                         @foreach($pendingRequests as $req)
                                             <tr class="align-middle">
                                                 <td class="py-4">
-                                                    <div class="flex items-center space-x-3">
-                                                        <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
-                                                            {{ substr($req->user->name, 0, 1) }}
+                                                    <div class="flex items-center space-x-3.5">
+                                                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                                                            {{ strtoupper(substr($req->user->name, 0, 1)) }}
                                                         </div>
                                                         <div>
-                                                            <div class="label-sm font-bold text-white">{{ $req->user->name }}</div>
-                                                            <div class="label-xs font-bold text-blue-400">{{ $req->user->employee_id }}</div>
+                                                            <div class="text-xs font-bold text-white">{{ $req->user->name }}</div>
+                                                            <div class="text-[10px] font-bold text-blue-400 mt-0.5">{{ $req->user->employee_id }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="py-4 text-xs font-bold text-slate-300">
+                                                <td class="py-4 text-xs font-bold">
                                                     @if($req->type === 'ijin_datang_terlambat')
-                                                        <span class="badge-rect-warning">Telat</span>
+                                                        <span class="badge-rect-warning">Terlambat</span>
                                                     @elseif($req->type === 'ijin_pulang_awal')
                                                         <span class="badge-rect-danger">Pulang Awal</span>
                                                     @elseif($req->type === 'ijin_setengah_hari')
-                                                        <span class="badge-rect-info">1/2 Hari</span>
+                                                        <span class="badge-rect-info">Setengah Hari</span>
                                                     @else
                                                         <span class="badge-rect-neutral">Tidak Masuk</span>
                                                     @endif
                                                 </td>
-                                                <td class="py-4 label-sm font-medium text-slate-300">
-                                                    <div class="font-bold">{{ $req->date->format('d M Y') }}</div>
+                                                <td class="py-4 text-xs font-medium text-slate-300">
+                                                    <div class="font-bold">{{ $req->date->translatedFormat('d M Y') }}</div>
                                                     @if($req->type !== 'ijin_tidak_masuk')
-                                                        <div class="label-xs text-slate-500 mt-0.5">{{ substr($req->start_time, 0, 5) }} - {{ substr($req->end_time, 0, 5) }}</div>
+                                                        <div class="text-[10px] text-slate-400 mt-1 flex items-center">
+                                                            <svg class="w-3 h-3 mr-1 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            {{ substr($req->start_time, 0, 5) }} - {{ substr($req->end_time, 0, 5) }}
+                                                        </div>
                                                     @endif
                                                 </td>
-                                                <td class="py-4 label-sm text-slate-400 max-w-xs truncate" title="{{ $req->reason }}">
-                                                    {{ $req->reason }}
-                                                </td>
-                                                <td class="py-4 text-center">
-                                                    @if($req->status_dept_head === 'approved')
-                                                        <span class="badge-rect-success">Disetujui</span>
-                                                    @elseif($req->status_dept_head === 'rejected')
-                                                        <span class="badge-rect-danger">Ditolak</span>
-                                                    @else
-                                                        <span class="badge-rect-neutral">Tertunda</span>
+                                                <td class="py-4 text-xs text-slate-300 max-w-xs">
+                                                    <div class="truncate font-medium" title="{{ $req->reason }}">{{ $req->reason }}</div>
+                                                    @if($req->attachment_path)
+                                                        <a href="{{ asset('storage/' . $req->attachment_path) }}" target="_blank" class="inline-flex items-center text-[10px] font-bold text-blue-400 hover:text-blue-300 mt-1.5">
+                                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                            </svg>
+                                                            Lihat Lampiran
+                                                        </a>
                                                     @endif
                                                 </td>
-                                                <td class="py-4 text-center">
-                                                    @if($req->status_hr === 'approved')
-                                                        <span class="badge-rect-success">Disetujui</span>
-                                                    @elseif($req->status_hr === 'rejected')
-                                                        <span class="badge-rect-danger">Ditolak</span>
-                                                    @else
-                                                        <span class="badge-rect-neutral">Tertunda</span>
-                                                    @endif
+                                                <td class="py-4">
+                                                    <div class="flex flex-col space-y-1.5 items-center justify-center">
+                                                        <div class="flex items-center space-x-2 w-full justify-between px-2.5 py-1 bg-black/10 border border-white/5 rounded-lg">
+                                                            <span class="text-[9px] font-bold text-slate-400 uppercase">Kadiv:</span>
+                                                            @if($req->status_dept_head === 'approved')
+                                                                <span class="text-[9px] font-black text-emerald-400 uppercase flex items-center">✓ OK</span>
+                                                            @elseif($req->status_dept_head === 'rejected')
+                                                                <span class="text-[9px] font-black text-rose-400 uppercase flex items-center">✗ NO</span>
+                                                            @else
+                                                                <span class="text-[9px] font-black text-amber-500 uppercase flex items-center animate-pulse">⏳ Pending</span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="flex items-center space-x-2 w-full justify-between px-2.5 py-1 bg-black/10 border border-white/5 rounded-lg">
+                                                            <span class="text-[9px] font-bold text-slate-400 uppercase">HRD:</span>
+                                                            @if($req->status_hr === 'approved')
+                                                                <span class="text-[9px] font-black text-emerald-400 uppercase flex items-center">✓ OK</span>
+                                                            @elseif($req->status_hr === 'rejected')
+                                                                <span class="text-[9px] font-black text-rose-400 uppercase flex items-center">✗ NO</span>
+                                                            @else
+                                                                <span class="text-[9px] font-black text-amber-500 uppercase flex items-center animate-pulse">⏳ Pending</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td class="py-4 text-right">
                                                     <div class="flex items-center justify-end space-x-1.5">
                                                         <!-- Department Head ACC Button -->
                                                         @if($isManager && $req->status_dept_head === 'pending')
-                                                            <button wire:click="approveDeptHead({{ $req->id }})" type="button" class="btn-success btn-xs shadow">
-                                                                Acc Divisi
+                                                            <button wire:click="approveDeptHead({{ $req->id }})" type="button" class="btn-success btn-xs shadow-sm font-extrabold px-3 py-1.5 rounded-xl">
+                                                                ACC Kadiv
                                                             </button>
                                                         @endif
 
                                                         <!-- HR ACC Button -->
                                                         @if($isHr && $req->status_hr === 'pending')
-                                                            <button wire:click="approveHr({{ $req->id }})" type="button" class="btn-primary btn-xs shadow">
-                                                                Acc HR
+                                                            <button wire:click="approveHr({{ $req->id }})" type="button" class="btn-primary btn-xs shadow-sm font-extrabold px-3 py-1.5 rounded-xl">
+                                                                ACC HR
                                                             </button>
                                                         @endif
 
-                                                        <button wire:click="rejectRequest({{ $req->id }})" type="button" class="btn-danger-outline btn-xs">
+                                                        <button wire:click="rejectRequest({{ $req->id }})" type="button" class="btn-danger-outline btn-xs px-3 py-1.5 rounded-xl font-extrabold">
                                                             Tolak
                                                         </button>
                                                     </div>
@@ -230,118 +361,190 @@
                             </div>
                         @endif
                     </div>
-                @endif
+                
+                <!-- Tab: Riwayat Pengajuan Izin Saya (Active by default or when clicked) -->
+                @else
+                    <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-6 w-1 bg-blue-500 rounded-full"></div>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-bold text-white">Riwayat Pengajuan Izin Saya</h3>
+                                    <p class="text-xs text-slate-400 mt-0.5">Lacak riwayat dispensasi kerja dan status persetujuan berjenjang Anda.</p>
+                                </div>
+                            </div>
 
-                <!-- Middle & Right: My Permission History -->
-                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden lg:col-span-3 mt-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                        <div>
-                            <h3 class="heading-3">Riwayat Pengajuan Izin Saya</h3>
-                            <p class="label-sm mt-0.5">Daftar permohonan dispensasi izin kerja yang pernah Anda ajukan beserta status verifikasi ganda.</p>
+                            <!-- Status Filter -->
+                            <div class="permission-tab-container flex overflow-x-auto whitespace-nowrap bg-[#0d1527] border border-white/5 p-1 rounded-xl scrollbar-none">
+                                <button wire:click="$set('statusFilter', 'all')" type="button" class="permission-tab-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'all' ? 'tab-active' : 'text-slate-350 hover:text-slate-900 dark:hover:text-white' }}">
+                                    Semua
+                                </button>
+                                <button wire:click="$set('statusFilter', 'approved')" type="button" class="permission-tab-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'approved' ? 'tab-active' : 'text-slate-350 hover:text-slate-900 dark:hover:text-white' }}">
+                                    Disetujui
+                                </button>
+                                <button wire:click="$set('statusFilter', 'pending')" type="button" class="permission-tab-btn px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'pending' ? 'tab-active' : 'text-slate-350 hover:text-slate-900 dark:hover:text-white' }}">
+                                    Pending
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Status Filter -->
-                        <div class="flex overflow-x-auto whitespace-nowrap bg-[#0d1527] border border-white/5 p-1 rounded-xl scrollbar-none">
-                            <button wire:click="$set('statusFilter', 'all')" type="button" class="px-3 py-1.5 label-xs rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'all' ? 'tab-active' : 'text-slate-300 hover:text-white' }}">
-                                Semua
-                            </button>
-                            <button wire:click="$set('statusFilter', 'approved')" type="button" class="px-3 py-1.5 label-xs rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'approved' ? 'tab-active' : 'text-slate-300 hover:text-white' }}">
-                                Disetujui
-                            </button>
-                            <button wire:click="$set('statusFilter', 'pending')" type="button" class="px-3 py-1.5 label-xs rounded-lg transition-all flex-shrink-0 {{ $statusFilter === 'pending' ? 'tab-active' : 'text-slate-300 hover:text-white' }}">
-                                Pending
-                        </div>
-                    </div>
-
-                    @if($myPermissions->isEmpty())
-                        <div class="py-12 flex flex-col items-center justify-center border border-white/5 bg-[#0d1527]/50 rounded-2xl">
+                        @if($myPermissions->isEmpty())
+                            <div class="py-12 flex flex-col items-center justify-center border border-white/5 bg-[#0d1527]/50 rounded-2xl">
                                 <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3 shadow-lg shadow-blue-500/5">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
                                     </svg>
                                 </div>
-                                <span class="label-sm font-bold text-slate-300">Belum ada data pengajuan izin kerja.</span>
-                        </div>
-                    @else
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @foreach($myPermissions as $perm)
-                                <div class="bg-[#0d1527] border border-white/5 rounded-2xl p-5 relative overflow-hidden space-y-3.5">
-                                    <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-blue-500/5 rounded-full blur-xl"></div>
-                                    
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="label-md font-bold text-white">
-                                                @if($perm->type === 'ijin_datang_terlambat')
-                                                    Izin Telat
-                                                @elseif($perm->type === 'ijin_pulang_awal')
-                                                    Izin Pulang Awal
-                                                @elseif($perm->type === 'ijin_setengah_hari')
-                                                    Izin 1/2 Hari
-                                                @else
-                                                    Izin Tidak Masuk
-                                                @endif
-                                            </span>
-                                        </div>
+                                <span class="text-xs font-bold text-slate-400">Belum ada data pengajuan izin kerja.</span>
+                            </div>
+                        @else
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                @foreach($myPermissions as $perm)
+                                    <div class="bg-[#0d1527]/40 border border-white/5 rounded-2xl p-5 relative overflow-hidden space-y-4 flex flex-col justify-between hover:border-blue-500/20 transition-all duration-200">
+                                        <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-blue-500/[0.02] rounded-full blur-xl"></div>
                                         
-                                        <!-- Overall status badge -->
-                                        @if($perm->status === 'approved')
-                                            <span class="badge-rect-success">Disetujui</span>
-                                        @elseif($perm->status === 'rejected')
-                                            <span class="badge-rect-danger">Ditolak</span>
-                                        @else
-                                            <span class="badge-rect-warning">Menunggu acc</span>
-                                        @endif
-                                    </div>
- 
-                                    <div class="label-xs text-slate-400 space-y-1">
-                                        <div class="flex justify-between">
-                                            <span>Tanggal:</span>
-                                            <span class="font-bold text-white">{{ $perm->date->format('d M Y') }}</span>
+                                        <div class="space-y-3.5">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs font-black uppercase text-slate-400 tracking-wider">
+                                                    @if($perm->type === 'ijin_datang_terlambat')
+                                                        Izin Telat
+                                                    @elseif($perm->type === 'ijin_pulang_awal')
+                                                        Izin Pulang Awal
+                                                    @elseif($perm->type === 'ijin_setengah_hari')
+                                                        Izin 1/2 Hari
+                                                    @else
+                                                        Izin Tidak Masuk
+                                                    @endif
+                                                </span>
+                                                
+                                                <!-- Overall status badge -->
+                                                @if($perm->status === 'approved')
+                                                    <span class="badge-rect-success">Disetujui</span>
+                                                @elseif($perm->status === 'rejected')
+                                                    <span class="badge-rect-danger">Ditolak</span>
+                                                @else
+                                                    <span class="badge-rect-warning">Diproses</span>
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="text-xs text-slate-400 space-y-1.5 bg-[#0d1527]/80 p-3 rounded-xl border border-white/5">
+                                                <div class="flex justify-between">
+                                                    <span>Tanggal Pengajuan:</span>
+                                                    <span class="font-bold text-white">{{ $perm->date->translatedFormat('d M Y') }}</span>
+                                                </div>
+                                                @if($perm->type !== 'ijin_tidak_masuk')
+                                                    <div class="flex justify-between">
+                                                        <span>Waktu Dispensasi:</span>
+                                                        <span class="font-bold text-blue-400">{{ substr($perm->start_time, 0, 5) }} s/d {{ substr($perm->end_time, 0, 5) }}</span>
+                                                    </div>
+                                                @endif
+                                                <div class="flex flex-col pt-1.5 border-t border-white/5">
+                                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Alasan Pengajuan:</span>
+                                                    <span class="mt-1 text-slate-300 leading-relaxed font-medium">{{ $perm->reason }}</span>
+                                                </div>
+                                                @if($perm->attachment_path)
+                                                    <div class="pt-1.5 border-t border-white/5">
+                                                        <a href="{{ asset('storage/' . $perm->attachment_path) }}" target="_blank" class="inline-flex items-center text-[10px] font-bold text-blue-400 hover:text-blue-300">
+                                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                            </svg>
+                                                            Dokumen Pendukung
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Visual Progress Tracking Line -->
+                                            <div class="bg-black/20 border border-white/5 rounded-2xl p-3.5 space-y-2.5">
+                                                <div class="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                                    <span>Alur Persetujuan:</span>
+                                                    <span class="{{ $perm->status === 'approved' ? 'text-emerald-400' : ($perm->status === 'rejected' ? 'text-rose-400' : 'text-amber-500') }}">
+                                                        @if($perm->status === 'approved')
+                                                            Selesai (Aktif)
+                                                        @elseif($perm->status === 'rejected')
+                                                            Ditolak
+                                                        @else
+                                                            Persetujuan Ganda
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center justify-between px-2 pt-1 relative">
+                                                    <!-- Background track line -->
+                                                    <div class="absolute top-[13px] inset-x-6 h-[2px] bg-slate-800 z-0"></div>
+                                                    <div class="absolute top-[13px] left-6 h-[2px] bg-gradient-to-r from-blue-600 to-emerald-500 z-0 transition-all duration-300"
+                                                         style="width: {{ $perm->status === 'approved' ? '100' : ($perm->status_dept_head === 'approved' ? '50' : '0') }}%"></div>
+
+                                                    <!-- Step 1: Draft / Diajukan -->
+                                                    <div class="flex flex-col items-center z-10">
+                                                        <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-blue-600 text-white shadow shadow-blue-500/20">
+                                                            ✓
+                                                        </div>
+                                                        <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Diajukan</span>
+                                                    </div>
+
+                                                    <!-- Step 2: Kadiv Acc -->
+                                                    <div class="flex flex-col items-center z-10">
+                                                        @if($perm->status_dept_head === 'approved')
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-emerald-600 text-white shadow shadow-emerald-500/20">
+                                                                ✓
+                                                            </div>
+                                                        @elseif($perm->status_dept_head === 'rejected')
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-rose-600 text-white shadow shadow-rose-500/20">
+                                                                ✗
+                                                            </div>
+                                                        @else
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-slate-800 border border-slate-700 text-slate-400 animate-pulse">
+                                                                ⏳
+                                                            </div>
+                                                        @endif
+                                                        <span class="text-[9px] font-bold mt-1 uppercase tracking-wider {{ $perm->status_dept_head === 'approved' ? 'text-emerald-400' : ($perm->status_dept_head === 'rejected' ? 'text-rose-400' : 'text-slate-500') }}">Kadiv</span>
+                                                    </div>
+
+                                                    <!-- Step 3: HR Acc -->
+                                                    <div class="flex flex-col items-center z-10">
+                                                        @if($perm->status_hr === 'approved')
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-emerald-600 text-white shadow shadow-emerald-500/20">
+                                                                ✓
+                                                            </div>
+                                                        @elseif($perm->status_hr === 'rejected')
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-rose-600 text-white shadow shadow-rose-500/20">
+                                                                ✗
+                                                            </div>
+                                                        @else
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] bg-slate-800 border border-slate-700 text-slate-400 {{ $perm->status_dept_head === 'approved' ? 'animate-pulse' : '' }}">
+                                                                ⏳
+                                                            </div>
+                                                        @endif
+                                                        <span class="text-[9px] font-bold mt-1 uppercase tracking-wider {{ $perm->status_hr === 'approved' ? 'text-emerald-400' : ($perm->status_hr === 'rejected' ? 'text-rose-400' : 'text-slate-500') }}">HR Manager</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        @if($perm->type !== 'ijin_tidak_masuk')
-                                            <div class="flex justify-between">
-                                                <span>Waktu dispensasi:</span>
-                                                <span class="font-bold text-blue-400">{{ substr($perm->start_time, 0, 5) }} s/d {{ substr($perm->end_time, 0, 5) }}</span>
+
+                                        <!-- Print Button -->
+                                        @if($perm->status === 'approved')
+                                            <div class="pt-3.5 border-t border-white/5">
+                                                <a href="{{ route('letters.permission', $perm->id) }}" target="_blank"
+                                                    class="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 font-extrabold text-[11px] transition-all">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                    </svg>
+                                                    Cetak Surat Izin Resmi
+                                                </a>
+                                            </div>
+                                        @else
+                                            <div class="pt-3.5 border-t border-white/5">
+                                                <button disabled class="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-white/5 border border-white/5 text-slate-500 font-bold text-[11px] cursor-not-allowed">
+                                                    Cetak Surat (Menunggu Persetujuan)
+                                                </button>
                                             </div>
                                         @endif
-                                        <div class="flex flex-col pt-1.5 border-t border-white/5">
-                                            <span class="label-xs font-bold text-slate-500">Alasan pengajuan:</span>
-                                            <span class="mt-0.5 label-sm text-slate-300 leading-relaxed">{{ $perm->reason }}</span>
-                                        </div>
                                     </div>
- 
-                                    <!-- Multi-level signature display -->
-                                    <div class="grid grid-cols-2 gap-3 pt-3.5 border-t border-white/5 text-[10px]">
-                                        <div class="p-2 bg-white/5 rounded-xl flex flex-col justify-center items-center text-center">
-                                            <span class="label-xs text-slate-500">Kepala divisi</span>
-                                            <span class="font-bold mt-1 label-xs {{ $perm->status_dept_head === 'approved' ? 'text-emerald-400' : ($perm->status_dept_head === 'rejected' ? 'text-rose-400' : 'text-slate-500') }}">
-                                                {{ $perm->status_dept_head === 'approved' ? 'Disetujui' : ($perm->status_dept_head === 'rejected' ? 'Ditolak' : 'Pending') }}
-                                            </span>
-                                        </div>
- 
-                                        <div class="p-2 bg-white/5 rounded-xl flex flex-col justify-center items-center text-center">
-                                            <span class="label-xs text-slate-500">HR manager</span>
-                                            <span class="font-bold mt-1 label-xs {{ $perm->status_hr === 'approved' ? 'text-emerald-400' : ($perm->status_hr === 'rejected' ? 'text-rose-400' : 'text-slate-500') }}">
-                                                {{ $perm->status_hr === 'approved' ? 'Disetujui' : ($perm->status_hr === 'rejected' ? 'Ditolak' : 'Pending') }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Print Button -->
-                                    <div class="pt-3 border-t border-white/5">
-                                        <a href="{{ route('letters.permission', $perm->id) }}" target="_blank"
-                                            class="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 font-bold text-[11px] transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                            </svg>
-                                            Cetak Surat Izin
-                                        </a>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
             </div>
         @endif

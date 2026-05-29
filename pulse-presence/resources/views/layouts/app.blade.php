@@ -77,7 +77,7 @@
                                     Manajemen Cuti
                                 </a>
 
-                                @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager']))
+                                @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager', 'employee']))
                                 <a href="{{ route('permissions.index') }}"
                                     class="inline-flex items-center border-b-[3px] px-2.5 xl:px-3.5 pt-1 text-xs xl:text-sm font-semibold tracking-tight transition-all duration-200 {{ request()->routeIs('permissions.*') ? 'border-blue-600 text-white' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-700' }}">
                                     Izin Kerja
@@ -131,8 +131,8 @@
                                     class="flex items-center rounded-2xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 p-1.5 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all">
                                     <div class="flex items-center space-x-3.5 pr-2">
                                         <div
-                                            class="h-9 w-9 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                            {{ substr(auth()->user()->name, 0, 1) }}
+                                            class="h-9 w-9 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
+                                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                         </div>
                                         <div class="text-left">
                                             <div class="label-md font-bold text-white">
@@ -170,7 +170,7 @@
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit"
-                                            class="flex w-full items-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition-all duration-150 text-left">
+                                            class="logout-btn flex w-full items-center space-x-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition-all duration-150 text-left">
                                             <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -233,7 +233,7 @@
                                     <a href="{{ route('leaves.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('leaves.*') ? 'text-white' : 'text-slate-300' }}">Manajemen
                                         Cuti</a>
-                                    @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager']))
+                                    @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin', 'manager', 'employee']))
                                     <a href="{{ route('permissions.index') }}"
                                         class="block py-2 text-sm font-semibold {{ request()->routeIs('permissions.*') ? 'text-white' : 'text-slate-300' }}">Izin Kerja</a>
                                     @endif
@@ -255,7 +255,7 @@
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf
                                             <button type="submit"
-                                                class="block w-full text-left py-2 text-sm font-semibold text-rose-400">Keluar
+                                                class="logout-btn block w-full text-left py-2 text-sm font-semibold text-rose-400">Keluar
                                                 Sesi</button>
                                         </form>
                                     </div>
@@ -410,12 +410,11 @@
                             @if(request()->routeIs('settings.*'))
                                 <span class="w-1 h-1 rounded-full bg-purple-500 mt-0.5"></span>
                             @endif
-                        </a>
-                    @else
+                        </a>                    @elseif(auth()->user()->hasRole('hr_admin'))
                         <a href="{{ route('reports.index') }}" 
                             class="flex flex-col items-center justify-center flex-1 h-12 transition-all duration-200 {{ request()->routeIs('reports.*') ? 'text-purple-400' : 'text-slate-400 hover:text-slate-200' }}">
                             <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                             <span class="text-[9px] font-bold tracking-tight">Laporan</span>
                             @if(request()->routeIs('reports.*'))

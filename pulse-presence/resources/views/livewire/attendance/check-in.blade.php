@@ -436,9 +436,9 @@
                         console.log('Initial location resolution missed:', err.message);
                     },
                     {
-                        enableHighAccuracy: false,
-                        timeout: 6000,
-                        maximumAge: 120000 // Allow up to 2 minutes cached position
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 30000 // Max 30s cached position for initial fix
                     }
                 );
 
@@ -504,10 +504,11 @@
                         attributionControl: true
                     }).setView([officeLat, officeLng], 17);
 
-                    // Classic Light Street map design similar to standard Google Maps
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '© OpenStreetMap contributors'
+                    // Google Maps Road tile layer
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                        attribution: '© Google Maps'
                     }).addTo(this.mapInstance);
 
                     // Custom office branch red location pin
