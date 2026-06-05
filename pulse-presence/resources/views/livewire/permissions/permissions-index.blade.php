@@ -731,7 +731,7 @@
                                                                 @endif
 
                                                                 <!-- HR actions -->
-                                                                @if($isHr && $req->status_hr === 'pending')
+                                                                @if($isHr && $req->status_hr === 'pending' && $req->status_dept_head === 'approved')
                                                                     <div class="flex items-center space-x-1">
                                                                         <button wire:click="approveHr({{ $req->id }})" type="button" class="btn-primary btn-xs font-black px-2.5 py-1.5 rounded-lg shadow-sm hover:scale-[1.03] transition-all">
                                                                             ACC HR
@@ -1160,7 +1160,7 @@
                                     Setujui Kadiv
                                 </button>
                             @endif
-                            @if($isHr && $selectedRequestForDetail->status_hr === 'pending')
+                            @if($isHr && $selectedRequestForDetail->status_hr === 'pending' && $selectedRequestForDetail->status_dept_head === 'approved')
                                 <button wire:click="approveHr({{ $selectedRequestForDetail->id }})" type="button" class="btn-sm btn-primary font-black">
                                     Setujui HRD
                                 </button>

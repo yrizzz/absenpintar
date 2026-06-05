@@ -3,6 +3,7 @@
 namespace App\Livewire\Permissions;
 
 use App\Models\PermissionRequest;
+use App\Notifications\RequestStatusNotification;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -251,6 +252,12 @@ class PermissionsIndex extends Component
             $this->selectedRequestForDetail = PermissionRequest::with(['user', 'deptHead', 'hr'])->find($permission->id);
         }
 
+        $permission->user->notify(new RequestStatusNotification(
+            'Izin disetujui Kepala Divisi',
+            'Pengajuan izin kerja Anda telah disetujui Kepala Divisi dan diteruskan ke HR.',
+            route('permissions.index'),
+            'info'
+        ));
         session()->flash('success', 'Izin disetujui sebagai Kepala Divisi.');
     }
 
@@ -260,6 +267,12 @@ class PermissionsIndex extends Component
         
         if ($permission->user_id === auth()->id()) {
             session()->flash('error', 'Keamanan Sistem: Anda tidak diizinkan menyetujui permohonan izin Anda sendiri.');
+            return;
+        }
+
+        // Sequential gate: HR can only act after the Department Head has approved.
+        if ($permission->status_dept_head !== 'approved') {
+            session()->flash('error', 'Izin harus disetujui Kepala Divisi terlebih dahulu sebelum persetujuan HR.');
             return;
         }
 
@@ -293,6 +306,12 @@ class PermissionsIndex extends Component
             $this->selectedRequestForDetail = PermissionRequest::with(['user', 'deptHead', 'hr'])->find($permission->id);
         }
 
+        $permission->user->notify(new RequestStatusNotification(
+            'Izin kerja disetujui',
+            'Selamat! Pengajuan izin kerja Anda telah disetujui penuh oleh HR.',
+            route('permissions.index'),
+            'approved'
+        ));
         session()->flash('success', 'Izin disetujui sebagai HR Manager.');
     }
 
@@ -345,6 +364,12 @@ class PermissionsIndex extends Component
             $this->selectedRequestForDetail = PermissionRequest::with(['user', 'deptHead', 'hr'])->find($permission->id);
         }
 
+        $permission->user->notify(new RequestStatusNotification(
+            'Izin kerja ditolak',
+            'Mohon maaf, pengajuan izin kerja Anda ditolak' . ($notes ? ': ' . $notes : '.'),
+            route('permissions.index'),
+            'rejected'
+        ));
         session()->flash('success', 'Pengajuan izin telah ditolak.');
     }
 
@@ -432,7 +457,8 @@ class PermissionsIndex extends Component
                 if ($user->hasRole('manager') && !$user->hasRole('super_admin')) {
                     $reviewQuery->where('status_dept_head', 'pending');
                 } elseif ($user->hasRole('hr_admin') && !$user->hasRole('super_admin')) {
-                    $reviewQuery->where('status_hr', 'pending');
+                    // Sequential: HR only sees requests already approved by the Department Head.
+                    $reviewQuery->where('status_hr', 'pending')->where('status_dept_head', 'approved');
                 }
             } elseif ($this->reviewStatusFilter === 'approved') {
                 $reviewQuery->where('status', 'approved');
@@ -461,7 +487,7 @@ class PermissionsIndex extends Component
         if ($user->hasRole('manager') && !$user->hasRole('super_admin')) {
             $badgeQuery->where('status_dept_head', 'pending');
         } elseif ($user->hasRole('hr_admin') && !$user->hasRole('super_admin')) {
-            $badgeQuery->where('status_hr', 'pending');
+            $badgeQuery->where('status_hr', 'pending')->where('status_dept_head', 'approved');
         }
         $rawPendingCount = $isAdmin ? $badgeQuery->count() : 0;
 

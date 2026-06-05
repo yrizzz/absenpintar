@@ -26,6 +26,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <style>[x-cloak]{display:none !important;}</style>
 </head>
 
 <body class="bg-[#090e1a] text-slate-100 antialiased font-sans">
@@ -126,6 +127,9 @@
                                 </button>
                             </div>
 
+                            <!-- In-app Notifications Bell -->
+                            @livewire('notification-bell')
+
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open"
                                     class="flex items-center rounded-2xl bg-[#121d33]/80 hover:bg-[#1c2e50]/80 border border-white/5 p-1.5 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all">
@@ -210,6 +214,9 @@
                                     </svg>
                                 </button>
                             </div>
+
+                            <!-- In-app Notifications Bell (Mobile) -->
+                            @livewire('notification-bell')
 
                             <button @click="mobileOpen = !mobileOpen"
                                 class="inline-flex items-center justify-center rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors duration-150">

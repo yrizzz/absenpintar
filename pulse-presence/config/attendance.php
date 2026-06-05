@@ -56,6 +56,11 @@ return [
     'ai_service_url' => env('AI_SERVICE_URL', 'http://localhost:8001'),
     'ai_service_timeout' => env('AI_SERVICE_TIMEOUT', 30),
 
+    // Local Python face-comparison script (OpenCV YuNet + SFace).
+    'face_python_binary' => env('FACE_PYTHON_BINARY', 'python3'),
+    'face_compare_script' => env('FACE_COMPARE_SCRIPT', base_path('face_compare.py')),
+    'face_compare_timeout' => (int) env('FACE_COMPARE_TIMEOUT', 20), // seconds
+
     /*
     |--------------------------------------------------------------------------
     | Attendance Rules

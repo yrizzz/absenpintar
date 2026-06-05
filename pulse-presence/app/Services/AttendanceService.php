@@ -389,17 +389,34 @@ class AttendanceService
             $absPath1 = storage_path('app/private/' . $path1);
             $absPath2 = storage_path('app/public/' . $path2);
 
-            // Execute python3 face_compare.py with custom calibrated threshold
-            $scriptPath = base_path('face_compare.py');
-            $command = "python3 " . escapeshellarg($scriptPath) . " " . escapeshellarg($absPath1) . " " . escapeshellarg($absPath2) . " " . escapeshellarg($threshold);
-            
-            $output = shell_exec($command);
-            if (!$output) {
-                return $defaultResponse;
+            $scriptPath = config('attendance.face_compare_script');
+            if (!is_file($scriptPath)) {
+                \Illuminate\Support\Facades\Log::error('Face compare script missing', ['path' => $scriptPath]);
+                return array_merge($defaultResponse, ['message' => 'Skrip verifikasi wajah tidak tersedia di server.']);
             }
 
-            $result = json_decode($output, true);
-            if ($result) {
+            // Run the Python comparator via Symfony Process so we get a hard timeout
+            // (a hung interpreter must never block the check-in request) and stderr capture.
+            $process = new \Symfony\Component\Process\Process([
+                config('attendance.face_python_binary', 'python3'),
+                $scriptPath,
+                $absPath1,
+                $absPath2,
+                (string) $threshold,
+            ]);
+            $process->setTimeout((float) config('attendance.face_compare_timeout', 20));
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                \Illuminate\Support\Facades\Log::warning('Face compare process failed', [
+                    'exit_code' => $process->getExitCode(),
+                    'stderr' => trim($process->getErrorOutput()),
+                ]);
+                return array_merge($defaultResponse, ['message' => 'Mesin verifikasi wajah gagal merespons. Silakan coba lagi.']);
+            }
+
+            $result = json_decode(trim($process->getOutput()), true);
+            if (is_array($result)) {
                 return [
                     'verified' => $result['verified'] ?? false,
                     'similarity' => ($result['similarity'] ?? 0.0) * 100.0,
@@ -408,8 +425,12 @@ class AttendanceService
             }
 
             return $defaultResponse;
-        } catch (\Exception $e) {
-            return array_merge($defaultResponse, ['message' => 'Exception: ' . $e->getMessage()]);
+        } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException $e) {
+            \Illuminate\Support\Facades\Log::warning('Face compare timed out', ['error' => $e->getMessage()]);
+            return array_merge($defaultResponse, ['message' => 'Verifikasi wajah melebihi batas waktu. Silakan coba lagi.']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Face compare exception: ' . $e->getMessage());
+            return array_merge($defaultResponse, ['message' => 'Gagal memproses verifikasi biometrik.']);
         }
     }
 }

@@ -38,4 +38,10 @@ return [
         'key' => env('GOOGLE_MAPS_API_KEY', ''),
     ],
 
+    // Optional IP reputation provider for VPN/proxy/Tor detection during attendance.
+    // Leave empty to use the built-in heuristic fallback.
+    'ipqualityscore' => [
+        'key' => env('IPQUALITYSCORE_API_KEY'),
+    ],
+
 ];

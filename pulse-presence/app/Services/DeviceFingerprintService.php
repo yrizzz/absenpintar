@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\Models\DeviceFingerprint;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DeviceFingerprintService
 {
@@ -104,30 +107,83 @@ class DeviceFingerprintService
     }
 
     /**
-     * Detect VPN usage based on IP and timezone.
+     * Detect VPN / proxy / Tor usage from the request IP.
+     *
+     * When an IPQualityScore API key is configured (services.ipqualityscore.key)
+     * the live reputation API is used. Otherwise we fall back to a self-contained
+     * heuristic based on private/reserved IPs and timezone mismatch.
      */
     public function detectVPN(string $ipAddress, string $timezone): array
     {
-        // Basic VPN detection logic
-        // In production, use a service like IPQualityScore or similar
-        
+        $apiKey = config('services.ipqualityscore.key');
+
+        if ($apiKey && filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            $live = $this->lookupIpReputation($ipAddress, $apiKey);
+            if ($live !== null) {
+                return $live;
+            }
+        }
+
+        return $this->heuristicVpnCheck($ipAddress, $timezone);
+    }
+
+    /**
+     * Query IPQualityScore and cache the result for 24h to avoid rate limits.
+     */
+    protected function lookupIpReputation(string $ipAddress, string $apiKey): ?array
+    {
+        return Cache::remember("vpn_lookup:{$ipAddress}", now()->addDay(), function () use ($ipAddress, $apiKey) {
+            try {
+                $response = Http::timeout(4)->get(
+                    "https://ipqualityscore.com/api/json/ip/{$apiKey}/{$ipAddress}",
+                    ['strictness' => 1, 'allow_public_access_points' => 'true']
+                );
+
+                if (!$response->successful() || !($response->json('success') ?? false)) {
+                    return null;
+                }
+
+                $isVpn = (bool) ($response->json('vpn') || $response->json('proxy') || $response->json('tor') || $response->json('active_vpn'));
+                $fraudScore = (int) ($response->json('fraud_score') ?? 0);
+
+                return [
+                    'is_vpn' => $isVpn,
+                    // Map provider fraud_score (0-100) onto our scale, capping the VPN contribution.
+                    'risk_score' => $isVpn ? max(25, (int) round($fraudScore / 2)) : min(10, (int) round($fraudScore / 4)),
+                    'message' => $isVpn ? 'VPN/Proxy/Tor terdeteksi (IPQS)' : 'Tidak terdeteksi VPN (IPQS)',
+                ];
+            } catch (\Throwable $e) {
+                Log::warning('VPN lookup failed: ' . $e->getMessage(), ['ip' => $ipAddress]);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Dependency-free fallback. Private/reserved IPs are treated as internal (safe).
+     * A timezone that does not match the business timezone is a mild remote-access signal.
+     */
+    protected function heuristicVpnCheck(string $ipAddress, string $timezone): array
+    {
+        $isPublic = filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+
+        $expectedTimezone = (string) (cache()->get('settings.timezone') ?? config('app.timezone', 'Asia/Jakarta'));
+        $timezoneMismatch = $timezone !== '' && $expectedTimezone !== '' && $timezone !== $expectedTimezone;
+
         $riskScore = 0;
-        $isVPN = false;
+        if ($isPublic && $timezoneMismatch) {
+            // Public IP + foreign timezone is a plausible VPN/remote indicator.
+            $riskScore = 15;
+        } elseif ($timezoneMismatch) {
+            $riskScore = 5;
+        }
 
-        // Check for common VPN IP ranges (simplified)
-        $vpnIndicators = [
-            'vpn' => 25,
-            'proxy' => 25,
-            'tor' => 30,
-        ];
-
-        // This is a placeholder - integrate with real VPN detection service
-        // For now, we'll just return low risk
-        
         return [
-            'is_vpn' => $isVPN,
+            'is_vpn' => false, // No definitive signal without a reputation provider.
             'risk_score' => $riskScore,
-            'message' => $isVPN ? 'VPN detected' : 'No VPN detected',
+            'message' => $timezoneMismatch
+                ? "Zona waktu perangkat ({$timezone}) berbeda dari zona waktu kantor ({$expectedTimezone})."
+                : 'Tidak terdeteksi indikasi VPN.',
         ];
     }
 }

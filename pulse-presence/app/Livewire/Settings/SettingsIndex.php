@@ -38,6 +38,12 @@ class SettingsIndex extends Component
     public $permission_max_early_hours = 2.0;
     public $permission_max_half_day_hours = 4.0;
 
+    // Company identity (printed on official letters)
+    public $company_name = 'PT AbsenPintar Indonesia';
+    public $company_address = 'Jl. Teknologi No. 1, Jakarta Selatan';
+    public $company_phone = '(021) 123-4567';
+    public $company_email = 'hrd@absenpintar.com';
+
     // Search and filters
     public $search = '';
     public $statusFilter = 'all'; // 'all', 'registered', 'pending'
@@ -102,25 +108,59 @@ class SettingsIndex extends Component
         $this->permission_max_late_hours = cache()->get('settings.permission_max_late_hours', 2.0);
         $this->permission_max_early_hours = cache()->get('settings.permission_max_early_hours', 2.0);
         $this->permission_max_half_day_hours = cache()->get('settings.permission_max_half_day_hours', 4.0);
+
+        $this->company_name = cache()->get('settings.company_name', $this->company_name);
+        $this->company_address = cache()->get('settings.company_address', $this->company_address);
+        $this->company_phone = cache()->get('settings.company_phone', $this->company_phone);
+        $this->company_email = cache()->get('settings.company_email', $this->company_email);
     }
 
     public function saveSettings()
     {
-        cache()->forever('settings.radius', $this->radius);
-        cache()->forever('settings.gps_margin', $this->gps_margin);
-        cache()->forever('settings.biometric_liveness_threshold', $this->biometric_liveness_threshold);
-        cache()->forever('settings.require_mfa', $this->require_mfa);
+        $this->validate([
+            'radius' => 'required|numeric|min:10|max:5000',
+            'gps_margin' => 'required|numeric|min:0|max:1000',
+            'biometric_liveness_threshold' => 'required|numeric|min:0|max:1',
+            'work_hour_start' => 'required|date_format:H:i',
+            'work_hour_end' => 'required|date_format:H:i|after:work_hour_start',
+            'grace_period' => 'required|integer|min:0|max:120',
+            'timezone' => 'required|string|max:64',
+            'overtime_min_hours' => 'required|numeric|min:0|max:24',
+            'overtime_full_day_hours' => 'required|numeric|min:0|max:24',
+            'permission_max_late_hours' => 'required|numeric|min:0|max:24',
+            'permission_max_early_hours' => 'required|numeric|min:0|max:24',
+            'permission_max_half_day_hours' => 'required|numeric|min:0|max:24',
+            'company_name' => 'required|string|max:150',
+            'company_address' => 'required|string|max:255',
+            'company_phone' => 'required|string|max:50',
+            'company_email' => 'required|email|max:150',
+        ]);
 
-        cache()->forever('settings.work_hour_start', $this->work_hour_start);
-        cache()->forever('settings.work_hour_end', $this->work_hour_end);
-        cache()->forever('settings.grace_period', $this->grace_period);
-        cache()->forever('settings.timezone', $this->timezone);
-        cache()->forever('settings.overtime_min_hours', $this->overtime_min_hours);
-        cache()->forever('settings.overtime_full_day_hours', $this->overtime_full_day_hours);
+        // Persist to DB + mirror into cache (survives `cache:clear`). Cast scalars
+        // so the stored values keep their numeric/boolean type.
+        $values = [
+            'radius' => (float) $this->radius,
+            'gps_margin' => (float) $this->gps_margin,
+            'biometric_liveness_threshold' => (float) $this->biometric_liveness_threshold,
+            'require_mfa' => (bool) $this->require_mfa,
+            'work_hour_start' => $this->work_hour_start,
+            'work_hour_end' => $this->work_hour_end,
+            'grace_period' => (int) $this->grace_period,
+            'timezone' => $this->timezone,
+            'overtime_min_hours' => (float) $this->overtime_min_hours,
+            'overtime_full_day_hours' => (float) $this->overtime_full_day_hours,
+            'permission_max_late_hours' => (float) $this->permission_max_late_hours,
+            'permission_max_early_hours' => (float) $this->permission_max_early_hours,
+            'permission_max_half_day_hours' => (float) $this->permission_max_half_day_hours,
+            'company_name' => $this->company_name,
+            'company_address' => $this->company_address,
+            'company_phone' => $this->company_phone,
+            'company_email' => $this->company_email,
+        ];
 
-        cache()->forever('settings.permission_max_late_hours', $this->permission_max_late_hours);
-        cache()->forever('settings.permission_max_early_hours', $this->permission_max_early_hours);
-        cache()->forever('settings.permission_max_half_day_hours', $this->permission_max_half_day_hours);
+        foreach ($values as $key => $value) {
+            \App\Models\Setting::put($key, $value);
+        }
 
         // WRITE AUTOMATED AUDIT LOG FOR CONFIGURATION CHANGES
         \App\Models\AuditLog::create([
@@ -142,6 +182,10 @@ class SettingsIndex extends Component
                 'permission_max_late_hours' => $this->permission_max_late_hours,
                 'permission_max_early_hours' => $this->permission_max_early_hours,
                 'permission_max_half_day_hours' => $this->permission_max_half_day_hours,
+                'company_name' => $this->company_name,
+                'company_address' => $this->company_address,
+                'company_phone' => $this->company_phone,
+                'company_email' => $this->company_email,
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),

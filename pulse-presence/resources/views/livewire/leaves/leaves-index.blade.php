@@ -33,8 +33,42 @@
         @endif
 
         @if($step === 'index')
-            <!-- Admin Leave Approval Inbox Panel -->
-            @if($isAdmin && $pendingLeaves->isNotEmpty())
+            @if (session()->has('error'))
+                <div class="mb-6 p-4 sm:p-5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl text-xs font-bold flex items-center">
+                    <svg class="w-4.5 h-4.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <!-- Stage 1: Manager Approval Queue -->
+            @if($isManager && $managerQueue->isNotEmpty())
+                <div class="mb-8 bg-[#121d33]/85 backdrop-blur-2xl border border-amber-500/20 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -right-16 -bottom-16 w-48 h-48 bg-amber-600/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="heading-3 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Persetujuan Tingkat Manajer
+                            </h3>
+                            <p class="label-sm">Tahap 1 dari 2 &mdash; setujui untuk meneruskan ke HR</p>
+                        </div>
+                        <span class="badge-warning">{{ $managerQueue->count() }} Menunggu</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($managerQueue as $pl)
+                            @include('livewire.leaves.partials.approval-card', ['pl' => $pl, 'stage' => 'manager'])
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <!-- Stage 2: HR Finalization Queue -->
+            @if($isHr && $hrQueue->isNotEmpty())
                 <div class="mb-8 bg-[#121d33]/85 backdrop-blur-2xl border border-blue-500/20 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
                     <div class="absolute -right-16 -bottom-16 w-48 h-48 bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="flex items-center justify-between mb-6">
@@ -43,47 +77,16 @@
                                 <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-4a2 2 0 00-2 2v1a2 2 0 01-2 2H8a2 2 0 01-2-2v-1a2 2 0 00-2-2H2"/>
                                 </svg>
-                                Kotak Masuk Persetujuan Cuti
+                                Finalisasi HR
                             </h3>
-                            <p class="label-sm">Tinjau dan proses permohonan cuti aktif karyawan</p>
+                            <p class="label-sm">Tahap 2 dari 2 &mdash; sudah disetujui Manajer, menunggu keputusan final HR</p>
                         </div>
-                        <span class="badge-info">
-                            {{ $pendingLeaves->count() }} Menunggu
-                        </span>
+                        <span class="badge-info">{{ $hrQueue->count() }} Menunggu</span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($pendingLeaves as $pl)
-                            <div class="bg-[#0d1527]/90 border border-white/5 rounded-2xl p-4 flex flex-col justify-between space-y-4">
-                                <div>
-                                    <div class="flex items-start justify-between">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-black text-xs">
-                                                {{ strtoupper(substr($pl->user->name ?? 'K', 0, 2)) }}
-                                            </div>
-                                            <div>
-                                                <span class="block label-sm font-bold text-white">{{ $pl->user->name ?? 'N/A' }}</span>
-                                                <span class="block label-xs">ID Karyawan: {{ $pl->user->employee_id ?? 'N/A' }}</span>
-                                            </div>
-                                        </div>
-                                        <span class="badge-rect-neutral">
-                                            {{ ucfirst($pl->leave_type) }}
-                                        </span>
-                                    </div>
-                                    <div class="mt-3 bg-white/5 rounded-xl p-3 text-xs text-slate-300">
-                                        <p class="font-semibold text-blue-300">Rentang: {{ \Carbon\Carbon::parse($pl->start_date)->translatedFormat('d M') }} s/d {{ \Carbon\Carbon::parse($pl->end_date)->translatedFormat('d M Y') }} ({{ $pl->total_days }} Hari)</p>
-                                        <p class="mt-1 text-slate-400 font-medium leading-relaxed">"{{ $pl->reason }}"</p>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button wire:click="approveLeave({{ $pl->id }})" class="flex-1 btn-success btn-xs">
-                                        Setujui
-                                    </button>
-                                    <button wire:click="rejectLeave({{ $pl->id }})" class="flex-1 btn-danger-outline btn-xs">
-                                        Tolak
-                                    </button>
-                                </div>
-                            </div>
+                        @foreach($hrQueue as $pl)
+                            @include('livewire.leaves.partials.approval-card', ['pl' => $pl, 'stage' => 'hr'])
                         @endforeach
                     </div>
                 </div>
@@ -162,8 +165,10 @@
                                         <td class="py-4 label-sm text-slate-400">{{ $ml->reason }}</td>
                                         <td class="py-4 text-right">
                                             @if($ml->status === 'pending')
-                                                <span class="badge-rect-warning">Menunggu Tinjauan</span>
-                                            @elseif($ml->status === 'hr_approved' || $ml->status === 'manager_approved')
+                                                <span class="badge-rect-warning">Menunggu Manajer</span>
+                                            @elseif($ml->status === 'manager_approved')
+                                                <span class="badge-rect-info">Menunggu HR</span>
+                                            @elseif($ml->status === 'hr_approved')
                                                 <span class="badge-rect-success">Disetujui</span>
                                             @else
                                                 <span class="badge-rect-danger">Ditolak</span>
@@ -193,12 +198,13 @@
                 <form wire:submit.prevent="submitRequest" class="space-y-5">
                     <div>
                         <label class="block label-xs mb-2">Kategori Cuti</label>
-                        <select wire:model="type" class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
-                            <option value="annual">Cuti Tahunan (Kuota: 12 hari)</option>
+                        <select wire:model.live="type" class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
+                            <option value="annual">Cuti Tahunan (Kuota: {{ auth()->user()->annual_leave_quota ?? 12 }} hari)</option>
                             <option value="sick">Cuti Sakit (Wajib melampirkan keterangan medis)</option>
                             <option value="special">Cuti Khusus / Pelatihan</option>
                             <option value="unpaid">Cuti Di Luar Tanggungan (Unpaid Leave)</option>
                         </select>
+                        @error('type') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -220,6 +226,21 @@
                         @error('reason') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
+                    <div>
+                        <label class="block label-xs mb-2">
+                            Lampiran
+                            @if($type === 'sick')
+                                <span class="text-rose-400 font-bold">(Wajib &mdash; surat keterangan dokter)</span>
+                            @else
+                                <span class="text-slate-500">(Opsional &mdash; PDF/JPG/PNG, maks 2MB)</span>
+                            @endif
+                        </label>
+                        <input wire:model="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png"
+                            class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-500/20 file:text-blue-300 hover:file:bg-blue-500/30 focus:outline-none focus:border-blue-500 transition-all">
+                        <div wire:loading wire:target="attachment" class="label-xs text-blue-400 mt-1">Mengunggah berkas...</div>
+                        @error('attachment') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
                     <div class="flex justify-end space-x-3 pt-4">
                         <button type="button" wire:click="$set('step', 'index')" class="btn-sm btn-secondary">
                             Batal
@@ -229,6 +250,37 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        @endif
+
+        <!-- Approval / Rejection Action Modal -->
+        @if($showActionModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="$set('showActionModal', false)">
+                <div class="w-full max-w-md bg-[#121d33] border border-white/10 rounded-2xl p-6 shadow-2xl">
+                    @php
+                        $isReject = $actionMode === 'reject';
+                        $titleTxt = $isReject
+                            ? 'Tolak Permohonan Cuti'
+                            : ($actionStage === 'manager' ? 'Setujui sebagai Manajer' : 'Finalisasi sebagai HR');
+                    @endphp
+                    <h3 class="heading-3 mb-1">{{ $titleTxt }}</h3>
+                    <p class="label-sm mb-4">
+                        {{ $isReject
+                            ? 'Catatan alasan penolakan wajib diisi dan akan tampil pada riwayat karyawan.'
+                            : 'Anda dapat menambahkan catatan (opsional) sebelum menyetujui.' }}
+                    </p>
+
+                    <label class="block label-xs mb-2">Catatan {{ $isReject ? '(wajib)' : '(opsional)' }}</label>
+                    <textarea wire:model="actionNotes" rows="3" class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all resize-none" placeholder="Tulis catatan di sini..."></textarea>
+                    @error('actionNotes') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
+
+                    <div class="flex justify-end gap-3 mt-5">
+                        <button type="button" wire:click="$set('showActionModal', false)" class="btn-sm btn-secondary">Batal</button>
+                        <button type="button" wire:click="submitAction" class="btn-sm {{ $isReject ? 'btn-danger' : 'btn-primary' }}">
+                            {{ $isReject ? 'Tolak Permohonan' : 'Konfirmasi Persetujuan' }}
+                        </button>
+                    </div>
+                </div>
             </div>
         @endif
 

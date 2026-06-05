@@ -54,6 +54,17 @@
                             <span>Batas Izin Kerja</span>
                         </button>
 
+                        <!-- Tab: Identitas Perusahaan -->
+                        <button wire:click="$set('activeTab', 'company')" type="button"
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'company' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'company' ? 'text-white' : 'text-slate-400' }}"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            <span>Perusahaan</span>
+                        </button>
+
                         <!-- Tab 4: Kantor Cabang & Geofence -->
                         <button wire:click="$set('activeTab', 'branches')" type="button"
                             class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'branches' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
@@ -314,6 +325,58 @@
                                         class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
                                     <span class="label-xs text-slate-500 mt-1 block">Batas jam kerja yang diperbolehkan
                                         untuk izin setengah hari.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button type="submit" class="btn-sm btn-primary">
+                                    Terapkan Konfigurasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
+
+                <!-- ========================================================== -->
+                <!-- TAB: IDENTITAS PERUSAHAAN (kop surat resmi) -->
+                <!-- ========================================================== -->
+                @if ($activeTab === 'company')
+                    <div
+                        class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden max-w-4xl mx-auto">
+                        <div class="mb-6">
+                            <h3 class="heading-3">Identitas Perusahaan</h3>
+                            <p class="label-sm mt-1">Data ini tampil pada kop semua surat resmi (cuti, izin, dan
+                                keterangan kehadiran) yang dicetak sistem.</p>
+                        </div>
+
+                        <form wire:submit.prevent="saveSettings" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="block label-xs mb-2">Nama Perusahaan</label>
+                                    <input wire:model="company_name" type="text" required
+                                        class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    @error('company_name') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block label-xs mb-2">Alamat Perusahaan</label>
+                                    <input wire:model="company_address" type="text" required
+                                        class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    @error('company_address') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block label-xs mb-2">Telepon</label>
+                                    <input wire:model="company_phone" type="text" required
+                                        class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    @error('company_phone') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block label-xs mb-2">Email HRD</label>
+                                    <input wire:model="company_email" type="email" required
+                                        class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    @error('company_email') <span class="label-xs text-rose-400 block mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
