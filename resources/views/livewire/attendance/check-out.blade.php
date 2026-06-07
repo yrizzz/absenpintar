@@ -169,7 +169,7 @@
                     <div class="px-4 py-3.5 border-b border-b-white/5 bg-[#17243e]/50 flex items-center justify-between">
                         <span class="text-[10px] font-bold text-rose-400 flex items-center">
                             <span class="w-2 h-2 rounded-full bg-rose-500 mr-2 animate-ping"></span>
-                            PEMINDAI BIOMETRIK AKTIF
+                            PEMINDAI VERIFIKASI WAJAH AKTIF
                         </span>
                         <span class="text-[9px] px-2 py-0.5 font-bold uppercase rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
                             LIVE
@@ -216,18 +216,17 @@
                             <div class="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-rose-450 rounded-br-sm"></div>
                         </div>
 
-                        <!-- Analyzing Scanner Overlay -->
-                        <div x-show="isAnalyzing" class="absolute inset-0 bg-[#090f1d]/75 backdrop-blur-sm flex flex-col items-center justify-center z-20 space-y-4" style="display: none;">
+                        <!-- Analyzing Scanner Overlay (Non-blocking, kept transparent to prevent camera flashing) -->
+                        <div x-show="isAnalyzing" class="absolute inset-0 bg-transparent flex flex-col items-center justify-center z-20 pointer-events-none" style="display: none;">
                             <!-- Glowing Scanner line -->
                             <div class="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-rose-400 to-transparent animate-scan z-20"></div>
-                            <!-- Double spinning rings for scanning -->
-                            <div class="w-16 h-16 relative">
-                                <div class="absolute inset-0 rounded-full border-4 border-t-rose-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-                                <div class="absolute inset-2 rounded-full border-4 border-t-red-400 border-r-transparent border-b-transparent border-l-transparent animate-spin-reverse" style="animation-duration: 1s;"></div>
-                            </div>
-                            <div class="text-center z-10">
-                                <h4 class="text-xs font-extrabold text-rose-400 tracking-wider uppercase animate-pulse">Memindai Wajah...</h4>
-                                <p class="text-[10px] text-slate-400 mt-1">Mengukur koordinat wajah Anda</p>
+                            <!-- Subtle indicator top right -->
+                            <div class="absolute top-3 right-3 bg-slate-900/80 border border-rose-500/30 text-rose-400 px-2.5 py-1 rounded-md text-[9px] font-bold tracking-wider flex items-center gap-1.5 shadow-lg">
+                                <svg class="animate-spin h-3 w-3 text-rose-400" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                ANALISIS...
                             </div>
                         </div>
                     </div>
