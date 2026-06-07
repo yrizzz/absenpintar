@@ -17,12 +17,7 @@ echo "╚═══════════════════════�
 echo "📁 Project path: $SCRIPT_DIR"
 echo ""
 
-# Update cwd di ecosystem.config.cjs sesuai path saat ini
-sed -i "s|cwd: \".*\"|cwd: \"$SCRIPT_DIR\"|g" ecosystem.config.cjs
-echo "✅ ecosystem.config.cjs diupdate ke path: $SCRIPT_DIR"
-
 # 1. Fix permission storage & cache
-echo ""
 echo "🔑 [1/10] Memperbaiki permission storage & cache..."
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
@@ -33,34 +28,38 @@ echo "✅ Permission storage OK"
 echo "🔧 [2/10] Mengaktifkan Maintenance Mode..."
 php artisan down || true
 
-# 3. Pull kode terbaru
+# 3. Pull kode terbaru (reset file yang di-generate script agar tidak konflik)
 echo "📥 [3/10] Menarik kode terbaru dari GitHub..."
+git checkout -- ecosystem.config.cjs 2>/dev/null || true
 git pull origin main
 
-# 4. Composer install
-echo "📦 [4/10] Menginstal dependensi PHP..."
+# 4. Update cwd di ecosystem.config.cjs sesuai path saat ini (SETELAH pull)
+sed -i "s|cwd: \".*\"|cwd: \"$SCRIPT_DIR\"|g" ecosystem.config.cjs
+echo "✅ ecosystem.config.cjs diupdate ke path: $SCRIPT_DIR"
+
+# 5. Composer install
+echo "📦 [5/10] Menginstal dependensi PHP..."
 composer install --no-dev --optimize-autoloader
 
-# 5. NPM build
-echo "📦 [5/10] Mengompilasi Aset Frontend..."
+# 6. NPM build
+echo "📦 [6/10] Mengompilasi Aset Frontend..."
 npm install --silent
 npm run build
 
-# 6. Migrasi database
-echo "🗄️  [6/10] Menjalankan migrasi database..."
+# 7. Migrasi database
+echo "🗄️  [7/10] Menjalankan migrasi database..."
 php artisan migrate --force
 
-# 7. Storage link
-echo "🔗 [7/10] Membuat Symlink Storage..."
+# 8. Storage link
+echo "🔗 [8/10] Membuat Symlink Storage..."
 php artisan storage:link || true
 
-# 8. Clear & optimize cache
-echo "⚡ [8/10] Mengoptimalkan Cache Laravel..."
+# 9. Clear & optimize cache
+echo "⚡ [9/10] Mengoptimalkan Cache Laravel..."
 php artisan optimize:clear
 php artisan optimize
 
-# 9. Fix permission storage setelah optimize (pastikan tetap writable)
-echo "🔑 [9/10] Re-fix permission setelah optimize..."
+# Re-fix permission setelah optimize
 chmod -R 775 storage bootstrap/cache
 
 # 10. PM2 restart
