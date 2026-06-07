@@ -6,8 +6,83 @@ import os
 sys.path.append(os.path.expanduser('~/.local/lib/python3.12/site-packages'))
 sys.path.append('/home/yr/.local/lib/python3.12/site-packages')
 
-import cv2 # type: ignore
-import numpy as np # type: ignore
+import cv2  # type: ignore
+import numpy as np  # type: ignore
+
+
+# --- Detection confidence: lowered to 0.55 to support faces with glasses ---
+# YuNet at 0.8 rejects faces where glasses cause partial landmark occlusion.
+# 0.55 maintains low false-positive rate while detecting glasses wearers reliably.
+YUNET_SCORE_THRESHOLD = 0.55
+YUNET_NMS_THRESHOLD   = 0.3
+YUNET_TOP_K           = 5000
+
+
+def _preprocess_for_detection(img):
+    """
+    Return a list of image variants to try for face detection.
+    Tries original first, then CLAHE-equalized (helps with glasses glare/shadow),
+    then a mild resize to 640-wide if the image is very large or very small.
+    """
+    variants = [img]
+
+    # CLAHE on luminance channel – improves contrast under glasses shadow/glare
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    l_eq = clahe.apply(l)
+    lab_eq = cv2.merge([l_eq, a, b])
+    img_clahe = cv2.cvtColor(lab_eq, cv2.COLOR_LAB2BGR)
+    variants.append(img_clahe)
+
+    # Resized variant: YuNet works best in the 320–640 px range
+    h, w = img.shape[:2]
+    if w > 640 or w < 200:
+        scale = 640.0 / w
+        img_resized = cv2.resize(img, (int(w * scale), int(h * scale)))
+        variants.append(img_resized)
+
+    return variants
+
+
+def _detect_best_face(detector, img):
+    """
+    Try multiple image variants for detection.
+    Returns the face row with the highest confidence, or None if nothing found.
+    """
+    best_face = None
+    best_conf  = -1.0
+
+    for variant in _preprocess_for_detection(img):
+        h, w = variant.shape[:2]
+        detector.setInputSize((w, h))
+        _, faces = detector.detect(variant)
+
+        if faces is not None and len(faces) > 0:
+            # faces[i][14] is the confidence score
+            for face in faces:
+                conf = float(face[14])
+                if conf > best_conf:
+                    best_conf = conf
+                    # Store the face coordinates remapped to original image size
+                    # If we used a resized variant, scale coordinates back
+                    orig_h, orig_w = img.shape[:2]
+                    scale_x = orig_w / w
+                    scale_y = orig_h / h
+                    remapped = face.copy()
+                    # Bounding box: x, y, w, h (indices 0-3)
+                    remapped[0] *= scale_x
+                    remapped[1] *= scale_y
+                    remapped[2] *= scale_x
+                    remapped[3] *= scale_y
+                    # Landmarks: 5 points × 2 coords, indices 4-13
+                    for k in range(5):
+                        remapped[4 + k * 2]     *= scale_x
+                        remapped[4 + k * 2 + 1] *= scale_y
+                    best_face = remapped
+
+    return best_face
+
 
 def verify_faces(img1_path, img2_path, threshold=0.65):
     # Check if files exist
@@ -32,9 +107,9 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
         }
 
     # Paths to OpenCV Zoo Deep Learning Models
-    models_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-    yunet_model = os.path.join(models_dir, "face_detection_yunet_2023mar.onnx")
-    sface_model = os.path.join(models_dir, "face_recognition_sface_2021dec.onnx")
+    models_dir   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
+    yunet_model  = os.path.join(models_dir, "face_detection_yunet_2023mar.onnx")
+    sface_model  = os.path.join(models_dir, "face_recognition_sface_2021dec.onnx")
 
     if not os.path.exists(yunet_model) or not os.path.exists(sface_model):
         return {
@@ -46,13 +121,14 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
 
     try:
         # Initialize YuNet face detector
+        # Score threshold lowered to 0.55 so glasses-wearing faces are detected.
         detector = cv2.FaceDetectorYN.create(
             yunet_model,
             "",
-            (320, 320),
-            0.8,
-            0.3,
-            5000
+            (320, 320),          # placeholder – overridden per image in _detect_best_face
+            YUNET_SCORE_THRESHOLD,
+            YUNET_NMS_THRESHOLD,
+            YUNET_TOP_K
         )
 
         # Initialize SFace face recognizer
@@ -61,17 +137,11 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
             ""
         )
 
-        # Detect face on Image 1 (Master)
-        h1, w1, _ = img1.shape
-        detector.setInputSize((w1, h1))
-        _, faces1 = detector.detect(img1)
+        # Detect best face in each image (tries original + CLAHE + resized variants)
+        face1 = _detect_best_face(detector, img1)
+        face2 = _detect_best_face(detector, img2)
 
-        # Detect face on Image 2 (Selfie)
-        h2, w2, _ = img2.shape
-        detector.setInputSize((w2, h2))
-        _, faces2 = detector.detect(img2)
-
-        if faces1 is None or len(faces1) == 0:
+        if face1 is None:
             return {
                 "verified": False,
                 "distance": 1.0,
@@ -79,17 +149,17 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
                 "message": "Wajah tidak terdeteksi pada Kunci Induk Wajah."
             }
 
-        if faces2 is None or len(faces2) == 0:
+        if face2 is None:
             return {
                 "verified": False,
                 "distance": 1.0,
                 "similarity": 0.0,
-                "message": "Wajah tidak terdeteksi pada kamera. Posisikan wajah Anda dengan jelas."
+                "message": "Wajah tidak terdeteksi pada kamera. Pastikan wajah terlihat jelas (kacamata diperbolehkan)."
             }
 
         # Align and crop faces based on deep-learning facial landmarks
-        face1_align = recognizer.alignCrop(img1, faces1[0])
-        face2_align = recognizer.alignCrop(img2, faces2[0])
+        face1_align = recognizer.alignCrop(img1, face1)
+        face2_align = recognizer.alignCrop(img2, face2)
 
         # Extract deep feature embeddings
         feat1 = recognizer.feature(face1_align)
@@ -98,9 +168,9 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
         # Compute cosine similarity (-1.0 to 1.0)
         cosine_sim = float(recognizer.match(feat1, feat2, cv2.FaceRecognizerSF_FR_COSINE))
 
-        # Normalize cosine similarity to a beautiful 0.0 - 1.0 scale
+        # Normalize cosine similarity to a 0.0 – 1.0 scale
         # OpenCV SFace match threshold for FR_COSINE is >= 0.363
-        # We calibrate this so that a cosine_sim >= 0.363 maps to a similarity >= threshold
+        # We calibrate so cosine_sim >= 0.363 maps to similarity >= 0.65
         if cosine_sim >= 0.363:
             # Scale between 0.65 and 1.0
             similarity = 0.65 + ((cosine_sim - 0.363) / (1.0 - 0.363)) * 0.35
@@ -128,6 +198,7 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
             "similarity": 0.0,
             "message": f"Gagal memproses analisis wajah: {str(e)}"
         }
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
