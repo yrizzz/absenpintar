@@ -179,9 +179,9 @@
         }
         .permissions-tab-btn.active,
         .permissions-tab-btn.tab-active {
-            background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 100%) !important;
+            background: linear-gradient(to right, #2563eb 0%, #4f46e5 100%) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
         }
         .permissions-tab-btn.active *,
         .permissions-tab-btn.tab-active * {
@@ -200,9 +200,9 @@
         }
         html.light .permissions-tab-btn.active,
         html.light .permissions-tab-btn.tab-active {
-            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
+            background: linear-gradient(to right, #2563eb 0%, #4f46e5 100%) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
             border: none !important;
         }
         html.light .permissions-tab-btn.active *,
@@ -227,17 +227,21 @@
             -webkit-backdrop-filter: blur(8px) !important;
         }
 
-        /* Base / Default Theme (Dark Mode) */
+        /* Base / Default Theme (Dark Mode) — frosted glass */
         .permissions-modal {
-            background-color: #121d33 !important;
+            background: linear-gradient(135deg, rgba(18, 29, 51, 0.92) 0%, rgba(11, 18, 34, 0.95) 100%) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #f1f5f9 !important;
         }
 
-        /* Light Mode Override */
+        /* Light Mode Override — frosted glass, not flat white */
         html.light .permissions-modal {
-            background-color: #ffffff !important;
-            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.78) 100%) !important;
+            backdrop-filter: blur(28px) !important;
+            -webkit-backdrop-filter: blur(28px) !important;
+            border: 1px solid rgba(15, 23, 42, 0.10) !important;
             color: #0f172a !important;
         }
 
@@ -272,7 +276,7 @@
         }
 
         /* Fix global CSS specificity issue forcing fill: #ffffff on SVGs in active states */
-        .tab-active svg, 
+        .tab-active svg,
         .tab-active svg *,
         .btn-primary svg,
         .btn-primary svg *,
@@ -285,6 +289,20 @@
         [class*="bg-blue-"] svg,
         [class*="bg-blue-"] svg * {
             fill: none !important;
+        }
+
+        /* btn-primary: force white text/icon in light mode
+           (html.light body color:#1e293b wins via inheritance over Tailwind text-white) */
+        html.light .btn-primary,
+        html.light .btn-primary span,
+        html.light .btn-primary svg {
+            color: #ffffff !important;
+        }
+
+        /* tab wrapper: cleaner look in light mode */
+        html.light .permissions-tab-wrapper {
+            background-color: #f1f5f9 !important;
+            border: 1px solid #e2e8f0 !important;
         }
     </style>
 
@@ -517,19 +535,19 @@
                     </div>
 
                     <div class="p-5 permissions-subcard rounded-2xl relative">
-                        <div class="text-2xl font-black text-amber-600 dark:text-amber-400 font-display leading-none mb-3">02</div>
+                        <div class="text-2xl font-black text-blue-600 dark:text-blue-400 font-display leading-none mb-3">02</div>
                         <h5 class="text-xs font-bold text-slate-800 dark:text-white">Kepala Divisi (Kadiv)</h5>
                         <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">Melakukan review kesesuaian operasional & beban kerja di divisi terkait.</p>
                     </div>
 
                     <div class="p-5 permissions-subcard rounded-2xl relative">
-                        <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-display leading-none mb-3">03</div>
+                        <div class="text-2xl font-black text-blue-600 dark:text-blue-400 font-display leading-none mb-3">03</div>
                         <h5 class="text-xs font-bold text-slate-800 dark:text-white">HR Manager (HRD)</h5>
                         <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">Persetujuan akhir & sinkronisasi data dispensasi kehadiran sistem.</p>
                     </div>
 
                     <div class="p-5 permissions-subcard rounded-2xl relative">
-                        <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display leading-none mb-3">04</div>
+                        <div class="text-2xl font-black text-blue-600 dark:text-blue-400 font-display leading-none mb-3">04</div>
                         <h5 class="text-xs font-bold text-slate-800 dark:text-white">Cetak Surat Resmi</h5>
                         <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">Sistem menerbitkan surat izin resmi bertanda tangan digital ber-barkod pengaman.</p>
                     </div>
@@ -623,8 +641,8 @@
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs text-center leading-relaxed">Tidak ditemukan pengajuan izin kerja yang cocok dengan kriteria filter Anda saat ini.</p>
                             </div>
                         @else
-                            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/25">
-                                <table class="w-full min-w-max text-left border-collapse">
+                            <div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/25">
+                                <table class="w-full text-left border-collapse">
                                     <thead>
                                         <tr class="border-b border-slate-200 dark:border-white/5 text-[10px] bg-slate-100 dark:bg-white/5 font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                             <th class="px-5 py-4 w-[240px]">Karyawan</th>
@@ -756,7 +774,88 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
+
+                            {{-- Mobile: review cards (no horizontal scroll) --}}
+                            <div class="md:hidden space-y-3">
+                                @foreach($reviewRequests as $req)
+                                    <div class="rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/25 p-4">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                <div class="w-9 h-9 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm uppercase shadow-sm">
+                                                    {{ strtoupper(substr($req->user->name, 0, 1)) }}
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <div class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ $req->user->name }}</div>
+                                                    <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">#{{ $req->user->employee_id }}</div>
+                                                </div>
+                                            </div>
+                                            @if($req->type === 'ijin_datang_terlambat')
+                                                <span class="badge-rect-warning flex-shrink-0">Terlambat</span>
+                                            @elseif($req->type === 'ijin_pulang_awal')
+                                                <span class="badge-rect-danger flex-shrink-0">Pulang Awal</span>
+                                            @elseif($req->type === 'ijin_setengah_hari')
+                                                <span class="badge-rect-info flex-shrink-0">Setengah Hari</span>
+                                            @else
+                                                <span class="badge-rect-neutral flex-shrink-0">Tidak Masuk</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="mt-3 flex items-center gap-2 text-xs">
+                                            <span class="font-bold text-slate-800 dark:text-white">{{ $req->date->translatedFormat('d M Y') }}</span>
+                                            @if($req->type !== 'ijin_tidak_masuk')
+                                                <span class="text-[10px] text-slate-500 dark:text-slate-400">{{ substr($req->start_time, 0, 5) }} - {{ substr($req->end_time, 0, 5) }}</span>
+                                            @endif
+                                        </div>
+
+                                        @if($req->reason)
+                                            <p class="mt-2 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">{{ $req->reason }}</p>
+                                        @endif
+                                        @if($req->attachment_path)
+                                            <a href="{{ asset('storage/' . $req->attachment_path) }}" target="_blank" class="inline-flex items-center text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline mt-1.5">
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                </svg>
+                                                Lihat Lampiran
+                                            </a>
+                                        @endif
+
+                                        <div class="mt-3 flex items-center gap-2">
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-black/25 border border-slate-200 dark:border-white/5 rounded-lg text-[10px]">
+                                                <span class="font-bold text-slate-500 dark:text-slate-400 uppercase">Kadiv</span>
+                                                @if($req->status_dept_head === 'approved')<span class="font-black text-emerald-600 dark:text-emerald-400">✓</span>
+                                                @elseif($req->status_dept_head === 'rejected')<span class="font-black text-rose-600 dark:text-rose-400">✗</span>
+                                                @else<span class="font-black text-amber-600 dark:text-amber-500">⏳</span>@endif
+                                            </span>
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-black/25 border border-slate-200 dark:border-white/5 rounded-lg text-[10px]">
+                                                <span class="font-bold text-slate-500 dark:text-slate-400 uppercase">HRD</span>
+                                                @if($req->status_hr === 'approved')<span class="font-black text-emerald-600 dark:text-emerald-400">✓</span>
+                                                @elseif($req->status_hr === 'rejected')<span class="font-black text-rose-600 dark:text-rose-400">✗</span>
+                                                @else<span class="font-black text-amber-600 dark:text-amber-500">⏳</span>@endif
+                                            </span>
+                                        </div>
+
+                                        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 dark:border-white/5 pt-3">
+                                            <button wire:click="viewDetail({{ $req->id }})" type="button" class="btn-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg transition-all">
+                                                Detail
+                                            </button>
+                                            @if($req->user_id === auth()->id())
+                                                <span class="inline-flex items-center gap-1 text-[10px] text-slate-500 font-bold bg-slate-100 dark:bg-slate-900/40 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 cursor-not-allowed">🔒 Pengajuan Sendiri</span>
+                                            @elseif($req->status === 'pending')
+                                                @if($isManager && $req->status_dept_head === 'pending')
+                                                    <button wire:click="approveDeptHead({{ $req->id }})" type="button" class="btn-success btn-xs font-black rounded-lg shadow-sm">ACC Kadiv</button>
+                                                @endif
+                                                @if($isHr && $req->status_hr === 'pending' && $req->status_dept_head === 'approved')
+                                                    <button wire:click="approveHr({{ $req->id }})" type="button" class="btn-primary btn-xs font-black rounded-lg shadow-sm">ACC HR</button>
+                                                @endif
+                                                <button wire:click="openRejectionModal({{ $req->id }})" type="button" class="btn-danger-outline btn-xs rounded-lg font-black">Tolak</button>
+                                            @else
+                                                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Selesai</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
                             <!-- Pagination Review -->
                             <div class="mt-6">
                                 {{ $reviewRequests->links() }}
@@ -856,78 +955,70 @@
                                             </div>
                                             
                                             <!-- Visual Progress Tracking Line -->
-                                            <div class="bg-slate-100/50 dark:bg-black/20 border border-slate-200/60 dark:border-white/5 rounded-xl p-3 space-y-2">
-                                                <div class="flex items-center justify-between text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                                                    <span>Tahap Verifikasi:</span>
+                                            <div class="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl p-3 space-y-2">
+                                                <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                                                    Tahap Verifikasi:
                                                 </div>
-                                                <div class="flex items-center justify-between px-2 pt-1 relative">
-                                                    <!-- Background track line -->
-                                                    <div class="absolute top-[13px] inset-x-6 h-[2px] bg-slate-200 dark:bg-slate-800 z-0"></div>
-                                                    <div class="absolute top-[13px] left-6 h-[2px] bg-gradient-to-r from-blue-600 to-emerald-500 z-0 transition-all duration-300"
-                                                         style="width: {{ $perm->status === 'approved' ? '100' : ($perm->status_dept_head === 'approved' ? '50' : '0') }}%"></div>
-
-                                                    <!-- Step 1: Draft / Diajukan -->
-                                                    <div class="flex flex-col items-center z-10" title="Izin telah diajukan ke sistem">
-                                                        <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-blue-600 text-white shadow shadow-blue-500/20">
-                                                            ✓
-                                                        </div>
-                                                        <span class="text-[8px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider">Diajukan</span>
+                                                <div class="flex items-start justify-between px-2 pt-1 relative">
+                                                    {{-- Track: sits between dot centers, fill nested inside so % is relative to track --}}
+                                                    <div class="absolute top-[10px] left-[26px] right-[26px] h-[2px] bg-slate-200 dark:bg-white/10 z-0 rounded-full overflow-hidden">
+                                                        <div class="absolute left-0 top-0 h-full bg-blue-500 transition-all duration-500"
+                                                             style="width: {{ $perm->status === 'approved' ? '100%' : ($perm->status_dept_head === 'approved' ? '50%' : '0%') }}"></div>
                                                     </div>
 
-                                                    <!-- Step 2: Kadiv Acc -->
+                                                    <!-- Step 1: Diajukan (always done) -->
+                                                    <div class="flex flex-col items-center z-10">
+                                                        <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-blue-600 text-white shadow shadow-blue-500/30">✓</div>
+                                                        <span class="text-[8px] font-bold text-blue-600 dark:text-blue-400 mt-1 uppercase tracking-wider">Diajukan</span>
+                                                    </div>
+
+                                                    <!-- Step 2: Kadiv -->
                                                     <div class="flex flex-col items-center z-10">
                                                         @if($perm->status_dept_head === 'approved')
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-emerald-600 text-white shadow shadow-emerald-500/20" title="Disetujui Kepala Divisi">
-                                                                ✓
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-blue-600 text-white shadow shadow-blue-500/30">✓</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-blue-600 dark:text-blue-400">Kadiv</span>
                                                         @elseif($perm->status_dept_head === 'rejected')
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-rose-600 text-white shadow shadow-rose-500/20" title="Ditolak Kepala Divisi">
-                                                                ✗
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-rose-600 text-white shadow shadow-rose-500/20">✗</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-rose-500">Kadiv</span>
                                                         @else
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-slate-100 dark:bg-slate-800 border border-slate-250 dark:border-slate-700 text-slate-500 dark:text-slate-400 animate-pulse" title="Menunggu verifikasi Kepala Divisi">
-                                                                ⏳
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[9px] bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 text-slate-400 animate-pulse">·</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-slate-400">Kadiv</span>
                                                         @endif
-                                                        <span class="text-[8px] font-bold mt-1 uppercase tracking-wider {{ $perm->status_dept_head === 'approved' ? 'text-emerald-600 dark:text-emerald-450' : ($perm->status_dept_head === 'rejected' ? 'text-rose-6050 dark:text-rose-4550' : 'text-slate-500') }}">Kadiv</span>
                                                     </div>
 
-                                                    <!-- Step 3: HR Acc -->
+                                                    <!-- Step 3: HRD -->
                                                     <div class="flex flex-col items-center z-10">
                                                         @if($perm->status_hr === 'approved')
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-emerald-600 text-white shadow shadow-emerald-500/20" title="Disetujui HR Manager">
-                                                                ✓
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-blue-600 text-white shadow shadow-blue-500/30">✓</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-blue-600 dark:text-blue-400">HRD</span>
                                                         @elseif($perm->status_hr === 'rejected')
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-rose-600 text-white shadow shadow-rose-500/20" title="Ditolak HR Manager">
-                                                                ✗
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-rose-600 text-white shadow shadow-rose-500/20">✗</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-rose-500">HRD</span>
                                                         @else
-                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[8px] bg-slate-100 dark:bg-slate-800 border border-slate-250 dark:border-slate-700 text-slate-500 dark:text-slate-400 {{ $perm->status_dept_head === 'approved' ? 'animate-pulse' : '' }}" title="Menunggu verifikasi HRD">
-                                                                ⏳
-                                                            </div>
+                                                            <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[9px] bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 text-slate-400 {{ $perm->status_dept_head === 'approved' ? 'animate-pulse' : '' }}">·</div>
+                                                            <span class="text-[8px] font-bold mt-1 uppercase tracking-wider text-slate-400">HRD</span>
                                                         @endif
-                                                        <span class="text-[8px] font-bold mt-1 uppercase tracking-wider {{ $perm->status_hr === 'approved' ? 'text-emerald-600 dark:text-emerald-4550' : ($perm->status_hr === 'rejected' ? 'text-rose-6050 dark:text-rose-4550' : 'text-slate-500') }}">HRD</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="pt-4 border-t border-slate-100 dark:border-white/5 mt-4 flex items-center gap-2">
-                                            <button wire:click="viewDetail({{ $perm->id }})" type="button" class="flex-1 py-2 text-center rounded-lg bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/5 font-extrabold text-[10px] transition-all">
+                                            <button wire:click="viewDetail({{ $perm->id }})" type="button"
+                                                class="flex-1 py-2 text-center rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-extrabold text-[10px] transition-all">
                                                 Detail & Lacak
                                             </button>
-                                            
+
                                             @if($perm->status === 'approved')
                                                 <a href="{{ route('letters.permission', $perm->id) }}" target="_blank"
-                                                    class="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 dark:hover:bg-blue-500/20 dark:hover:text-blue-300 font-extrabold text-[10px] transition-all">
-                                                    <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    class="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-[10px] transition-all shadow-sm shadow-blue-500/20">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                     </svg>
                                                     Cetak Surat
                                                 </a>
                                             @else
-                                                <button disabled class="flex-1 py-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 dark:text-slate-600 font-bold text-[10px] cursor-not-allowed text-center">
+                                                <button disabled class="flex-1 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 font-bold text-[10px] cursor-not-allowed text-center">
                                                     Menunggu
                                                 </button>
                                             @endif

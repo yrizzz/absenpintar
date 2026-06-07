@@ -17,7 +17,7 @@
             </a>
             <h1 class="text-2xl font-extrabold text-white flex items-center">
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2.5 animate-pulse shadow-[0_0_8px_#f43f5e]"></span>
-                Presensi Keluar Biometrik Live
+                Presensi Keluar Live
             </h1>
             <p class="text-xs text-slate-400 mt-1">Dekatkan wajah dan pastikan Anda berada di dalam area kantor untuk melakukan absen keluar</p>
         </div>
@@ -114,7 +114,7 @@
                                 <svg class="w-4 h-4 mr-2 text-rose-450" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Verifikasi Biometrik Wajah
+                                Verifikasi Wajah
                             </span>
 
                             <span x-show="!$wire.selfieData && !cameraActive" class="text-[9px] px-2 py-0.5 font-bold uppercase rounded bg-slate-800 text-slate-400 animate-pulse">Menunggu...</span>
@@ -227,7 +227,7 @@
                             </div>
                             <div class="text-center z-10">
                                 <h4 class="text-xs font-extrabold text-rose-400 tracking-wider uppercase animate-pulse">Memindai Wajah...</h4>
-                                <p class="text-[10px] text-slate-400 mt-1">Mengukur koordinat biometrik wajah Anda</p>
+                                <p class="text-[10px] text-slate-400 mt-1">Mengukur koordinat wajah Anda</p>
                             </div>
                         </div>
                     </div>
@@ -235,7 +235,7 @@
                     <!-- Manual Verification Trigger Panel -->
                     <div class="p-4 bg-[#17243e]/30 border-t border-t-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
                         <div class="text-[10px] text-slate-400 font-medium text-center sm:text-left">
-                            <span class="block text-white font-bold text-xs mb-0.5">Petunjuk Biometrik:</span>
+                            <span class="block text-white font-bold text-xs mb-0.5">Petunjuk Wajah:</span>
                             Pastikan pencahayaan cukup dan wajah terlihat jelas tanpa aksesoris berlebih.
                         </div>
                         <div class="flex-shrink-0 w-full sm:w-auto">

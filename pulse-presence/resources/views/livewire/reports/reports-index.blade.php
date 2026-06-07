@@ -234,13 +234,58 @@
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto">
+            <div>
                 @if($recapLogs->isEmpty())
                     <div class="label-xs text-slate-500 font-bold text-center py-10 bg-[#0d1527]/50 rounded-2xl">
                         Tidak ada kecocokan data absensi untuk saringan filter saat ini.
                     </div>
                 @else
-                    <table class="w-full min-w-max text-left border-collapse">
+                    {{-- Mobile: selectable recap cards --}}
+                    <div class="md:hidden space-y-3">
+                        <label class="flex items-center gap-2 px-1 pb-1 label-xs cursor-pointer">
+                            <input type="checkbox" wire:model.live="selectAll" class="rounded border-white/10 bg-[#0d1527] text-blue-500 focus:ring-blue-500 cursor-pointer">
+                            Pilih semua di halaman ini
+                        </label>
+                        @foreach($recapLogs as $log)
+                            <div class="bg-[#0d1527]/60 border border-white/5 rounded-2xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" value="{{ $log->id }}" wire:model.live="selectedLogs" class="mt-1 rounded border-white/10 bg-[#0d1527] text-blue-500 focus:ring-blue-500 cursor-pointer flex-shrink-0">
+                                    @if($log->selfie_path)
+                                        <div class="relative w-12 h-12 flex-shrink-0 bg-slate-800 rounded-lg overflow-hidden border border-white/10">
+                                            <img src="{{ asset('storage/' . $log->selfie_path) }}" class="w-full h-full object-cover">
+                                        </div>
+                                    @else
+                                        <div class="w-12 h-12 flex-shrink-0 bg-slate-900/60 rounded-lg flex items-center justify-center border border-white/5 text-[9px] font-bold text-slate-500">
+                                            Tanpa foto
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0 flex-1">
+                                        <div class="label-sm font-bold text-white truncate">{{ $log->user->name ?? 'N/A' }}</div>
+                                        <div class="label-xs text-slate-400">ID: {{ $log->user->employee_id ?? 'N/A' }}</div>
+                                        <div class="label-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($log->timestamp)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d M Y, H:i') }}</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 grid grid-cols-2 gap-2">
+                                    <div><div class="label-xs">Lokasi</div><div class="label-sm text-slate-300 truncate">{{ $log->branch->name ?? 'Mobile / WFH' }}</div></div>
+                                    <div><div class="label-xs">Presisi GPS</div><div class="label-sm text-slate-300">± {{ $log->accuracy ?? '0' }}m</div></div>
+                                    <div><div class="label-xs">IP Address</div><div class="label-xs font-mono text-slate-400">{{ $log->ip_address }}</div></div>
+                                    <div><div class="label-xs">Tipe</div>
+                                        @if($log->type === 'checkin')<span class="badge-rect-success">Masuk</span>@else<span class="badge-rect-info">Keluar</span>@endif
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
+                                    @if($log->risk_level === 'high')<span class="badge-rect-danger">Risiko Tinggi</span>
+                                    @elseif($log->risk_level === 'medium')<span class="badge-rect-warning">Risiko Sedang</span>
+                                    @else<span class="badge-rect-success">Risiko Rendah</span>@endif
+                                    @if($log->is_late)<span class="badge-rect-danger">Terlambat</span>@else<span class="badge-rect-success">Tepat waktu</span>@endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Desktop / tablet: full recap table --}}
+                    <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-white/5 label-xs font-bold text-slate-400">
                                 <th class="pb-3" style="width: 40px;">
@@ -317,6 +362,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
         </div>

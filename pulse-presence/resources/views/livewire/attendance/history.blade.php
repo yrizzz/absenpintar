@@ -167,37 +167,39 @@
                     <p class="mt-1 label-sm">Cobalah melonggarkan filter Anda atau lakukan absensi baru untuk mengisi halaman riwayat.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full min-w-max divide-y divide-white/5">
+                @php
+                    $tzSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
+                    $tzLabel = 'WIB';
+                    if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
+                    if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
+                @endphp
+
+                {{-- Desktop / tablet: full data table --}}
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white/5">
                         <thead class="bg-white/5">
                             <tr>
                                 @if($isAdmin)
-                                    <th class="px-6 py-4 text-left label-xs w-[200px]" style="width: 200px;">Karyawan</th>
+                                    <th class="px-4 lg:px-6 py-4 text-left label-xs">Karyawan</th>
                                 @endif
-                                <th class="px-6 py-4 text-left label-xs w-[180px]" style="width: 180px;">Tanggal & Waktu</th>
-                                <th class="px-6 py-4 text-left label-xs w-[140px]" style="width: 140px;">Metode Absensi</th>
-                                <th class="px-6 py-4 text-left label-xs w-[220px]" style="width: 220px;">Cabang & Presisi GPS</th>
-                                <th class="px-6 py-4 text-left label-xs w-[160px]" style="width: 160px;">Telemetri Risiko</th>
-                                <th class="px-6 py-4 text-left label-xs w-[150px]" style="width: 150px;">Status Kepatuhan</th>
-                                <th class="px-6 py-4 text-left label-xs w-[100px]" style="width: 100px;">Aksi</th>
+                                <th class="px-4 lg:px-6 py-4 text-left label-xs">Tanggal & Waktu</th>
+                                <th class="px-4 lg:px-6 py-4 text-left label-xs">Metode</th>
+                                <th class="px-4 lg:px-6 py-4 text-left label-xs">Cabang & GPS</th>
+                                <th class="px-4 lg:px-6 py-4 text-left label-xs">Telemetri Risiko</th>
+                                <th class="px-4 lg:px-6 py-4 text-left label-xs">Status</th>
+                                <th class="px-4 lg:px-6 py-4 text-right label-xs">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5 bg-transparent">
-                            @php
-                                $tzSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
-                                $tzLabel = 'WIB';
-                                if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
-                                if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
-                            @endphp
                             @foreach($attendances as $attendance)
                                 <tr class="hover:bg-white/5 transition-colors duration-150">
                                     @if($isAdmin)
-                                        <td class="px-6 py-4.5 whitespace-nowrap">
+                                        <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                             <div class="label-md font-bold text-white">{{ $attendance->user->name ?? 'Karyawan' }}</div>
                                             <div class="label-xs font-mono">#{{ $attendance->user->employee_id ?? 'N/A' }}</div>
                                         </td>
                                     @endif
-                                    <td class="px-6 py-4.5 whitespace-nowrap">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                         <div class="label-md font-bold text-white">
                                             {{ $attendance->timestamp->translatedFormat('d M Y') }}
                                         </div>
@@ -205,27 +207,27 @@
                                             {{ $attendance->timestamp->timezone($tzSetting)->format('H:i:s') }} {{ $tzLabel }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4.5 whitespace-nowrap">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                         <span class="{{ $attendance->type === 'checkin' ? 'badge-rect-success' : 'badge-rect-info' }}">
                                             {{ $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4.5 whitespace-nowrap">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                         <div class="label-md font-bold text-white">{{ $attendance->branch?->name ?? 'HQ Workspace' }}</div>
                                         <div class="label-sm mt-0.5">Akurasi GPS: ± {{ round($attendance->accuracy) }}m</div>
                                     </td>
-                                    <td class="px-6 py-4.5 whitespace-nowrap">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                         <span class="badge-rect-{{ $attendance->risk_level === 'high' ? 'danger' : ($attendance->risk_level === 'medium' ? 'warning' : 'success') }}">
-                                            Risiko: {{ $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah') }} (Skor: {{ $attendance->risk_score }})
+                                            {{ $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah') }} ({{ $attendance->risk_score }})
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4.5 whitespace-nowrap">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                                         <span class="badge-rect-{{ $attendance->status === 'approved' ? 'success' : ($attendance->status === 'flagged' ? 'danger' : 'warning') }}">
                                             {{ $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses') }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4.5 whitespace-nowrap text-xs">
-                                        <div class="flex items-center gap-3">
+                                    <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-right">
+                                        <div class="flex items-center justify-end gap-3">
                                             <button @click="selectedLog = {{ json_encode([
                                                 'id' => $attendance->id,
                                                 'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
@@ -252,10 +254,10 @@
                                                 Detail
                                             </button>
                                             <span class="text-white/10">|</span>
-                                            <a href="{{ route('letters.attendance-certificate', ['user_id' => $attendance->user_id, 'start_date' => $attendance->timestamp->startOfMonth()->toDateString(), 'end_date' => $attendance->timestamp->endOfMonth()->toDateString()]) }}" 
+                                            <a href="{{ route('letters.attendance-slip', $attendance->id) }}"
                                                target="_blank"
                                                class="label-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
-                                                Cetak
+                                                Cetak Slip
                                             </a>
                                         </div>
                                     </td>
@@ -263,6 +265,81 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Mobile: stacked cards (no horizontal scrolling) --}}
+                <div class="md:hidden divide-y divide-white/5">
+                    @foreach($attendances as $attendance)
+                        <div class="p-4 hover:bg-white/5 transition-colors duration-150">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    @if($isAdmin)
+                                        <div class="label-md font-bold text-white truncate">{{ $attendance->user->name ?? 'Karyawan' }}</div>
+                                        <div class="label-xs font-mono mb-1">#{{ $attendance->user->employee_id ?? 'N/A' }}</div>
+                                    @endif
+                                    <div class="label-md font-bold text-white">{{ $attendance->timestamp->translatedFormat('d M Y') }}</div>
+                                    <div class="label-sm mt-0.5">{{ $attendance->timestamp->timezone($tzSetting)->format('H:i:s') }} {{ $tzLabel }}</div>
+                                </div>
+                                <span class="{{ $attendance->type === 'checkin' ? 'badge-rect-success' : 'badge-rect-info' }} flex-shrink-0">
+                                    {{ $attendance->type === 'checkin' ? 'Masuk' : 'Keluar' }}
+                                </span>
+                            </div>
+
+                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                <div>
+                                    <div class="label-xs">Cabang</div>
+                                    <div class="label-sm font-semibold text-white truncate">{{ $attendance->branch?->name ?? 'HQ Workspace' }}</div>
+                                </div>
+                                <div>
+                                    <div class="label-xs">Akurasi GPS</div>
+                                    <div class="label-sm font-semibold text-white">± {{ round($attendance->accuracy) }}m</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 flex flex-wrap items-center gap-2">
+                                <span class="badge-rect-{{ $attendance->risk_level === 'high' ? 'danger' : ($attendance->risk_level === 'medium' ? 'warning' : 'success') }}">
+                                    Risiko {{ $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah') }} ({{ $attendance->risk_score }})
+                                </span>
+                                <span class="badge-rect-{{ $attendance->status === 'approved' ? 'success' : ($attendance->status === 'flagged' ? 'danger' : 'warning') }}">
+                                    {{ $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses') }}
+                                </span>
+                            </div>
+
+                            <div class="mt-3 flex items-center gap-3 border-t border-white/5 pt-3">
+                                <button @click="selectedLog = {{ json_encode([
+                                    'id' => $attendance->id,
+                                    'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
+                                    'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
+                                    'latitude' => $attendance->latitude,
+                                    'longitude' => $attendance->longitude,
+                                    'accuracy' => $attendance->accuracy,
+                                    'ip_address' => $attendance->ip_address,
+                                    'work_mode' => strtoupper($attendance->work_mode ?? 'office'),
+                                    'risk_score' => $attendance->risk_score ?? 0,
+                                    'risk_level' => $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
+                                    'risk_class' => $attendance->risk_level,
+                                    'status' => $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
+                                    'status_class' => $attendance->status,
+                                    'is_late' => $attendance->is_late,
+                                    'selfie_url' => $attendance->selfie_path ? asset('storage/' . $attendance->selfie_path) : null,
+                                    'notes' => $attendance->notes ?? 'Tidak ada catatan tambahan.',
+                                    'branch_name' => $attendance->branch->name ?? 'HQ Workspace',
+                                    'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
+                                    'employee_name' => $attendance->user->name ?? 'Karyawan',
+                                    'resolved_address' => $attendance->metadata['resolved_address'] ?? null
+                                ]) }}; showModal = true; initDetailMap();"
+                                class="label-sm font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">
+                                    Lihat Detail
+                                </button>
+                                <span class="text-white/10">|</span>
+                                <a href="{{ route('letters.attendance-slip', $attendance->id) }}"
+                                   target="_blank"
+                                   class="label-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                    Cetak Slip
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
 
                 <!-- Pagination block -->

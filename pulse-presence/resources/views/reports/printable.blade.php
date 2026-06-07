@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>AbsenPintar Ledger - Laporan Kehadiran Resmi</title>
+    <title>PresensiKu Ledger - Laporan Kehadiran Resmi</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -151,7 +151,7 @@
 
     <div class="header">
         <div>
-            <h1>AbsenPintar</h1>
+            <h1>PresensiKu</h1>
             <p>Sistem Manajemen Kehadiran & Telemetri Perusahaan</p>
         </div>
         <div class="meta-info">
@@ -326,11 +326,11 @@
     <div class="signature-space">
         <p>Disetujui dan disahkan oleh,</p>
         <span class="signature-line"></span>
-        <p style="margin-top: 5px; font-weight: 700;">HR & Super Admin AbsenPintar</p>
+        <p style="margin-top: 5px; font-weight: 700;">HR & Super Admin PresensiKu</p>
     </div>
 
     <div class="footer">
-        <span>AbsenPintar Ledger - Dokumen ini sah dan dicetak secara elektronik dari server sistem absensi
+        <span>PresensiKu Ledger - Dokumen ini sah dan dicetak secara elektronik dari server sistem absensi
             biometrik.</span>
         <span>Halaman 1 dari 1</span>
     </div>

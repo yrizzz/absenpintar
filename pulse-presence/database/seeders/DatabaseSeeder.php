@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             ShiftSeeder::class,
             UserSeeder::class,
+            SettingSeeder::class,
+            AttendanceSeeder::class,
+            LeaveSeeder::class,
+            PermissionRequestSeeder::class,
         ]);
     }
 }

@@ -27,7 +27,9 @@
         position: relative;
         width: 100%;
         max-width: 768px;
-        background: #121d33 !important;
+        background: linear-gradient(135deg, rgba(18, 29, 51, 0.94) 0%, rgba(11, 18, 34, 0.96) 100%) !important;
+        backdrop-filter: blur(28px) !important;
+        -webkit-backdrop-filter: blur(28px) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #f1f5f9 !important;
         border-radius: 24px !important;
@@ -40,9 +42,11 @@
 
     html.light .atd-modal-card {
         background: #ffffff !important;
-        border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid #e2e8f0 !important;
         color: #0f172a !important;
-        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 20px 60px -12px rgba(15,23,42,0.15), 0 4px 16px rgba(15,23,42,0.08) !important;
     }
 
     /* Header */
@@ -179,11 +183,19 @@
     }
 
     .atd-mono {
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
         font-weight: 700;
     }
+    .atd-coord-text { font-size: 11px; color: #cbd5e1; }
+    html.light .atd-coord-text { color: #334155; }
+
+    .atd-risk-score { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+    html.light .atd-risk-score { color: #334155; }
+
+    .atd-muted-text { font-size: 12px; font-weight: 500; line-height: 1.5; color: #94a3b8; }
+    html.light .atd-muted-text { color: #475569; }
     .atd-section-title {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 800;
         color: #94a3b8;
         text-transform: uppercase;
@@ -367,8 +379,8 @@
                             </template>
                             <!-- Badges -->
                             <div style="position: absolute; bottom: 6px; left: 6px; right: 6px; display: flex; justify-content: space-between; pointer-events: none;">
-                                <span style="padding: 2px 6px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 4px; font-size: 7px; font-weight: 900; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em;">Liveness ✓</span>
-                                <span style="padding: 2px 6px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 4px; font-size: 7px; font-weight: 900; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.05em;" x-text="selectedLog ? selectedLog.work_mode : ''"></span>
+                                <span style="padding: 3px 7px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 5px; font-size: 9px; font-weight: 900; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em;">Liveness ✓</span>
+                                <span style="padding: 3px 7px; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-radius: 5px; font-size: 9px; font-weight: 900; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.05em;" x-text="selectedLog ? selectedLog.work_mode : ''"></span>
                             </div>
                         </div>
                     </div>
@@ -437,7 +449,7 @@
                             <tr>
                                 <td class="atd-label">Koordinat</td>
                                 <td style="text-align: right;">
-                                    <span class="atd-mono" style="font-size: 11px;" :style="document.documentElement.classList.contains('light') ? 'color: #334155;' : 'color: #cbd5e1;'" x-text="selectedLog ? selectedLog.latitude + ', ' + selectedLog.longitude : ''"></span>
+                                    <span class="atd-mono atd-coord-text" x-text="selectedLog ? selectedLog.latitude + ', ' + selectedLog.longitude : ''"></span>
                                     <button @click="navigator.clipboard.writeText(selectedLog.latitude + ', ' + selectedLog.longitude); showToast('Koordinat disalin!', 'success')"
                                         style="font-size: 9px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-left: 6px; transition: all 0.2s;"
                                         onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
@@ -446,9 +458,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="atd-label">Keamanan Biometrik</td>
+                                <td class="atd-label">Keamanan Wajah</td>
                                 <td style="text-align: right;">
-                                    <span style="font-size: 12px; font-weight: 700;" :style="document.documentElement.classList.contains('light') ? 'color: #334155;' : 'color: #e2e8f0;'" x-text="selectedLog ? selectedLog.risk_score + '% Risk' : ''"></span>
+                                    <span class="atd-risk-score" x-text="selectedLog ? selectedLog.risk_score + '% Risk' : ''"></span>
                                     <span style="font-size: 9px; text-transform: uppercase; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid; margin-left: 4px;"
                                         :style="selectedLog && selectedLog.risk_class === 'high' ? 'background: rgba(244,63,94,0.08); border-color: rgba(244,63,94,0.2); color: #e11d48;' : (selectedLog && selectedLog.risk_class === 'medium' ? 'background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); color: #d97706;' : 'background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.2); color: #059669;')"
                                         x-text="selectedLog ? selectedLog.risk_level : ''"></span>
@@ -457,7 +469,7 @@
                             <tr x-show="selectedLog && selectedLog.resolved_address">
                                 <td colspan="2" style="vertical-align: top;">
                                     <span class="atd-label" style="display: block; margin-bottom: 2px;">Alamat Terdeteksi</span>
-                                    <span style="font-weight: 500; color: #94a3b8; line-height: 1.5; font-size: 12px;" :style="document.documentElement.classList.contains('light') ? 'color: #475569;' : 'color: #94a3b8;'" x-text="selectedLog ? selectedLog.resolved_address : ''"></span>
+                                    <span class="atd-muted-text" x-text="selectedLog ? selectedLog.resolved_address : ''"></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -466,7 +478,7 @@
                     <!-- Catatan -->
                     <div class="atd-notes-box" x-show="selectedLog && selectedLog.notes">
                         <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 800; color: #94a3b8; display: block;">Catatan Kehadiran</span>
-                        <p style="font-size: 12px; line-height: 1.5; font-weight: 600; font-style: italic; margin: 2px 0 0 0;" :style="document.documentElement.classList.contains('light') ? 'color: #475569;' : 'color: #cbd5e1;'" x-text="selectedLog ? selectedLog.notes : ''"></p>
+                        <p class="atd-muted-text" style="font-weight: 600; font-style: italic; margin: 2px 0 0 0;" x-text="selectedLog ? selectedLog.notes : ''"></p>
                     </div>
                 </div>
 

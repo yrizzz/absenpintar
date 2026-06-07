@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
         $superAdmin = User::create([
             'employee_id' => 'EMP001',
             'name' => 'Super Admin',
-            'email' => 'admin@AbsenPintar.com',
+            'email' => 'admin@PresensiKu.com',
             'password' => Hash::make('password'),
             'branch_id' => $headOffice->id,
             'phone' => '+62812345678',
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         $hrAdmin = User::create([
             'employee_id' => 'EMP002',
             'name' => 'HR Admin',
-            'email' => 'hr@AbsenPintar.com',
+            'email' => 'hr@PresensiKu.com',
             'password' => Hash::make('password'),
             'branch_id' => $headOffice->id,
             'phone' => '+62812345679',
@@ -54,7 +54,7 @@ class UserSeeder extends Seeder
         $manager = User::create([
             'employee_id' => 'EMP003',
             'name' => 'Manager',
-            'email' => 'manager@AbsenPintar.com',
+            'email' => 'manager@PresensiKu.com',
             'password' => Hash::make('password'),
             'branch_id' => $headOffice->id,
             'phone' => '+62812345680',
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
             $employee = User::create([
                 'employee_id' => 'EMP' . str_pad($i, 3, '0', STR_PAD_LEFT),
                 'name' => 'Employee ' . $i,
-                'email' => 'employee' . $i . '@AbsenPintar.com',
+                'email' => 'employee' . $i . '@PresensiKu.com',
                 'password' => Hash::make('password'),
                 'branch_id' => $headOffice->id,
                 'phone' => '+6281234' . str_pad($i, 4, '0', STR_PAD_LEFT),

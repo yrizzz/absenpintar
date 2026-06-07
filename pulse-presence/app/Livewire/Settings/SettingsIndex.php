@@ -39,10 +39,10 @@ class SettingsIndex extends Component
     public $permission_max_half_day_hours = 4.0;
 
     // Company identity (printed on official letters)
-    public $company_name = 'PT AbsenPintar Indonesia';
+    public $company_name = 'PT PresensiKu Indonesia';
     public $company_address = 'Jl. Teknologi No. 1, Jakarta Selatan';
     public $company_phone = '(021) 123-4567';
-    public $company_email = 'hrd@absenpintar.com';
+    public $company_email = 'hrd@presensiku.com';
 
     // Search and filters
     public $search = '';

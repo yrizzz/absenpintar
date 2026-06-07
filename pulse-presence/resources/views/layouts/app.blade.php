@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'AbsenPintar' }} - Enterprise Presence System</title>
+    <title>{{ $title ?? 'PresensiKu' }} - Enterprise Presence System</title>
 
     <!-- Premium Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap"
         rel="stylesheet">
 
     <!-- Theme Initializer Script to prevent flashing -->
@@ -56,8 +56,8 @@
                                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                     </div>
-                                    <span class="text-xl font-black text-white tracking-tight font-display">Absen<span
-                                            class="text-blue-500">Pintar</span></span>
+                                    <span class="text-xl font-black text-white tracking-tight font-display">Presensi<span
+                                            class="text-blue-500">Ku</span></span>
                                 </a>
                             </div>
 
@@ -333,7 +333,7 @@
                             </svg>
                         </div>
                         <div>
-                            <span class="text-base font-extrabold text-white tracking-tight font-display">Absen<span class="text-blue-500">Pintar</span></span>
+                            <span class="text-base font-extrabold text-white tracking-tight font-display">Presensi<span class="text-blue-500">Ku</span></span>
                             <span class="text-[10px] text-slate-500 block">Enterprise Presence System</span>
                         </div>
                     </div>
@@ -350,7 +350,7 @@
 
                 <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-medium pt-6 gap-4">
                     <div>
-                        © {{ date('Y') }} Platform AbsenPintar. Hak Cipta Dilindungi Undang-Undang.
+                        © {{ date('Y') }} Platform PresensiKu. Hak Cipta Dilindungi Undang-Undang.
                     </div>
                     <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
                         <a href="#" class="hover:text-blue-400 transition-colors">Kebijakan privasi</a>

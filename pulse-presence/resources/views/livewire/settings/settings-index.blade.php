@@ -19,11 +19,11 @@
                     </div>
 
                     <div
-                        class="flex flex-row overflow-x-auto whitespace-nowrap lg:flex-col lg:space-y-1.5 lg:space-x-0 lg:overflow-x-visible lg:whitespace-normal space-x-2 p-0.5 scrollbar-none">
+                        class="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-0 lg:space-y-1.5 p-0.5">
 
                         <!-- Tab 1: Parameter Keamanan -->
                         <button wire:click="$set('activeTab', 'security')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'security' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'security' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'security' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -34,7 +34,7 @@
 
                         <!-- Tab 2: Jam Kerja & Lembur -->
                         <button wire:click="$set('activeTab', 'work_hours')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'work_hours' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'work_hours' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'work_hours' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -45,7 +45,7 @@
 
                         <!-- Tab 3: Batas Izin Kerja -->
                         <button wire:click="$set('activeTab', 'permission_rules')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'permission_rules' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'permission_rules' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'permission_rules' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -56,7 +56,7 @@
 
                         <!-- Tab: Identitas Perusahaan -->
                         <button wire:click="$set('activeTab', 'company')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'company' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'company' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'company' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,7 +67,7 @@
 
                         <!-- Tab 4: Kantor Cabang & Geofence -->
                         <button wire:click="$set('activeTab', 'branches')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'branches' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'branches' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'branches' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -80,18 +80,18 @@
 
                         <!-- Tab 5: Kredensial Biometrik -->
                         <button wire:click="$set('activeTab', 'biometrics')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'biometrics' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'biometrics' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'biometrics' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>Kredensial Biometrik</span>
+                            <span>Verifikasi Wajah</span>
                         </button>
 
                         <!-- Tab 6: Peran & Spatie -->
                         <button wire:click="$set('activeTab', 'roles')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'roles' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'roles' ? 'tab-active' : 'text-slate-300 hover:text-white hover:bg-white/5 bg-[#0d1527]/40 lg:bg-transparent border border-white/5 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'roles' ? 'text-white' : 'text-slate-400' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,7 +103,7 @@
                         @if(auth()->user()->hasRole('super_admin'))
                         <!-- Tab 7: Hapus Riwayat Presensi (Super Admin Only) -->
                         <button wire:click="$set('activeTab', 'reset')" type="button"
-                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex items-center space-x-2 text-left flex-shrink-0 {{ $activeTab === 'reset' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-300' : 'text-rose-400/70 hover:text-rose-300 hover:bg-rose-500/10 bg-[#0d1527]/40 lg:bg-transparent border border-rose-500/10 lg:border-0' }}">
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-2xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'reset' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-300' : 'text-rose-400/70 hover:text-rose-300 hover:bg-rose-500/10 bg-[#0d1527]/40 lg:bg-transparent border border-rose-500/10 lg:border-0' }}">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'reset' ? 'text-rose-300' : 'text-rose-400/70' }}"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -412,7 +412,7 @@
                                         class="p-5 bg-[#0d1527] border border-white/5 rounded-2xl space-y-3.5 hover:border-white/10 transition-all">
                                         <div class="flex items-center justify-between">
                                             <span
-                                                class="label-sm font-bold text-white uppercase">{{ $b->name }}</span>
+                                                class="label-sm font-bold text-white">{{ $b->name }}</span>
                                             @if ($b->is_active)
                                                 <span class="badge-success text-[9px] py-0.5">Aktif</span>
                                             @else
@@ -454,17 +454,17 @@
                             </div>
 
                             <div class="border border-white/5 rounded-2xl overflow-hidden bg-black/20">
-                                <div class="overflow-x-auto">
-                                    <table class="w-full min-w-max text-left text-xs border-collapse">
+                                <div class="hidden md:block overflow-x-auto">
+                                    <table class="w-full text-left text-xs border-collapse">
                                         <thead>
                                             <tr
-                                                class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                                <th class="px-5 py-3.5" style="width: 220px;">Nama & Kode Cabang</th>
-                                                <th class="px-5 py-3.5" style="width: 320px;">Alamat Kantor</th>
-                                                <th class="px-5 py-3.5" style="width: 220px;">Koordinat (Lat / Lng)</th>
-                                                <th class="px-5 py-3.5 text-center" style="width: 120px;">Batas Radius</th>
-                                                <th class="px-5 py-3.5 text-center" style="width: 110px;">Status</th>
-                                                <th class="px-5 py-3.5 text-right" style="width: 120px;">Aksi</th>
+                                                class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold">
+                                                <th class="px-5 py-3.5 whitespace-nowrap" style="width: 22%;">Nama & Kode Cabang</th>
+                                                <th class="px-5 py-3.5 whitespace-nowrap" style="width: 30%;">Alamat Kantor</th>
+                                                <th class="px-5 py-3.5 whitespace-nowrap" style="width: 20%;">Koordinat (Lat / Lng)</th>
+                                                <th class="px-5 py-3.5 text-center whitespace-nowrap" style="width: 12%;">Batas Radius</th>
+                                                <th class="px-5 py-3.5 text-center whitespace-nowrap" style="width: 8%;">Status</th>
+                                                <th class="px-5 py-3.5 text-right whitespace-nowrap" style="width: 8%;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-white/5 font-medium text-slate-300">
@@ -474,7 +474,7 @@
                                                         <span
                                                             class="label-sm font-bold text-white block">{{ $b->name }}</span>
                                                         <span
-                                                            class="label-xs font-mono text-slate-500 uppercase block tracking-wider mt-0.5">KODE:
+                                                            class="label-xs font-mono text-slate-500 block tracking-wider mt-0.5">Kode:
                                                             {{ $b->code }}</span>
                                                     </td>
 
@@ -528,13 +528,51 @@
                                             @empty
                                                 <tr>
                                                     <td colspan="6"
-                                                        class="px-5 py-12 text-center text-slate-500 font-bold uppercase label-xs">
+                                                        class="px-5 py-12 text-center text-slate-500 font-bold label-xs">
                                                         Tidak ada data kantor cabang yang terdaftar di database.
                                                     </td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
                                     </table>
+                                </div>
+
+                                {{-- Mobile: branch cards --}}
+                                <div class="md:hidden divide-y divide-white/5">
+                                    @forelse($branches as $b)
+                                        <div class="p-4">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0">
+                                                    <span class="label-sm font-bold text-white block truncate">{{ $b->name }}</span>
+                                                    <span class="label-xs font-mono text-slate-500 block tracking-wider mt-0.5">Kode: {{ $b->code }}</span>
+                                                </div>
+                                                @if ($b->is_active)
+                                                    <span class="badge-success flex-shrink-0">Aktif</span>
+                                                @else
+                                                    <span class="badge-neutral flex-shrink-0">Nonaktif</span>
+                                                @endif
+                                            </div>
+                                            <div class="mt-3 label-sm text-slate-300">{{ $b->address }}</div>
+                                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <div class="label-xs">Koordinat</div>
+                                                    <div class="label-xs font-mono text-slate-400">{{ $b->latitude }}, {{ $b->longitude }}</div>
+                                                </div>
+                                                <div>
+                                                    <div class="label-xs">Batas Radius</div>
+                                                    <div class="label-sm font-bold text-blue-400">{{ $b->radius }} meter</div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 flex items-center gap-2 border-t border-white/5 pt-3">
+                                                <button wire:click="openBranchModal({{ $b->id }})" type="button" class="btn-xs btn-primary">Ubah</button>
+                                                <button wire:click="deleteBranch({{ $b->id }})" wire:confirm="Apakah Anda yakin ingin menghapus cabang ini?" type="button" class="btn-xs btn-danger-outline">Hapus</button>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="px-5 py-12 text-center text-slate-500 font-bold label-xs">
+                                            Tidak ada data kantor cabang yang terdaftar di database.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
                         </div>
@@ -553,7 +591,7 @@
 
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                             <div>
-                                <h3 class="heading-3">Dasbor Kredensial Biometrik Karyawan</h3>
+                                <h3 class="heading-3">Dasbor Verifikasi Wajah Karyawan</h3>
                                 <p class="label-sm">Pantau status biometrik karyawan, lakukan audit keamanan, dan hapus
                                     template terdaftar</p>
                             </div>
@@ -591,7 +629,7 @@
                                 </div>
                                 <div class="label-xs text-slate-400">Identitas Terverifikasi</div>
                                 <div class="heading-value-white text-emerald-400 mt-1">{{ $stats['enrolled'] }}</div>
-                                <div class="label-xs text-slate-500 mt-0.5">Kunci biometrik aman aktif</div>
+                                <div class="label-xs text-slate-500 mt-0.5">Verifikasi wajah aktif</div>
                             </div>
 
                             <div
@@ -634,7 +672,7 @@
                             </div>
 
                             <div>
-                                <label class="block label-xs mb-1.5">Filter Status Biometrik</label>
+                                <label class="block label-xs mb-1.5">Filter Status Wajah</label>
                                 <select wire:model.live="statusFilter"
                                     class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
                                     <option value="all" class="bg-[#121d33]">Semua Karyawan</option>
@@ -659,16 +697,16 @@
 
                         <!-- Main Ledger Table -->
                         <div class="border border-white/5 rounded-2xl overflow-hidden bg-black/20">
-                            <div class="overflow-x-auto">
-                                <table class="w-full min-w-max text-left text-xs border-collapse">
+                            <div class="hidden md:block overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
                                     <thead>
                                         <tr
-                                            class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                            <th class="px-5 py-3.5" style="width: 280px;">Karyawan</th>
-                                            <th class="px-5 py-3.5" style="width: 220px;">Cabang & Mode Kerja</th>
-                                            <th class="px-5 py-3.5 text-center" style="width: 200px;">Status Registrasi Wajah</th>
-                                            <th class="px-5 py-3.5 text-center" style="width: 150px;">Sudut Telemetri</th>
-                                            <th class="px-5 py-3.5 text-right" style="width: 140px;">Aksi</th>
+                                            class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold">
+                                            <th class="px-5 py-3.5 whitespace-nowrap" style="width: 34%;">Karyawan</th>
+                                            <th class="px-5 py-3.5 whitespace-nowrap" style="width: 22%;">Cabang & Mode Kerja</th>
+                                            <th class="px-5 py-3.5 text-center whitespace-nowrap" style="width: 18%;">Status Registrasi Wajah</th>
+                                            <th class="px-5 py-3.5 text-center whitespace-nowrap" style="width: 14%;">Sudut Telemetri</th>
+                                            <th class="px-5 py-3.5 text-right whitespace-nowrap" style="width: 12%;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-white/5 font-medium text-slate-300">
@@ -684,15 +722,15 @@
                                                             </div>
                                                         @else
                                                             <div
-                                                                class="w-9 h-9 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center font-bold text-slate-400 flex-shrink-0 uppercase">
+                                                                class="w-9 h-9 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center font-bold text-slate-400 flex-shrink-0">
                                                                 {{ strtoupper(substr($u->name, 0, 1)) }}
                                                             </div>
                                                         @endif
                                                         <div>
                                                             <span
-                                                                class="label-sm font-bold text-white block">{{ $u->name }}</span>
+                                                                class="label-sm font-bold text-white block whitespace-nowrap">{{ $u->name }}</span>
                                                             <span
-                                                                class="label-xs font-mono text-slate-500 block mt-0.5 font-semibold">#{{ $u->employee_id }}
+                                                                class="label-xs text-slate-500 block mt-0.5 font-medium whitespace-nowrap">#{{ $u->employee_id }}
                                                                 · {{ strtolower($u->email) }}</span>
                                                         </div>
                                                     </div>
@@ -700,21 +738,21 @@
 
                                                 <td class="px-5 py-4">
                                                     <span
-                                                        class="label-sm font-bold text-white block">{{ $u->branch->name ?? 'Belum Ditentukan' }}</span>
-                                                    <span class="badge-rect-info mt-1 inline-block">
-                                                        {{ strtoupper($u->work_mode) }}
+                                                        class="label-sm font-bold text-white block whitespace-nowrap">{{ $u->branch->name ?? 'Belum Ditentukan' }}</span>
+                                                    <span class="badge-rect-info mt-1 inline-block whitespace-nowrap">
+                                                        {{ ucfirst($u->work_mode) }}
                                                     </span>
                                                 </td>
 
                                                 <td class="px-5 py-4 text-center">
                                                     @if ($u->is_registered)
-                                                        <span class="badge-success">
+                                                        <span class="badge-success whitespace-nowrap">
                                                             <span
                                                                 class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
                                                             Kunci Aktif
                                                         </span>
                                                     @else
-                                                        <span class="badge-danger">
+                                                        <span class="badge-danger whitespace-nowrap">
                                                             <span
                                                                 class="w-1.5 h-1.5 rounded-full bg-rose-400 mr-1.5"></span>
                                                             Belum Terdaftar
@@ -722,7 +760,7 @@
                                                     @endif
                                                 </td>
 
-                                                <td class="px-5 py-4 text-center font-mono text-xs">
+                                                <td class="px-5 py-4 text-center text-xs">
                                                     @if ($u->is_registered)
                                                         <div class="flex items-center justify-center space-x-1">
                                                             <span
@@ -738,14 +776,14 @@
                                                                 title="Profil Kanan"></span>
                                                         </div>
                                                     @else
-                                                        <span class="label-xs text-slate-600">0 Sudut Terkunci</span>
+                                                        <span class="label-xs text-slate-600 whitespace-nowrap">0 Sudut Terkunci</span>
                                                     @endif
                                                 </td>
 
                                                 <td class="px-5 py-4 text-right">
                                                     <div class="flex items-center justify-end space-x-2">
                                                         <button wire:click="openUserEditModal({{ $u->id }})"
-                                                            class="btn-primary btn-xs shadow-sm">
+                                                            class="btn-primary btn-xs shadow-sm whitespace-nowrap">
                                                             <svg class="w-3.5 h-3.5 mr-1 inline-block" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -760,7 +798,7 @@
                                                         @if ($u->is_registered)
                                                             <button wire:click="revokeBiometrics({{ $u->id }})"
                                                                 wire:confirm="Apakah Anda yakin ingin menghapus dan membatalkan kunci biometrik untuk {{ $u->name }}? Mereka akan langsung diblokir dari sistem absensi."
-                                                                class="btn-danger-outline btn-xs">
+                                                                class="btn-danger-outline btn-xs whitespace-nowrap">
                                                                 <svg class="w-3 h-3 mr-1" fill="none"
                                                                     stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round"
@@ -773,7 +811,7 @@
                                                             <div class="flex items-center justify-end"
                                                                 x-data="{ uploading: false }">
                                                                 <label
-                                                                    class="btn-primary-outline btn-xs relative cursor-pointer">
+                                                                    class="btn-primary-outline btn-xs relative cursor-pointer whitespace-nowrap">
                                                                     <span x-show="!uploading"><svg
                                                                             class="w-3.5 h-3.5 mr-1 inline-block"
                                                                             fill="none" stroke="currentColor"
@@ -809,7 +847,7 @@
                                         @empty
                                             <tr>
                                                 <td colspan="5"
-                                                    class="px-5 py-12 text-center text-slate-500 font-bold uppercase tracking-wider">
+                                                    class="px-5 py-12 text-center text-slate-500 font-bold tracking-wider">
                                                     <svg class="w-8 h-8 mx-auto mb-2 text-slate-600" fill="none"
                                                         stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -822,6 +860,81 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {{-- Mobile: biometric enrolment cards --}}
+                            <div class="md:hidden divide-y divide-white/5">
+                                @forelse($users as $u)
+                                    <div class="p-4">
+                                        <div class="flex items-start gap-3">
+                                            @if ($u->hasRegisteredFace())
+                                                <div class="relative w-10 h-10 rounded-xl border border-blue-500/20 overflow-hidden bg-slate-800 flex-shrink-0">
+                                                    <img src="{{ $u->getMasterFaceUrl() }}" class="w-full h-full object-cover">
+                                                </div>
+                                            @else
+                                                <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center font-bold text-slate-400 flex-shrink-0">
+                                                    {{ strtoupper(substr($u->name, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                            <div class="min-w-0 flex-1">
+                                                <span class="label-sm font-bold text-white block truncate">{{ $u->name }}</span>
+                                                <span class="label-xs text-slate-500 block mt-0.5 font-medium truncate">#{{ $u->employee_id }} · {{ strtolower($u->email) }}</span>
+                                            </div>
+                                            @if ($u->is_registered)
+                                                <span class="badge-success flex-shrink-0">Aktif</span>
+                                            @else
+                                                <span class="badge-danger flex-shrink-0">Belum</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="mt-3 grid grid-cols-2 gap-2">
+                                            <div>
+                                                <div class="label-xs">Cabang & Mode</div>
+                                                <div class="label-sm font-semibold text-white truncate">{{ $u->branch->name ?? 'Belum Ditentukan' }}</div>
+                                                <span class="badge-rect-info mt-1 inline-block">{{ ucfirst($u->work_mode) }}</span>
+                                            </div>
+                                            <div>
+                                                <div class="label-xs">Sudut Telemetri</div>
+                                                <div class="label-sm font-bold text-blue-400">{{ $u->is_registered ? $u->registered_angles . '/3 terkunci' : '0 terkunci' }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
+                                            <button wire:click="openUserEditModal({{ $u->id }})" class="btn-primary btn-xs shadow-sm">Kelola</button>
+                                            @if ($u->is_registered)
+                                                <button wire:click="revokeBiometrics({{ $u->id }})"
+                                                    wire:confirm="Apakah Anda yakin ingin menghapus dan membatalkan kunci biometrik untuk {{ $u->name }}? Mereka akan langsung diblokir dari sistem absensi."
+                                                    class="btn-danger-outline btn-xs">Hapus Wajah</button>
+                                            @else
+                                                <div x-data="{ uploading: false }">
+                                                    <label class="btn-primary-outline btn-xs relative cursor-pointer">
+                                                        <span x-show="!uploading">+ Wajah</span>
+                                                        <span x-show="uploading" class="animate-pulse">...</span>
+                                                        <input type="file" accept="image/*"
+                                                            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                            @change="
+                                                            const file = $event.target.files[0];
+                                                            if (file) {
+                                                                uploading = true;
+                                                                const reader = new FileReader();
+                                                                reader.onload = (e) => {
+                                                                    @this.call('enrollUserFace', {{ $u->id }}, e.target.result)
+                                                                        .then(() => { uploading = false; })
+                                                                        .catch(() => { uploading = false; });
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            }
+                                                        ">
+                                                    </label>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="px-5 py-12 text-center text-slate-500 font-bold tracking-wider label-xs">
+                                        Tidak ada data karyawan yang cocok dengan kriteria pencarian Anda.
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -839,35 +952,36 @@
                                 masing-masing peran karyawan</p>
 
                             <div
-                                class="mt-4 p-4 bg-[#0d1527]/90 border border-amber-500/20 text-amber-400 rounded-2xl label-xs font-bold flex items-start gap-2 max-w-3xl">
-                                <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-400" fill="none"
+                                class="mt-4 p-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl flex items-start gap-3 max-w-3xl">
+                                <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-amber-400" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                                 <div>
-                                    <span class="label-xs block mb-1">Peringatan Keamanan Administratif</span>
-                                    Pemberian hak akses baru atau penolakan kapabilitas akan berdampak langsung seketika
-                                    pada sesi aktif karyawan.
-                                    Demi menjaga keamanan struktur otorisasi sistem, hanya akun Super Administrator yang
-                                    diizinkan memodifikasi Spatie Matrix ini.
+                                    <span class="block mb-1 text-sm font-bold text-amber-300">Peringatan Keamanan Administratif</span>
+                                    <p class="text-xs leading-relaxed text-amber-200/90 font-medium">
+                                        Pemberian hak akses baru atau penolakan kapabilitas akan berdampak langsung seketika
+                                        pada sesi aktif karyawan. Demi menjaga keamanan struktur otorisasi sistem, hanya akun
+                                        Super Administrator yang diizinkan memodifikasi Spatie Matrix ini.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="border border-white/5 rounded-2xl overflow-hidden bg-black/20">
-                            <div class="overflow-x-auto">
-                                <table class="w-full min-w-max text-left text-xs border-collapse">
+                            <div class="hidden md:block overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
                                     <thead>
                                         <tr
-                                            class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold uppercase">
-                                            <th class="px-5 py-4" style="width: 40%;">Kunci Kapabilitas / Izin Sistem</th>
+                                            class="border-b border-white/5 bg-[#0d1527]/70 label-xs font-bold">
+                                            <th class="px-5 py-4 whitespace-nowrap" style="width: 40%;">Kunci Kapabilitas / Izin Sistem</th>
                                             @foreach ($roles as $r)
-                                                <th class="px-5 py-4 text-center font-bold" style="width: 15%;">
+                                                <th class="px-5 py-4 text-center font-bold whitespace-nowrap" style="width: 15%;">
                                                     <span
-                                                        class="label-sm font-bold text-white block">{{ strtoupper(str_replace('_', ' ', $r->name)) }}</span>
+                                                        class="label-sm font-bold text-white block">{{ ucwords(str_replace('_', ' ', $r->name)) }}</span>
                                                     <span
-                                                        class="label-xs text-slate-500 font-bold uppercase mt-0.5">{{ $r->permissions->count() }}
+                                                        class="label-xs text-slate-500 font-bold mt-0.5">{{ $r->permissions->count() }}
                                                         Izin</span>
                                                 </th>
                                             @endforeach
@@ -878,10 +992,10 @@
                                             <tr class="hover:bg-white/5 transition-colors">
                                                 <td class="px-5 py-3">
                                                     <span
-                                                        class="label-sm font-bold text-white block">{{ strtoupper(str_replace('view ', 'Lihat ', str_replace('create ', 'Buat ', str_replace('edit ', 'Ubah ', str_replace('delete ', 'Hapus ', str_replace('approve ', 'Setujui ', $p->name)))))) }}</span>
+                                                        class="label-sm font-bold text-white block">{{ ucwords(str_replace('view ', 'Lihat ', str_replace('create ', 'Buat ', str_replace('edit ', 'Ubah ', str_replace('delete ', 'Hapus ', str_replace('approve ', 'Setujui ', $p->name)))))) }}</span>
                                                     <span
-                                                        class="label-xs text-slate-500 uppercase tracking-widest mt-0.5">KUNCI
-                                                        TEKNIS: {{ $p->name }}</span>
+                                                        class="label-xs text-slate-500 normal-case mt-0.5">Kunci
+                                                        teknis: {{ $p->name }}</span>
                                                 </td>
 
                                                 @foreach ($roles as $r)
@@ -901,6 +1015,25 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {{-- Mobile: permission cards with per-role toggle chips --}}
+                            <div class="md:hidden divide-y divide-white/5">
+                                @foreach ($allPermissions as $p)
+                                    <div class="p-4">
+                                        <span class="label-sm font-bold text-white block">{{ ucwords(str_replace('view ', 'Lihat ', str_replace('create ', 'Buat ', str_replace('edit ', 'Ubah ', str_replace('delete ', 'Hapus ', str_replace('approve ', 'Setujui ', $p->name)))))) }}</span>
+                                        <span class="label-xs text-slate-500 normal-case mt-0.5 block">Kunci teknis: {{ $p->name }}</span>
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            @foreach ($roles as $r)
+                                                <button wire:click="togglePermission({{ $r->id }}, '{{ $p->name }}')" type="button"
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-bold transition-all {{ $r->hasPermissionTo($p->name) ? 'bg-blue-500/20 border-blue-400 text-blue-300' : 'bg-white/5 border-white/10 text-slate-400' }}">
+                                                    <span>{{ $r->hasPermissionTo($p->name) ? '✓' : '○' }}</span>
+                                                    {{ ucwords(str_replace('_', ' ', $r->name)) }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -1021,10 +1154,10 @@
     <!-- ========================================================== -->
 
     <div x-data="{ open: @entangle('showRegisterModal') }" x-show="open"
-        class="fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
+        class="fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 modal-overlay"
         style="display: none;" x-transition>
         <div @click.away="open = false"
-            class="w-full max-w-lg max-h-[85vh] bg-[#121d33] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
+            class="w-full max-w-lg max-h-[85vh] modal-glass rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
             <div class="absolute -right-16 -top-16 w-36 h-36 bg-blue-500/5 rounded-full blur-3xl pointer-events-none">
             </div>
 
@@ -1135,10 +1268,10 @@
 
     <!-- Branch CRUD Modal -->
     <div x-data="{ open: @entangle('showBranchModal') }" x-show="open"
-        class="fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
+        class="fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 modal-overlay"
         style="display: none;" x-transition>
         <div @click.away="open = false"
-            class="w-full max-w-lg max-h-[85vh] bg-[#121d33] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
+            class="w-full max-w-lg max-h-[85vh] modal-glass rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col">
             <div
                 class="absolute -right-16 -top-16 w-36 h-36 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none">
             </div>
@@ -1246,42 +1379,53 @@
         </div>
     </div>
 
-    <!-- Employee Detail & Edit Modal -->
     <div x-data="{ open: @entangle('showUserEditModal') }" x-show="open"
-        class="fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
-        style="display: none;" x-transition>
+        class="fixed inset-0 z-[100] flex items-start justify-center p-4 py-8 overflow-y-auto modal-overlay"
+        style="display: none;"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
         <div @click.away="open = false"
-            class="w-full max-w-3xl max-h-[85vh] bg-[#121d33]/95 border border-white/15 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fade-in flex flex-col">
+            class="w-full max-w-3xl my-auto rounded-2xl shadow-2xl relative overflow-hidden modal-glass"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+            x-transition:leave-end="opacity-0 scale-95 translate-y-4">
             <div class="absolute -right-16 -top-16 w-36 h-36 bg-blue-500/5 rounded-full blur-3xl pointer-events-none">
             </div>
 
-            <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 sm:px-8 py-5" style="border-bottom: 1px solid #e2e8f0;">
                 <div>
-                    <h3 class="heading-3"><svg class="w-3.5 h-3.5 mr-1 inline-block" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="heading-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>Kelola Akun Karyawan</h3>
-                    <p class="label-xs text-slate-400 mt-0.5">Ubah rincian profil, penempatan cabang, biometrik wajah,
-                        perangkat terpercaya, dan peran</p>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Kelola Akun Karyawan
+                    </h3>
+                    <p class="label-xs text-slate-400 mt-0.5">Ubah rincian profil, penempatan cabang, biometrik wajah, perangkat terpercaya, dan peran</p>
                 </div>
-                <button @click="open = false" class="text-slate-400 hover:text-white text-xl font-bold">×</button>
+                <button @click="open = false" class="w-8 h-8 flex items-center justify-center rounded-lg transition-all text-lg font-bold" style="color: #64748b;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#0f172a'" onmouseout="this.style.background='transparent'; this.style.color='#64748b'">×</button>
             </div>
 
             @php
                 $selectedUser = $selectedUserId ? \App\Models\User::find($selectedUserId) : null;
             @endphp
 
-            <form wire:submit.prevent="saveUser"
-                class="space-y-6 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+            <form wire:submit.prevent="saveUser" class="px-6 sm:px-8 py-6 space-y-6">
                 <!-- Two Column Layout: Face + Details -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
 
                     <!-- Left Column: Master Face Photos (3 Angles) -->
                     <div class="md:col-span-4 flex flex-col items-center">
-                        <span class="block label-xs mb-2.5 text-center">Baseline Biometrik</span>
+                        <span class="block label-xs mb-2.5 text-center">Template Wajah</span>
 
                         @if ($selectedUser && $selectedUser->hasRegisteredFace())
                             <div class="grid grid-cols-3 gap-2 w-full max-w-[220px]">
@@ -1335,7 +1479,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Nama Lengkap</label>
                                 <input wire:model="edit_name" type="text" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_name')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1344,7 +1488,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Nomor Induk / ID Karyawan</label>
                                 <input wire:model="edit_employee_id" type="text" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_employee_id')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1355,7 +1499,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Alamat Email</label>
                                 <input wire:model="edit_email" type="email" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_email')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1365,7 +1509,7 @@
                                 <label class="block label-xs mb-1.5">Ubah Sandi Baru (Opsional)</label>
                                 <input wire:model="edit_password" type="password"
                                     placeholder="Kosongkan jika tidak diubah"
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_password')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1376,7 +1520,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Tanggal Lahir</label>
                                 <input wire:model="edit_date_of_birth" type="date"
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_date_of_birth')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1385,7 +1529,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Tanggal Masuk Kerja (Joined)</label>
                                 <input wire:model="edit_joined_at" type="date"
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_joined_at')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror
@@ -1396,7 +1540,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Cabang Kantor</label>
                                 <select wire:model="edit_branch_id" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
                                     <option value="">Pilih Cabang</option>
                                     @foreach ($branches as $b)
                                         <option value="{{ $b->id }}">{{ $b->name }}</option>
@@ -1410,7 +1554,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Mode Kerja</label>
                                 <select wire:model="edit_work_mode" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
                                     <option value="wfo">WFO (Di Kantor)</option>
                                     <option value="wfh">WFH (Di Rumah)</option>
                                     <option value="hybrid">Hybrid</option>
@@ -1423,7 +1567,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Peran Sistem</label>
                                 <select wire:model="edit_role" required
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer">
                                     <option value="employee">Employee</option>
                                     <option value="manager">Manager</option>
                                     <option value="hr_admin">HR Admin</option>
@@ -1437,7 +1581,7 @@
                             <div>
                                 <label class="block label-xs mb-1.5">Kuota Cuti Tahunan</label>
                                 <input wire:model="edit_annual_leave_quota" type="number" required min="0" max="100"
-                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all">
+                                    class="w-full bg-[#0d1527] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
                                 @error('edit_annual_leave_quota')
                                     <span class="label-xs text-rose-400 font-bold block mt-1">{{ $message }}</span>
                                 @enderror

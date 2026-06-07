@@ -151,10 +151,10 @@
 
 <body>
     @php
-        $company = cache()->get('settings.company_name', 'PT AbsenPintar Indonesia');
+        $company = cache()->get('settings.company_name', 'PT PresensiKu Indonesia');
         $address = cache()->get('settings.company_address', 'Jl. Teknologi No. 1, Jakarta Selatan');
         $phone = cache()->get('settings.company_phone', '(021) 1234-5678');
-        $email = cache()->get('settings.company_email', 'hrd@absenpintar.com');
+        $email = cache()->get('settings.company_email', 'hrd@presensiku.com');
         $tz = cache()->get('settings.timezone', 'Asia/Jakarta');
 
         $nomorSurat = 'SK/' . str_pad($user->id, 4, '0', STR_PAD_LEFT) . '/HRD/' . \Carbon\Carbon::now()->format('m/Y');
@@ -273,8 +273,8 @@
     </p>
 
     <div class="footer-doc">
-        <p>Dokumen ini dicetak secara elektronik oleh sistem AbsenPintar pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} WIB.</p>
-        <p>Surat keterangan ini sah dan diverifikasi melalui sistem biometrik & geofencing AbsenPintar.</p>
+        <p>Dokumen ini dicetak secara elektronik oleh sistem PresensiKu pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} WIB.</p>
+        <p>Surat keterangan ini sah dan diverifikasi melalui sistem biometrik & geofencing PresensiKu.</p>
     </div>
 
     <script>window.onload = function() { window.print(); }</script>

@@ -113,7 +113,7 @@ class CheckIn extends Component
                     // Fallback to Nominatim if Google fails or no API key
                     if (empty($this->resolvedAddress)) {
                         $fallback = \Illuminate\Support\Facades\Http::withHeaders([
-                            'User-Agent' => 'AbsenPintar/1.0 (contact@yrizzz.com)'
+                            'User-Agent' => 'PresensiKu/1.0 (contact@yrizzz.com)'
                         ])->timeout(5)->get("https://nominatim.openstreetmap.org/reverse", [
                             'format' => 'jsonv2',
                             'lat' => $lat,

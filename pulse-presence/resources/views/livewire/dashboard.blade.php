@@ -132,7 +132,7 @@
                     </div>
                     <div>
                         <h4 class="text-sm font-bold text-white leading-tight">Absensi Berhasil Terverifikasi!</h4>
-                        <p class="text-xs text-slate-400 mt-1">Sistem biometrik & geofencing pintar berhasil mendata sesi Anda secara akurat.</p>
+                        <p class="text-xs text-slate-400 mt-1">Face recognition & geofencing pintar berhasil mendata sesi Anda secara akurat.</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">

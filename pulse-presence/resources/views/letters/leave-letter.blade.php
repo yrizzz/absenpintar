@@ -144,10 +144,10 @@
 
 <body>
     @php
-        $company = cache()->get('settings.company_name', 'PT AbsenPintar Indonesia');
+        $company = cache()->get('settings.company_name', 'PT PresensiKu Indonesia');
         $address = cache()->get('settings.company_address', 'Jl. Teknologi No. 1, Jakarta Selatan');
         $phone = cache()->get('settings.company_phone', '(021) 1234-5678');
-        $email = cache()->get('settings.company_email', 'hrd@absenpintar.com');
+        $email = cache()->get('settings.company_email', 'hrd@presensiku.com');
         $tz = cache()->get('settings.timezone', 'Asia/Jakarta');
 
         $leaveTypes = [
@@ -282,7 +282,7 @@
     </p>
 
     <div class="footer-doc">
-        <p>Dokumen ini dicetak secara elektronik oleh sistem AbsenPintar pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} WIB.</p>
+        <p>Dokumen ini dicetak secara elektronik oleh sistem PresensiKu pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} WIB.</p>
         <p>Surat ini sah tanpa tanda tangan basah apabila status persetujuan berstatus "Disetujui" pada sistem.</p>
     </div>
 

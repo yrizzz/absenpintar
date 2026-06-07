@@ -6,10 +6,19 @@
 @source '../**/*.js';
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Outfit', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
 }
+
+/*
+ * Bind Tailwind's `dark:` variant to the app's own theme toggle.
+ * The app is dark by default and adds `.light` on <html> for light mode,
+ * so `dark:` must apply whenever <html> does NOT have `.light`
+ * (instead of Tailwind's default of following the OS prefers-color-scheme).
+ * This keeps `dark:`-styled views (e.g. Izin Kerja) in sync with the toggle.
+ */
+@custom-variant dark (&:where(:root:not(.light), :root:not(.light) *));
 
 /* Force pointer cursor globally on all button-like elements */
 button,
@@ -520,23 +529,45 @@ html.light a.text-transparent {
 }
 
 html.light .text-blue-400,
-html.light .text-blue-400\/90 {
+html.light .text-blue-400\/90,
+html.light .text-blue-300,
+html.light .text-blue-200 {
   color: #1d4ed8 !important;
 }
 
 html.light .text-emerald-400,
-html.light .text-emerald-400\/90 {
+html.light .text-emerald-400\/90,
+html.light .text-emerald-300,
+html.light .text-emerald-200 {
   color: #047857 !important;
 }
 
 html.light .text-rose-400,
-html.light .text-rose-400\/90 {
+html.light .text-rose-400\/90,
+html.light .text-rose-300,
+html.light .text-rose-200 {
   color: #b91c1c !important;
 }
 
 html.light .text-amber-400,
-html.light .text-amber-400\/90 {
+html.light .text-amber-400\/90,
+html.light .text-amber-300,
+html.light .text-amber-200 {
   color: #b45309 !important;
+}
+
+html.light .text-indigo-400,
+html.light .text-indigo-400\/90,
+html.light .text-indigo-300,
+html.light .text-indigo-200 {
+  color: #4338ca !important;
+}
+
+html.light .text-cyan-400,
+html.light .text-cyan-400\/90,
+html.light .text-cyan-300,
+html.light .text-cyan-200 {
+  color: #0e7490 !important;
 }
 
 /* Text & Typography Overrides */
@@ -659,16 +690,67 @@ html.light textarea:focus {
 }
 
 /* Badges & Accents in Light Mode */
-html.light .badge-neutral {
+html.light .badge-neutral,
+html.light .badge-rect-neutral {
   background-color: rgba(15, 23, 42, 0.06) !important;
   border-color: rgba(15, 23, 42, 0.1) !important;
   color: #334155 !important;
 }
 
-html.light .badge-rect-neutral {
-  background-color: rgba(15, 23, 42, 0.06) !important;
-  border-color: rgba(15, 23, 42, 0.1) !important;
-  color: #334155 !important;
+html.light .badge-info,
+html.light .badge-rect-info {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  color: #1d4ed8 !important;
+}
+
+html.light .badge-success,
+html.light .badge-rect-success {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #047857 !important;
+}
+
+html.light .badge-warning,
+html.light .badge-rect-warning {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  color: #b45309 !important;
+}
+
+html.light .badge-danger,
+html.light .badge-rect-danger {
+  background-color: rgba(225, 29, 72, 0.1) !important;
+  border-color: rgba(225, 29, 72, 0.25) !important;
+  color: #be123c !important;
+}
+
+/* Outline Buttons in Light Mode */
+html.light .btn-primary-outline {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: #1d4ed8 !important;
+}
+html.light .btn-primary-outline:hover {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+html.light .btn-success-outline {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #047857 !important;
+}
+html.light .btn-success-outline:hover {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+html.light .btn-danger-outline {
+  background-color: rgba(225, 29, 72, 0.1) !important;
+  border-color: rgba(225, 29, 72, 0.3) !important;
+  color: #be123c !important;
+}
+html.light .btn-danger-outline:hover {
+  background-color: rgba(225, 29, 72, 0.15) !important;
 }
 
 /* Table and Border Overrides */
@@ -713,6 +795,25 @@ html.light .btn-secondary {
 html.light .btn-secondary:hover {
   background-color: #f1f5f9 !important;
   border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Force white text on solid coloured buttons/badges in light mode
+   (html.light body sets color:#1e293b !important which otherwise wins via inheritance
+   over Tailwind text-white since Tailwind utilities don't use !important) */
+html.light .bg-blue-600,
+html.light .bg-blue-700,
+html.light .hover\:bg-blue-700:hover,
+html.light .bg-rose-600,
+html.light .bg-emerald-600,
+html.light .bg-indigo-600,
+html.light .bg-violet-600 {
+  color: #ffffff !important;
+}
+html.light .bg-blue-600 svg,
+html.light .bg-blue-700 svg,
+html.light .bg-rose-600 svg,
+html.light .bg-emerald-600 svg {
+  color: #ffffff !important;
 }
 
 html.light .text-slate-500 {
@@ -783,33 +884,33 @@ html.light .span.bg-\[\#17223b\] {
   border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
-html.light button[onclick*="admin@absenpintar.com"],
-html.light button[onclick*="hr@absenpintar.com"],
-html.light button[onclick*="manager@absenpintar.com"],
-html.light button[onclick*="employee4@absenpintar.com"] {
+html.light button[onclick*="admin@presensiku.com"],
+html.light button[onclick*="hr@presensiku.com"],
+html.light button[onclick*="manager@presensiku.com"],
+html.light button[onclick*="employee4@presensiku.com"] {
   background-color: #ffffff !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
 }
 
-html.light button[onclick*="admin@absenpintar.com"]:hover,
-html.light button[onclick*="hr@absenpintar.com"]:hover,
-html.light button[onclick*="manager@absenpintar.com"]:hover,
-html.light button[onclick*="employee4@absenpintar.com"]:hover {
+html.light button[onclick*="admin@presensiku.com"]:hover,
+html.light button[onclick*="hr@presensiku.com"]:hover,
+html.light button[onclick*="manager@presensiku.com"]:hover,
+html.light button[onclick*="employee4@presensiku.com"]:hover {
   background-color: rgba(37, 99, 235, 0.05) !important;
   border-color: rgba(37, 99, 235, 0.3) !important;
 }
 
-html.light button[onclick*="admin@absenpintar.com"] span,
-html.light button[onclick*="hr@absenpintar.com"] span,
-html.light button[onclick*="manager@absenpintar.com"] span,
-html.light button[onclick*="employee4@absenpintar.com"] span {
+html.light button[onclick*="admin@presensiku.com"] span,
+html.light button[onclick*="hr@presensiku.com"] span,
+html.light button[onclick*="manager@presensiku.com"] span,
+html.light button[onclick*="employee4@presensiku.com"] span {
   color: #1e293b !important;
 }
 
-html.light button[onclick*="admin@absenpintar.com"]:hover span,
-html.light button[onclick*="hr@absenpintar.com"]:hover span,
-html.light button[onclick*="manager@absenpintar.com"]:hover span,
-html.light button[onclick*="employee4@absenpintar.com"]:hover span {
+html.light button[onclick*="admin@presensiku.com"]:hover span,
+html.light button[onclick*="hr@presensiku.com"]:hover span,
+html.light button[onclick*="manager@presensiku.com"]:hover span,
+html.light button[onclick*="employee4@presensiku.com"]:hover span {
   color: #1d4ed8 !important;
 }
 
@@ -1229,6 +1330,39 @@ html.light button.permission-tab-btn:hover:not(.tab-active) {
 
 html.light button.permission-tab-btn.tab-active svg {
   fill: none !important; /* prevent white circle fill on SVG clock/other icons */
+}
+
+/* ==========================================
+   UNIFIED MODAL SYSTEM — frosted glass in BOTH themes
+   Blurred translucent overlay (never a solid white sheet) +
+   frosted panel (never a flat opaque white card).
+   ========================================== */
+.modal-overlay {
+  background: rgba(2, 6, 23, 0.55) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+html.light .modal-overlay {
+  background: rgba(15, 23, 42, 0.32) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.modal-glass {
+  background: linear-gradient(135deg, rgba(18, 29, 51, 0.92) 0%, rgba(11, 18, 34, 0.95) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55) !important;
+  color: #f1f5f9 !important;
+}
+html.light .modal-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.78) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18) !important;
+  color: #0f172a !important;
 }
 
 

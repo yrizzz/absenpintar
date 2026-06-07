@@ -137,44 +137,47 @@
                     <h3 class="heading-3">Riwayat Pengajuan Cuti Anda</h3>
                     <span class="label-sm">Menampilkan pengajuan terbaru</span>
                 </div>
-                <div class="overflow-x-auto">
-                    @if($myLeaves->isEmpty())
-                        <div class="text-xs text-slate-500 font-bold text-center py-8 bg-[#0d1527]/50 rounded-2xl">
-                            Anda belum pernah mengajukan cuti.
-                        </div>
-                    @else
-                        <table class="w-full min-w-max text-left border-collapse">
+                @if($myLeaves->isEmpty())
+                    <div class="text-xs text-slate-500 font-bold text-center py-8 bg-[#0d1527]/50 rounded-2xl">
+                        Anda belum pernah mengajukan cuti.
+                    </div>
+                @else
+                    @php
+                        $leaveStatusBadge = function ($status) {
+                            return match ($status) {
+                                'pending' => ['badge-rect-warning', 'Menunggu Manajer'],
+                                'manager_approved' => ['badge-rect-info', 'Menunggu HR'],
+                                'hr_approved' => ['badge-rect-success', 'Disetujui'],
+                                default => ['badge-rect-danger', 'Ditolak'],
+                            };
+                        };
+                    @endphp
+
+                    {{-- Desktop / tablet: table --}}
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-white/5 label-xs font-bold text-slate-400">
-                                    <th class="pb-3 w-[150px]" style="width: 150px;">Tipe Cuti</th>
-                                    <th class="pb-3 w-[150px]" style="width: 150px;">Tanggal Mulai</th>
-                                    <th class="pb-3 w-[150px]" style="width: 150px;">Tanggal Selesai</th>
-                                    <th class="pb-3 w-[100px]" style="width: 100px;">Durasi</th>
-                                    <th class="pb-3 w-[250px]" style="width: 250px;">Alasan</th>
-                                    <th class="pb-3 w-[120px] text-right" style="width: 120px;">Status</th>
-                                    <th class="pb-3 w-[80px] text-right" style="width: 80px;">Aksi</th>
+                                    <th class="px-5 py-3.5 w-[12%]">Tipe Cuti</th>
+                                    <th class="px-5 py-3.5 w-[14%]">Tanggal Mulai</th>
+                                    <th class="px-5 py-3.5 w-[14%]">Tanggal Selesai</th>
+                                    <th class="px-5 py-3.5 w-[8%]">Durasi</th>
+                                    <th class="px-5 py-3.5">Alasan</th>
+                                    <th class="px-5 py-3.5 w-[12%] text-right">Status</th>
+                                    <th class="px-5 py-3.5 w-[8%] text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/5 text-xs text-slate-300">
                                 @foreach($myLeaves as $ml)
-                                    <tr>
-                                        <td class="py-4 label-md font-bold text-white">{{ ucfirst($ml->leave_type) }}</td>
-                                        <td class="py-4 label-sm">{{ \Carbon\Carbon::parse($ml->start_date)->translatedFormat('d F Y') }}</td>
-                                        <td class="py-4 label-sm">{{ \Carbon\Carbon::parse($ml->end_date)->translatedFormat('d F Y') }}</td>
-                                        <td class="py-4 label-sm">{{ $ml->total_days }} Hari</td>
-                                        <td class="py-4 label-sm text-slate-400">{{ $ml->reason }}</td>
-                                        <td class="py-4 text-right">
-                                            @if($ml->status === 'pending')
-                                                <span class="badge-rect-warning">Menunggu Manajer</span>
-                                            @elseif($ml->status === 'manager_approved')
-                                                <span class="badge-rect-info">Menunggu HR</span>
-                                            @elseif($ml->status === 'hr_approved')
-                                                <span class="badge-rect-success">Disetujui</span>
-                                            @else
-                                                <span class="badge-rect-danger">Ditolak</span>
-                                            @endif
-                                        </td>
-                                        <td class="py-4 text-right">
+                                    @php $lb = $leaveStatusBadge($ml->status); @endphp
+                                    <tr class="hover:bg-white/5 transition-colors duration-150">
+                                        <td class="px-5 py-4 label-md font-bold text-white whitespace-nowrap">{{ ucfirst($ml->leave_type) }}</td>
+                                        <td class="px-5 py-4 label-sm whitespace-nowrap">{{ \Carbon\Carbon::parse($ml->start_date)->translatedFormat('d F Y') }}</td>
+                                        <td class="px-5 py-4 label-sm whitespace-nowrap">{{ \Carbon\Carbon::parse($ml->end_date)->translatedFormat('d F Y') }}</td>
+                                        <td class="px-5 py-4 label-sm whitespace-nowrap">{{ $ml->total_days }} Hari</td>
+                                        <td class="px-5 py-4 label-sm text-slate-400 max-w-[260px] truncate">{{ $ml->reason }}</td>
+                                        <td class="px-5 py-4 text-right"><span class="{{ $lb[0] }}">{{ $lb[1] }}</span></td>
+                                        <td class="px-5 py-4 text-right">
                                             <a href="{{ route('letters.leave', $ml->id) }}" target="_blank"
                                                 class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 font-bold transition-colors text-[11px]">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,8 +190,50 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    @endif
-                </div>
+                    </div>
+
+                    {{-- Mobile: stacked cards --}}
+                    <div class="md:hidden space-y-3">
+                        @foreach($myLeaves as $ml)
+                            @php $lb = $leaveStatusBadge($ml->status); @endphp
+                            <div class="bg-[#0d1527]/50 border border-white/5 rounded-2xl p-4">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="label-md font-bold text-white">{{ ucfirst($ml->leave_type) }}</div>
+                                    <span class="{{ $lb[0] }} flex-shrink-0">{{ $lb[1] }}</span>
+                                </div>
+                                <div class="mt-3 grid grid-cols-2 gap-2">
+                                    <div>
+                                        <div class="label-xs">Mulai</div>
+                                        <div class="label-sm font-semibold text-white">{{ \Carbon\Carbon::parse($ml->start_date)->translatedFormat('d M Y') }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="label-xs">Selesai</div>
+                                        <div class="label-sm font-semibold text-white">{{ \Carbon\Carbon::parse($ml->end_date)->translatedFormat('d M Y') }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="label-xs">Durasi</div>
+                                        <div class="label-sm font-semibold text-white">{{ $ml->total_days }} Hari</div>
+                                    </div>
+                                </div>
+                                @if($ml->reason)
+                                    <div class="mt-3">
+                                        <div class="label-xs">Alasan</div>
+                                        <div class="label-sm text-slate-400">{{ $ml->reason }}</div>
+                                    </div>
+                                @endif
+                                <div class="mt-3 border-t border-white/5 pt-3">
+                                    <a href="{{ route('letters.leave', $ml->id) }}" target="_blank"
+                                        class="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 font-bold transition-colors text-[11px]">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                        Cetak Surat Cuti
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @else
             <!-- Request Leave Form -->

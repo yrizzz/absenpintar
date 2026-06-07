@@ -4,7 +4,7 @@
         <!-- Header -->
         <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <div>
-                <h1 class="heading-1">Profil Karyawan Saya</h1>
+                <h1 class="heading-1">Profil Karyawan</h1>
                 <p class="mt-1 label-sm">Kelola kredensial keamanan Anda, daftarkan biometrik tepercaya, dan verifikasi kantor cabang penempatan</p>
             </div>
             @if ($step === 'enroll')
@@ -27,42 +27,94 @@
 
         @if ($step === 'overview')
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left: Beautiful Employee Card Info -->
-                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden lg:col-span-1 text-center">
-                    <div class="absolute -right-12 -top-12 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-
-                    <!-- Avatar with glowing border -->
-                    <div class="relative w-28 h-28 mx-auto mb-6">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-blue-600 via-blue-400 to-emerald-400 rounded-2xl blur-[8px] opacity-75"></div>
-                        <div class="relative w-full h-full bg-[#0d1527] border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center text-5xl font-black text-white font-display uppercase">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                        </div>
+                <!-- Left: Employee Identity Card -->
+                <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl relative overflow-hidden lg:col-span-1">
+                    <!-- Cover band (subtle brand tint that blends with the base in both themes) -->
+                    <div class="h-20 bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-emerald-500/15 relative">
+                        <div class="absolute inset-0 bg-premium-mesh opacity-20"></div>
                     </div>
 
-                    <h3 class="heading-3">{{ auth()->user()->name ?? 'Pulse Employee' }}</h3>
-                    <span class="badge-info mt-2 inline-block">
-                        {{ auth()->user()->role ?? 'Karyawan' }}
-                    </span>
+                    <div class="px-6 pb-6 -mt-10 text-center">
+                        <!-- Avatar with photo upload -->
+                        <div class="relative w-24 h-24 mx-auto mb-4">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-600 via-blue-400 to-emerald-400 rounded-3xl blur-[10px] opacity-50"></div>
+                            <div class="relative w-full h-full bg-gradient-to-br from-blue-600 to-indigo-600 border-4 border-white dark:border-slate-600 rounded-3xl overflow-hidden flex items-center justify-center text-white text-3xl font-black uppercase shadow-md shadow-blue-600/20">
+                                @if (auth()->user()->avatar)
+                                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-full h-full object-cover" alt="Foto profil">
+                                @else
+                                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                                @endif
 
-                    <div class="mt-8 pt-6 border-t border-white/5 space-y-4 text-left text-xs text-slate-300">
-                        <div class="flex justify-between">
-                            <span class="label-xs">ID Karyawan</span>
-                            <span class="label-sm font-mono font-bold text-white">#PP-{{ str_pad(auth()->user()->id ?? 1, 5, '0', STR_PAD_LEFT) }}</span>
+                                <!-- Uploading spinner -->
+                                <div wire:loading wire:target="photo" class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <svg class="w-6 h-6 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Upload button -->
+                            <label class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-500 border-2 border-white dark:border-slate-600 flex items-center justify-center cursor-pointer shadow-lg transition-all" title="Ubah foto profil">
+                                <svg class="w-4 h-4" fill="none" stroke="#ffffff" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <input type="file" wire:model="photo" accept="image/*" class="hidden">
+                            </label>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="label-xs">Email Kantor</span>
-                            <span class="label-sm font-bold text-white">{{ auth()->user()->email ?? 'employee@AbsenPintar.com' }}</span>
+
+                        @error('photo')
+                            <p class="label-xs text-rose-400 mb-2">{{ $message }}</p>
+                        @enderror
+
+                        <h3 class="heading-3">{{ auth()->user()->name ?? 'Pulse Employee' }}</h3>
+                        <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+                            <span class="badge-info">{{ ucwords(str_replace('_', ' ', auth()->user()->role ?? 'Karyawan')) }}</span>
+                            @if (auth()->user()->hasRegisteredFace())
+                                <span class="badge-success">Wajah terdaftar</span>
+                            @else
+                                <span class="badge-warning">Wajah belum terdaftar</span>
+                            @endif
                         </div>
-                        <div class="flex justify-between">
-                            <span class="label-xs">Kantor Cabang</span>
-                            <span class="label-sm font-bold text-blue-400">{{ auth()->user()->branch->name ?? 'HQ Sudirman' }}</span>
+
+                        @if (auth()->user()->avatar)
+                            <button wire:click="deletePhoto" wire:confirm="Hapus foto profil Anda?"
+                                class="mt-2 text-[11px] font-bold text-rose-400 hover:text-rose-300 transition-colors">
+                                Hapus foto profil
+                            </button>
+                        @endif
+
+                        <div class="mt-6 pt-5 border-t border-white/5 space-y-4 text-left">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="label-xs flex-shrink-0">ID Karyawan</span>
+                                <span class="label-sm font-mono font-bold text-white text-right">#{{ auth()->user()->employee_id ?? ('PP-' . str_pad(auth()->user()->id ?? 1, 5, '0', STR_PAD_LEFT)) }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="label-xs flex-shrink-0">Email</span>
+                                <span class="label-sm font-bold text-white text-right break-all">{{ strtolower(auth()->user()->email ?? '-') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="label-xs flex-shrink-0">Kantor Cabang</span>
+                                <span class="label-sm font-bold text-blue-400 text-right">{{ auth()->user()->branch->name ?? 'HQ Sudirman' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="label-xs flex-shrink-0">Mode Kerja</span>
+                                <span class="label-sm font-bold text-white text-right">{{ ucfirst(auth()->user()->work_mode ?? 'office') }}</span>
+                            </div>
+                            @if (auth()->user()->joined_at)
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="label-xs flex-shrink-0">Bergabung</span>
+                                    <span class="label-sm font-bold text-white text-right">{{ \Carbon\Carbon::parse(auth()->user()->joined_at)->translatedFormat('d M Y') }}</span>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Right: Trusted Biometrics & Face Registration Core Workspace -->
                 <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden lg:col-span-2">
-                    <h3 class="heading-3 mb-6">Pusat Identitas & Kunci Biometrik</h3>
+                    <h3 class="heading-3 mb-6">Verifikasi Wajah</h3>
 
                     <div class="space-y-6">
                         <!-- Face Biometric Registration Status Panel -->
@@ -74,15 +126,15 @@
                                     <div class="flex items-center space-x-2">
                                         @if (auth()->user()->hasRegisteredFace())
                                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                                            <span class="badge-success">Kunci Biometrik Terdaftar Aman</span>
+                                            <span class="badge-success">Data Wajah Terdaftar</span>
                                         @else
                                             <span class="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse"></span>
-                                            <span class="badge-danger">Biometrik Wajah Belum Terdaftar</span>
+                                            <span class="badge-danger">Wajah Belum Terdaftar</span>
                                         @endif
                                     </div>
-                                    <h4 class="label-md font-bold text-white">Baseline Kunci Induk Wajah (Face Master)</h4>
+                                    <h4 class="label-md font-bold text-white">Informasi Wajah</h4>
                                     <p class="label-sm max-w-md leading-relaxed">
-                                        Kunci induk wajah Anda menggunakan struktur vektor multi-sudut (Depan, Kiri, dan Rerata Kanan) untuk memverifikasi identitas fisik secara presisi tanpa batas token atau latensi awan.
+                                        Data wajah Anda digunakan untuk memverifikasi kehadiran (absen) harian Anda di kantor. Pastikan foto wajah yang didaftarkan terlihat jelas.
                                     </p>
 
                                     <div class="pt-2 flex flex-wrap gap-2.5">
@@ -141,50 +193,12 @@
                             </div>
                         </div>
 
-                        <!-- Trusted Session Parameters (Parity UX) -->
-                        <div class="p-5 bg-[#0d1527] border border-white/5 rounded-2xl space-y-3">
-                            <h4 class="label-xs text-white flex items-center">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
-                                Parameter Sesi Aktif
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
-                                <div>
-                                    <span class="label-xs">Sistem Operasi:</span>
-                                    <span class="label-sm font-bold text-white block mt-0.5">Linux (x86_64)</span>
-                                </div>
-                                <div>
-                                    <span class="label-xs">Agen Browser:</span>
-                                    <span class="label-sm font-bold text-white block mt-0.5">Chrome 124.0.0</span>
-                                </div>
-                                <div>
-                                    <span class="label-xs">IP Address Sesi:</span>
-                                    <span class="label-sm font-mono font-bold text-white block mt-0.5">127.0.0.1 (Localhost Loopback)</span>
-                                </div>
-                                <div>
-                                    <span class="label-xs">Status Verifikasi:</span>
-                                    <span class="badge-success mt-0.5">MFA Terverifikasi</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="label-xs text-slate-400">Token Perangkat Keras Tepercaya</h4>
-                            <div class="divide-y divide-white/5 text-xs text-slate-300">
-                                <div class="flex items-center justify-between py-3">
-                                    <div>
-                                        <span class="label-sm font-bold text-white">Kunci Fisik (FIDO2/WebAuthn)</span>
-                                        <span class="block label-xs mt-0.5">Status: Belum terdaftar</span>
-                                    </div>
-                                    <button class="btn-sm btn-secondary py-1.5 px-3 rounded-xl label-xs">Daftarkan Token</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         @else
             <!-- Face Biometric Multi-Angle Enrollment View -->
-            <div class="bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl max-w-2xl mx-auto relative overflow-hidden"
+            <div class="enroll-wizard bg-[#121d33]/65 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl max-w-2xl mx-auto relative overflow-hidden"
                 x-data="{
                     enrollStage: 'capture_front',
                 
@@ -216,14 +230,14 @@
                         } else if (this.enrollStage === 'capture_right') {
                             return 'Putar kepala Anda perlahan ke arah KANAN (Profil Kanan).';
                         }
-                        return 'Kunci biometrik berhasil diamankan. Tinjau foto hasil pemindaian sebelum mengirim.';
+                        return 'Semua foto wajah berhasil diambil. Tinjau foto Anda sebelum menyimpan.';
                     },
                 
                     get stageBadge() {
                         if (this.enrollStage === 'capture_front') return 'SUDUT 1/3: WAJAH DEPAN';
                         if (this.enrollStage === 'capture_left') return 'SUDUT 2/3: WAJAH KIRI';
                         if (this.enrollStage === 'capture_right') return 'SUDUT 3/3: WAJAH KANAN';
-                        return 'VERIFIKASI MATRIKS VEKTOR';
+                        return 'VERIFIKASI FOTO WAJAH';
                     },
                 
                     get currentProgress() {
@@ -393,90 +407,92 @@
                         this.startCamera();
                     },
                 
-                    simulatePhoto() {
-                        const dummyFront = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2310b981%22 stroke-width=%222%22 fill=%22%230d1527%22/><circle cx=%2250%22 cy=%2235%22 r=%2215%22 fill=%22%2310b981%22/><path d=%22M25,75 Q50,55 75,75%22 stroke=%22%2310b981%22 stroke-width=%223%22 fill=%22none%22/></svg>';
-                        const dummyLeft = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%236366f1%22 stroke-width=%222%22 fill=%22%230d1527%22/><circle cx=%2240%22 cy=%2235%22 r=%2215%22 fill=%22%236366f1%22/><path d=%22M25,75 Q50,55 75,75%22 stroke=%22%236366f1%22 stroke-width=%223%22 fill=%22none%22/></svg>';
-                        const dummyRight = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%2306b6d4%22 stroke-width=%222%22 fill=%22%230d1527%22/><circle cx=%2260%22 cy=%2235%22 r=%2215%22 fill=%22%2306b6d4%22/><path d=%22M25,75 Q50,55 75,75%22 stroke=%22%2306b6d4%22 stroke-width=%223%22 fill=%22none%22/></svg>';
-                
-                        this.frontImage = dummyFront;
-                        this.leftImage = dummyLeft;
-                        this.rightImage = dummyRight;
-                        this.enrollStage = 'verify_details';
-                        if (this.stream) {
-                            this.stream.getTracks().forEach(track => track.stop());
-                        }
-                    },
-                
                     confirmPhoto() {
                         $wire.enrollFace(this.frontImage, this.leftImage, this.rightImage);
                     }
                 }" x-init="await requestCameraAccess();">
 
                 <div class="text-center max-w-md mx-auto">
-                    <!-- Premium Cybernetic Header -->
+
+                    <!-- Header -->
                     <div class="mb-6">
-                        <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 via-blue-500 to-emerald-400 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-500/10 mb-3 animate-pulse">
-                            👤
+                        <div class="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25 mb-4">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
                         <h3 class="heading-3">Pendaftaran Kunci Wajah</h3>
-                        <p class="label-sm mt-1 leading-relaxed" x-text="instructionText"></p>
+                        <p class="enroll-instruction label-sm mt-1.5 leading-relaxed text-slate-400" x-text="instructionText"></p>
                     </div>
 
-                    <!-- Cybernetic Vector Node Step Progress Indicator -->
-                    <div class="mb-6 bg-slate-950/40 border border-white/5 rounded-2xl p-4 shadow-inner">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="label-xs text-blue-400" x-text="stageBadge"></span>
-                            <span class="label-xs font-mono bg-white/5 px-2 py-0.5 rounded-lg" x-text="enrollStage !== 'verify_details' ? 'Tersisa ' + countdownSeconds + 'd' : 'SELESAI'"></span>
+                    <!-- Step Progress -->
+                    <div class="enroll-step-box mb-6 bg-black/20 border border-white/8 rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="label-xs text-blue-400 font-bold" x-text="stageBadge"></span>
+                            <span class="enroll-countdown-badge text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-slate-400"
+                                  x-text="enrollStage !== 'verify_details' ? 'Tersisa ' + countdownSeconds + 'd' : 'Selesai'"></span>
                         </div>
-                        
-                        <!-- Visual Step Nodes -->
-                        <div class="flex items-center justify-between px-2 pt-1.5 relative">
-                            <!-- Background connecting bar -->
-                            <div class="absolute top-[18px] inset-x-8 h-[2px] bg-slate-800 z-0"></div>
-                            <!-- Active progress line filled dynamically -->
-                            <div class="absolute top-[18px] left-8 h-[2px] bg-gradient-to-r from-blue-600 to-emerald-500 z-0 transition-all duration-300" 
-                                 :style="`width: ${Math.max(0, (currentProgress - 10) * 1.1)}%`"></div>
 
-                            <!-- Node 1: FRONT -->
+                        <!-- Nodes + track (overflow-safe nested approach) -->
+                        <div class="flex items-start justify-between px-3 relative">
+                            {{-- Track background --}}
+                            <div class="enroll-track absolute top-[14px] left-[30px] right-[30px] h-[2px] bg-white/8 rounded-full overflow-hidden z-0">
+                                <div class="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500 rounded-full"
+                                     :style="`width: ${currentProgress}%`"></div>
+                            </div>
+
+                            <!-- Node 1: Depan -->
                             <div class="flex flex-col items-center z-10">
-                                <div class="w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-black border transition-all duration-300"
-                                     :class="enrollStage === 'capture_front' ? 'bg-blue-500/20 border-blue-400 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.3)] animate-pulse' : (frontImage ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'bg-slate-900 border-slate-700 text-slate-500')">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-300"
+                                     :class="enrollStage === 'capture_front'
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)]'
+                                        : (frontImage ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-indigo-500 text-white' : 'enroll-node-pending')">
                                     <span x-text="frontImage ? '✓' : '1'"></span>
                                 </div>
-                                <span class="label-xs uppercase mt-1.5" :class="enrollStage === 'capture_front' ? 'text-blue-400' : (frontImage ? 'text-emerald-400' : 'text-slate-500')">Depan</span>
+                                <span class="text-[9px] font-bold mt-1.5 tracking-wide"
+                                      :class="enrollStage === 'capture_front' ? 'text-blue-400' : (frontImage ? 'text-indigo-400' : 'text-slate-500')">Depan</span>
                             </div>
 
-                            <!-- Node 2: LEFT -->
+                            <!-- Node 2: Kiri -->
                             <div class="flex flex-col items-center z-10">
-                                <div class="w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-black border transition-all duration-300"
-                                     :class="enrollStage === 'capture_left' ? 'bg-indigo-500/20 border-indigo-400 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.3)] animate-pulse' : (leftImage ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'bg-slate-900 border-slate-700 text-slate-500')">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-300"
+                                     :class="enrollStage === 'capture_left'
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)]'
+                                        : (leftImage ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-indigo-500 text-white' : 'enroll-node-pending')">
                                     <span x-text="leftImage ? '✓' : '2'"></span>
                                 </div>
-                                <span class="label-xs uppercase mt-1.5" :class="enrollStage === 'capture_left' ? 'text-indigo-400' : (leftImage ? 'text-emerald-400' : 'text-slate-500')">Kiri</span>
+                                <span class="text-[9px] font-bold mt-1.5 tracking-wide"
+                                      :class="enrollStage === 'capture_left' ? 'text-blue-400' : (leftImage ? 'text-indigo-400' : 'text-slate-500')">Kiri</span>
                             </div>
 
-                            <!-- Node 3: RIGHT -->
+                            <!-- Node 3: Kanan -->
                             <div class="flex flex-col items-center z-10">
-                                <div class="w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-black border transition-all duration-300"
-                                     :class="enrollStage === 'capture_right' ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)] animate-pulse' : (rightImage ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'bg-slate-900 border-slate-700 text-slate-500')">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-300"
+                                     :class="enrollStage === 'capture_right'
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)]'
+                                        : (rightImage ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-indigo-500 text-white' : 'enroll-node-pending')">
                                     <span x-text="rightImage ? '✓' : '3'"></span>
                                 </div>
-                                <span class="label-xs uppercase mt-1.5" :class="enrollStage === 'capture_right' ? 'text-cyan-400' : (rightImage ? 'text-emerald-400' : 'text-slate-500')">Kanan</span>
+                                <span class="text-[9px] font-bold mt-1.5 tracking-wide"
+                                      :class="enrollStage === 'capture_right' ? 'text-blue-400' : (rightImage ? 'text-indigo-400' : 'text-slate-500')">Kanan</span>
                             </div>
 
-                            <!-- Node 4: VERIFY -->
+                            <!-- Node 4: Selesai -->
                             <div class="flex flex-col items-center z-10">
-                                <div class="w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-black border transition-all duration-300"
-                                     :class="enrollStage === 'verify_details' ? 'bg-emerald-500/20 border-emerald-400 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)] animate-pulse' : 'bg-slate-900 border-slate-700 text-slate-500'">
-                                    4
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-300"
+                                     :class="enrollStage === 'verify_details'
+                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 border-indigo-500 text-white shadow-[0_0_12px_rgba(79,70,229,0.5)]'
+                                        : 'enroll-node-pending'">
+                                    <span x-text="enrollStage === 'verify_details' ? '✓' : '4'"></span>
                                 </div>
-                                <span class="label-xs uppercase mt-1.5" :class="enrollStage === 'verify_details' ? 'text-emerald-400' : 'text-slate-500'">Ledger</span>
+                                <span class="text-[9px] font-bold mt-1.5 tracking-wide"
+                                      :class="enrollStage === 'verify_details' ? 'text-indigo-400' : 'text-slate-500'">Selesai</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Camera Device list switcher -->
-                    <div class="mb-4 max-w-md mx-auto" x-show="devices.length > 1" style="display: none;">
+                    <!-- Camera switcher -->
+                    <div class="mb-4" x-show="devices.length > 1" style="display: none;">
                         <div class="relative">
                             <select x-model="selectedDeviceId" @change="switchCamera()"
                                 class="w-full bg-[#0d1527]/90 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all cursor-pointer appearance-none">
@@ -492,177 +508,146 @@
                         </div>
                     </div>
 
-                    <!-- Premium Secure Context & Camera Troubleshooter Panel -->
-                    <div x-show="cameraError" class="mb-6 bg-[#1a0e1a]/85 border border-rose-500/30 rounded-2xl p-5 text-xs text-slate-300 flex flex-col space-y-4 shadow-2xl relative overflow-hidden text-left" style="display: none;">
-                        <div class="absolute -right-12 -top-12 w-28 h-28 bg-rose-500/5 rounded-full blur-2xl"></div>
-                        
-                        <!-- Header Info -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0 text-rose-400 shadow-inner">
-                                🔒
+                    <!-- Camera error panel -->
+                    <div x-show="cameraError" class="enroll-error-panel mb-6 bg-rose-950/60 border border-rose-500/30 rounded-2xl p-5 text-xs text-slate-300 flex flex-col space-y-4 shadow-2xl text-left" style="display: none;">
+                        <div class="flex items-start gap-3">
+                            <div class="enroll-error-icon w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                             </div>
                             <div>
-                                <h4 class="label-md font-bold text-white">Kamera Tidak Dapat Diakses</h4>
+                                <h4 class="enroll-error-title label-md font-bold text-white">Kamera Tidak Dapat Diakses</h4>
                                 <p class="label-xs text-rose-300 mt-0.5 leading-relaxed" x-text="cameraError"></p>
                             </div>
                         </div>
 
-                        <!-- Diagnostic Info -->
-                        <div class="bg-black/40 border border-white/5 rounded-2xl p-3.5 space-y-2">
-                            <span class="label-xs text-amber-400 block">🔍 Diagnostik Sistem:</span>
-                            <div class="grid grid-cols-2 gap-2 text-[10px]">
-                                <div>
-                                    <span class="text-slate-505">Secure Context:</span>
-                                    <span class="font-bold" :class="window.isSecureContext ? 'text-emerald-400' : 'text-rose-400'" x-text="window.isSecureContext ? '✓ Ya' : '✗ Tidak'"></span>
+                        <div class="enroll-error-diag bg-black/30 border border-white/8 rounded-xl p-3.5 space-y-2">
+                            <span class="label-xs text-slate-400 font-bold block mb-2">Diagnostik Sistem:</span>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-slate-500">Secure Context:</span>
+                                    <span class="font-bold" :class="window.isSecureContext ? 'text-blue-400' : 'text-rose-400'" x-text="window.isSecureContext ? '✓ Ya' : '✗ Tidak'"></span>
                                 </div>
-                                <div>
-                                    <span class="text-slate-505">Media API:</span>
-                                    <span class="font-bold" :class="navigator.mediaDevices ? 'text-emerald-400' : 'text-rose-400'" x-text="navigator.mediaDevices ? '✓ Tersedia' : '✗ Tidak Ada'"></span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-slate-500">Media API:</span>
+                                    <span class="font-bold" :class="navigator.mediaDevices ? 'text-blue-400' : 'text-rose-400'" x-text="navigator.mediaDevices ? '✓ Ada' : '✗ Tidak'"></span>
                                 </div>
-                                <div>
-                                    <span class="text-slate-505">Protocol:</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-slate-500">Protocol:</span>
                                     <span class="font-bold text-blue-400" x-text="location.protocol"></span>
                                 </div>
-                                <div>
-                                    <span class="text-slate-550">Host:</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-slate-500">Host:</span>
                                     <span class="font-bold text-blue-400" x-text="location.hostname"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Quick Fix Guide -->
-                        <div x-show="permissionDenied" class="bg-black/40 border border-white/5 rounded-2xl p-3.5 space-y-2" style="display: none;">
-                            <span class="label-xs text-blue-400 block">💡 Cara Reset Izin Kamera:</span>
-                            <div class="text-[10px] leading-relaxed space-y-1.5 text-slate-400">
-                                <p>1. Klik ikon <b class="text-white">🔒 gembok</b> di sebelah kiri URL address bar</p>
-                                <p>2. Pilih <b class="text-white">Site settings</b> atau <b class="text-white">Izin</b></p>
-                                <p>3. Ubah <b class="text-white">Camera</b> dari "Block" menjadi <b class="text-emerald-400">Allow</b></p>
-                                <p>4. Refresh halaman ini (Ctrl+R / F5)</p>
-                            </div>
+                        <div x-show="permissionDenied" class="enroll-error-permission bg-black/30 border border-white/8 rounded-xl p-3.5 space-y-1.5 text-[10px] text-slate-400 leading-relaxed" style="display: none;">
+                            <span class="label-xs text-blue-400 font-bold block mb-1">Cara Reset Izin Kamera:</span>
+                            <p>1. Klik ikon <b class="text-white">gembok</b> di kiri URL bar</p>
+                            <p>2. Pilih <b class="text-white">Site settings</b> atau <b class="text-white">Izin</b></p>
+                            <p>3. Ubah Camera dari Block menjadi <b class="text-blue-400">Allow</b></p>
+                            <p>4. Refresh halaman (Ctrl+R)</p>
                         </div>
 
-                        <!-- Action Buttons designed for finger reach -->
-                        <div class="flex flex-col sm:flex-row gap-2.5 pt-1.5" x-data="{ retrying: false }">
-                            <button @click="retrying = true; await requestCameraAccess(); retrying = false;" type="button" 
+                        <div x-data="{ retrying: false }">
+                            <button @click="retrying = true; await requestCameraAccess(); retrying = false;" type="button"
                                 :disabled="retrying"
-                                class="btn-sm btn-secondary flex-1 py-3 text-[10px]">
-                                <span x-show="!retrying">🔄 Coba Ajukan Izin Lagi</span>
-                                <span x-show="retrying" class="animate-pulse">⏳ Meminta akses...</span>
-                            </button>
-                            <button @click="simulatePhoto(); confirmPhoto();" type="button" class="btn-sm btn-success flex-1 py-3 text-[10px]">
-                                ⚡ Simulasikan Kamera (Instan)
+                                class="w-full py-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-xs font-bold transition-all shadow-md">
+                                <span x-show="!retrying">Coba Ajukan Izin Lagi</span>
+                                <span x-show="retrying" class="animate-pulse">Meminta akses...</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Cybernetic Circle Viewport Camera Feed (Custom biometric face circle) -->
+                    <!-- Camera viewport -->
                     <div x-show="enrollStage !== 'verify_details'"
-                        class="relative mx-auto w-64 h-64 bg-[#0d1527] border-2 border-white/10 rounded-full overflow-hidden shadow-2xl flex items-center justify-center">
+                        class="enroll-camera-viewport relative mx-auto w-72 h-72 bg-[#0a1020] border-2 border-white/10 rounded-full overflow-hidden shadow-2xl shadow-blue-900/30 flex items-center justify-center">
 
-                        <!-- Scanning overlay effect -->
                         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-[#0d1527]/10 to-[#0d1527]/90 z-10 pointer-events-none"></div>
+                        <div class="absolute inset-2 border border-dashed border-blue-500/20 rounded-full animate-spin pointer-events-none z-10" style="animation-duration: 30s;"></div>
+                        <div class="absolute inset-5 border border-blue-500/15 rounded-full pointer-events-none z-10"></div>
 
-                        <!-- Vector Bounding Target ring -->
-                        <div class="absolute inset-2 border-2 border-dashed border-blue-400/30 rounded-full animate-spin pointer-events-none z-10" style="animation-duration: 25s;"></div>
-                        <div class="absolute inset-4 border border-blue-400/40 rounded-full pointer-events-none z-10"></div>
-                        <div class="absolute inset-8 border-2 border-cyan-400/30 rounded-full pointer-events-none z-10 animate-pulse"></div>
-
-                        <!-- Side guides for angles -->
+                        <!-- Direction guide overlays -->
                         <div x-show="enrollStage === 'capture_left'"
-                            class="absolute inset-x-8 top-1/2 -translate-y-1/2 bg-indigo-500/80 border border-indigo-400/20 px-3 py-1.5 rounded-full pointer-events-none z-10 label-xs text-white tracking-widest uppercase animate-bounce">
-                            ← HADAP KIRI
+                            class="absolute inset-x-10 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-3 py-1.5 rounded-full pointer-events-none z-10 text-[10px] font-bold text-white tracking-wider animate-bounce">
+                            ← Hadap Kiri
                         </div>
                         <div x-show="enrollStage === 'capture_right'"
-                            class="absolute inset-x-8 top-1/2 -translate-y-1/2 bg-cyan-500/80 border border-cyan-400/20 px-3 py-1.5 rounded-full pointer-events-none z-10 label-xs text-white tracking-widest uppercase animate-bounce">
-                            HADAP KANAN →
+                            class="absolute inset-x-10 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 px-3 py-1.5 rounded-full pointer-events-none z-10 text-[10px] font-bold text-white tracking-wider animate-bounce">
+                            Hadap Kanan →
                         </div>
 
-                        <!-- Holographic Sweeper -->
-                        <div class="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_15px_#3b82f6] z-10 pointer-events-none animate-scan"
+                        <!-- Scan line -->
+                        <div class="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_12px_#3b82f6] z-10 pointer-events-none"
                             style="animation: scanLine 2s linear infinite;"></div>
 
-                        <!-- Countdown HUD circular Widget -->
+                        <!-- Countdown overlay -->
                         <div x-show="faceDetected && countdownSeconds > 0"
                             class="absolute inset-0 bg-[#090e1a]/80 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center pointer-events-none">
-                            <div class="label-xs text-blue-400 mb-1">DETEKSI KUNCI</div>
+                            <div class="text-[10px] font-bold text-blue-400 mb-1 tracking-widest">Deteksi Kunci</div>
                             <div class="heading-value-white" x-text="countdownSeconds"></div>
-                            <div class="label-xs mt-1">TAHAN POSISI</div>
+                            <div class="text-[10px] text-slate-400 mt-1">Tahan Posisi</div>
                         </div>
 
-                        <!-- Status Badge Overlay -->
-                        <div class="absolute bottom-4 z-10 badge-success bg-black/70 border-emerald-500/25 shadow-none">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span>LIVE</span>
+                        <!-- Live badge -->
+                        <div class="absolute bottom-5 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/10 text-[9px] font-bold text-white">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
+                            Live
                         </div>
 
                         <video x-ref="video" autoplay playsinline muted class="w-full h-full object-cover rounded-full" style="transform: scaleX(-1);"></video>
                         <canvas x-ref="canvas" class="hidden"></canvas>
                     </div>
 
-                    <!-- Step 4: Verification Grid Preview (Unified Gallery) -->
+                    <!-- Verification gallery (step 4) -->
                     <div x-show="enrollStage === 'verify_details'"
-                        class="max-w-md mx-auto bg-[#0d1527]/90 border border-white/10 rounded-2xl p-5 shadow-2xl relative overflow-hidden"
+                        class="enroll-gallery bg-[#0d1527]/90 border border-white/10 rounded-2xl p-5 shadow-2xl"
                         style="display: none;">
-                        <div class="absolute -right-16 -top-16 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                        <h4 class="label-xs mb-4">Matriks Ledger Biometrik Terkunci</h4>
-
-                        <div class="grid grid-cols-3 gap-3.5 mb-5">
-                            <!-- Front Profile -->
-                            <div class="relative bg-[#121d33] border border-blue-500/30 rounded-2xl overflow-hidden aspect-square flex flex-col shadow-lg">
-                                <img :src="frontImage" class="w-full h-full object-cover transform scaleX(-1)">
-                                <div class="absolute bottom-0 inset-x-0 bg-blue-600 text-[#090e1a] text-[8px] font-black tracking-wider uppercase py-0.5 leading-none">
-                                    DEPAN
-                                </div>
+                        <h4 class="label-xs font-bold text-slate-400 mb-4 text-left">Hasil Foto Wajah</h4>
+                        <div class="grid grid-cols-3 gap-3 mb-5">
+                            <div class="enroll-gallery-img relative bg-[#121d33] border border-blue-500/25 rounded-xl overflow-hidden aspect-square shadow-md">
+                                <img :src="frontImage" class="w-full h-full object-cover" style="transform: scaleX(-1)">
+                                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[8px] font-bold py-0.5 text-center">Depan</div>
                             </div>
-
-                            <!-- Left Profile -->
-                            <div class="relative bg-[#121d33] border border-indigo-500/30 rounded-2xl overflow-hidden aspect-square flex flex-col shadow-lg">
-                                <img :src="leftImage" class="w-full h-full object-cover transform scaleX(-1)">
-                                <div class="absolute bottom-0 inset-x-0 bg-indigo-500 text-white text-[8px] font-black tracking-wider uppercase py-0.5 leading-none">
-                                    KIRI
-                                </div>
+                            <div class="enroll-gallery-img relative bg-[#121d33] border border-blue-500/25 rounded-xl overflow-hidden aspect-square shadow-md">
+                                <img :src="leftImage" class="w-full h-full object-cover" style="transform: scaleX(-1)">
+                                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[8px] font-bold py-0.5 text-center">Kiri</div>
                             </div>
-
-                            <!-- Right Profile -->
-                            <div class="relative bg-[#121d33] border border-cyan-500/30 rounded-2xl overflow-hidden aspect-square flex flex-col shadow-lg">
-                                <img :src="rightImage" class="w-full h-full object-cover transform scaleX(-1)">
-                                <div class="absolute bottom-0 inset-x-0 bg-cyan-500 text-[#090e1a] text-[8px] font-black tracking-wider uppercase py-0.5 leading-none">
-                                    KANAN
-                                </div>
+                            <div class="enroll-gallery-img relative bg-[#121d33] border border-blue-500/25 rounded-xl overflow-hidden aspect-square shadow-md">
+                                <img :src="rightImage" class="w-full h-full object-cover" style="transform: scaleX(-1)">
+                                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[8px] font-bold py-0.5 text-center">Kanan</div>
                             </div>
                         </div>
-
-                        <div class="p-3.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 rounded-2xl text-left text-xs font-bold flex items-center space-x-2.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-                            <span>Ketiga sudut wajah berhasil dihitung, diselaraskan, dan siap didaftarkan!</span>
+                        <div class="enroll-confirm-hint flex items-center gap-2.5 p-3 bg-blue-500/8 border border-blue-500/20 rounded-xl text-xs font-bold text-blue-300">
+                            <svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Ketiga foto berhasil diambil dan siap disimpan.
                         </div>
                     </div>
 
-                    <!-- Tactical Finger Buttons at bottom -->
-                    <div class="mt-6 flex flex-col items-center justify-center space-y-4">
-                        <div class="flex justify-center space-x-3.5 w-full max-w-sm">
-                            <button @click="capturePhoto()" x-show="enrollStage !== 'verify_details'" type="button"
-                                class="btn-sm btn-primary w-full">
-                                Ambil Foto Manual
-                            </button>
-                            <button @click="resetSequence()" x-show="enrollStage === 'verify_details'" type="button"
-                                class="btn-sm btn-secondary flex-1"
-                                style="display: none;">
-                                Ulangi Urutan
-                            </button>
-                            <button @click="confirmPhoto()" x-show="enrollStage === 'verify_details'" type="button"
-                                class="btn-sm btn-success flex-1"
-                                style="display: none;">
-                                Simpan Kunci Induk
-                            </button>
-                        </div>
+                    <!-- Action buttons — tall, full width -->
+                    <div class="mt-6 space-y-3 w-full">
+                        <button @click="capturePhoto()" x-show="enrollStage !== 'verify_details'" type="button"
+                            class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-bold transition-all shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Ambil Foto
+                        </button>
 
-                        <!-- Manual Insecure Simulation trigger block -->
-                        <div class="w-full max-w-md pt-5 border-t border-white/5 mt-4" x-show="!cameraReady && enrollStage !== 'verify_details'">
-                            <p class="label-xs mb-2.5">Simulasi Pengujian Lokal (Tanpa Kamera)</p>
-                            <button @click="simulatePhoto(); confirmPhoto();" type="button"
-                                class="btn-sm btn-secondary w-full text-[10px] hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10">
-                                ⚡ Lewati &amp; Daftarkan Wajah Simulasi (Instan)
+                        <div x-show="enrollStage === 'verify_details'" class="flex gap-3" style="display: none;">
+                            <button @click="resetSequence()" type="button"
+                                class="enroll-btn-secondary flex-1 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-sm font-bold transition-all">
+                                Ulangi
+                            </button>
+                            <button @click="confirmPhoto()" type="button"
+                                class="flex-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-bold transition-all shadow-lg shadow-blue-600/25">
+                                Simpan Kunci Wajah
                             </button>
                         </div>
                     </div>
@@ -675,16 +660,102 @@
 
 <style>
     @keyframes scanLine {
-        0% {
-            top: 0%;
-        }
-
-        50% {
-            top: 100%;
-        }
-
-        100% {
-            top: 0%;
-        }
+        0%   { top: 0%; }
+        50%  { top: 100%; }
+        100% { top: 0%; }
     }
+
+    /* ============ Pending node dark-mode defaults ============ */
+    .enroll-node-pending {
+        background: rgba(0,0,0,0.30);
+        border-color: rgba(255,255,255,0.15);
+        color: #64748b;
+    }
+
+    /* ============ LIGHT MODE: Enrollment Wizard ============ */
+    html.light .enroll-wizard {
+        background: #ffffff !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 20px 60px -12px rgba(15,23,42,0.10), 0 4px 16px rgba(15,23,42,0.06) !important;
+    }
+
+    html.light .enroll-instruction { color: #475569 !important; }
+
+    html.light .enroll-step-box {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    html.light .enroll-countdown-badge {
+        background: #e2e8f0 !important;
+        border-color: #cbd5e1 !important;
+        color: #475569 !important;
+    }
+
+    html.light .enroll-track {
+        background: #e2e8f0 !important;
+    }
+
+    html.light .enroll-node-pending {
+        background: #e2e8f0 !important;
+        border-color: #cbd5e1 !important;
+        color: #94a3b8 !important;
+    }
+
+    html.light .enroll-error-panel {
+        background: #fff1f2 !important;
+        border-color: #fecdd3 !important;
+        color: #9f1239 !important;
+    }
+
+    html.light .enroll-error-icon {
+        background: #fee2e2 !important;
+        border-color: #fca5a5 !important;
+    }
+
+    html.light .enroll-error-title { color: #be123c !important; }
+
+    html.light .enroll-error-diag,
+    html.light .enroll-error-permission {
+        background: #ffe4e6 !important;
+        border-color: #fecdd3 !important;
+    }
+
+    html.light .enroll-camera-viewport {
+        border-color: #93c5fd !important;
+        box-shadow: 0 20px 50px -12px rgba(37,99,235,0.20) !important;
+    }
+
+    html.light .enroll-gallery {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+    }
+
+    html.light .enroll-gallery-img {
+        background: #f1f5f9 !important;
+        border-color: #bfdbfe !important;
+    }
+
+    html.light .enroll-confirm-hint {
+        background: #eff6ff !important;
+        border-color: #bfdbfe !important;
+        color: #1d4ed8 !important;
+    }
+
+    html.light .enroll-btn-secondary {
+        background: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+        color: #334155 !important;
+    }
+
+    html.light .enroll-error-panel button {
+        background: linear-gradient(to right, rgba(225,29,72,0.70), rgba(190,18,60,0.70)) !important;
+        color: #ffffff !important;
+    }
+    html.light .enroll-error-panel button:hover {
+        background: linear-gradient(to right, rgba(225,29,72,0.85), rgba(190,18,60,0.85)) !important;
+    }
+    html.light .enroll-error-panel button svg { color: #ffffff !important; }
 </style>

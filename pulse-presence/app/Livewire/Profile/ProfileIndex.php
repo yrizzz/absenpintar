@@ -7,12 +7,54 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
 #[Title('My Profile')]
 class ProfileIndex extends Component
 {
+    use WithFileUploads;
+
     public $step = 'overview'; // 'overview' or 'enroll'
+
+    public $photo; // temporary upload for the profile picture
+
+    /**
+     * Auto-save the profile photo as soon as it is selected.
+     */
+    public function updatedPhoto()
+    {
+        $this->validate(
+            ['photo' => 'image|max:4096'],
+            ['photo.image' => 'Berkas harus berupa gambar.', 'photo.max' => 'Ukuran foto maksimal 4MB.'],
+            ['photo' => 'foto profil']
+        );
+
+        $user = Auth::user();
+
+        // Remove previous avatar to avoid orphaned files.
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->avatar = $this->photo->store('avatars', 'public');
+        $user->save();
+
+        $this->photo = null;
+        session()->flash('success', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function deletePhoto()
+    {
+        $user = Auth::user();
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+        $user->avatar = null;
+        $user->save();
+
+        session()->flash('success', 'Foto profil dihapus.');
+    }
 
     public function enrollFace($frontData, $leftData = null, $rightData = null)
     {

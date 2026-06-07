@@ -130,6 +130,16 @@ Route::middleware(['auth', 'active'])->group(function () {
             return view('letters.permission-letter', compact('permission'));
         })->name('permission');
 
+        // Slip Absen — 1 record tunggal (check-in / check-out)
+        Route::get('/attendance-slip/{id}', function ($id) {
+            $log = \App\Models\AttendanceLog::with(['user.branch', 'user.roles', 'branch'])->findOrFail($id);
+            $authUser = auth()->user();
+            if ($log->user_id !== $authUser->id && !$authUser->hasAnyRole(['super_admin', 'hr_admin', 'manager'])) {
+                abort(403, 'Anda tidak memiliki akses untuk mencetak slip ini.');
+            }
+            return view('letters.attendance-slip', compact('log'));
+        })->name('attendance-slip');
+
         // Surat Keterangan Kehadiran
         Route::get('/attendance-certificate', function () {
             $targetUserId = request('user_id', auth()->id());
