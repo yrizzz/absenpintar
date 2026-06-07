@@ -29,9 +29,9 @@ echo "✅ Permission storage OK"
 echo "🔧 [2/10] Mengaktifkan Maintenance Mode..."
 php artisan down --no-interaction || true
 
-# 3. Pull kode terbaru (reset file yang di-generate script agar tidak konflik)
+# 3. Pull kode terbaru (reset file tracked yang berubah lokal agar tidak konflik merge)
 echo "📥 [3/10] Menarik kode terbaru dari GitHub..."
-git checkout -- ecosystem.config.cjs 2>/dev/null || true
+git checkout -- . 2>/dev/null || true
 git pull origin main
 
 # 4. Update cwd di ecosystem.config.cjs sesuai path saat ini (SETELAH pull)
