@@ -79,7 +79,7 @@ def _detect_best_face(detector, img):
                     for k in range(5):
                         remapped[4 + k * 2]     *= scale_x
                         remapped[4 + k * 2 + 1] *= scale_y
-                    best_face = remapped
+                    best_face = remapped.astype(np.float32)
 
     return best_face
 
@@ -160,6 +160,22 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
         # Align and crop faces based on deep-learning facial landmarks
         face1_align = recognizer.alignCrop(img1, face1)
         face2_align = recognizer.alignCrop(img2, face2)
+
+        if face1_align is None or face1_align.shape[0] != 112 or face1_align.shape[1] != 112:
+            return {
+                "verified": False,
+                "distance": 1.0,
+                "similarity": 0.0,
+                "message": "Gagal menyelaraskan wajah pada Kunci Induk Wajah. Pastikan foto master jelas."
+            }
+
+        if face2_align is None or face2_align.shape[0] != 112 or face2_align.shape[1] != 112:
+            return {
+                "verified": False,
+                "distance": 1.0,
+                "similarity": 0.0,
+                "message": "Gagal menyelaraskan wajah pada kamera. Posisikan wajah Anda lebih jelas."
+            }
 
         # Extract deep feature embeddings
         feat1 = recognizer.feature(face1_align)
