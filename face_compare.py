@@ -21,8 +21,7 @@ YUNET_TOP_K           = 5000
 def _preprocess_for_detection(img):
     """
     Return a list of image variants to try for face detection.
-    Tries original first, then CLAHE-equalized (helps with glasses glare/shadow),
-    then a mild resize to 640-wide if the image is very large or very small.
+    Tries original first, then CLAHE-equalized (helps with glasses glare/shadow).
     """
     variants = [img]
 
@@ -35,39 +34,30 @@ def _preprocess_for_detection(img):
     img_clahe = cv2.cvtColor(lab_eq, cv2.COLOR_LAB2BGR)
     variants.append(img_clahe)
 
-    # Resized variant: YuNet works best in the 320–640 px range
-    h, w = img.shape[:2]
-    if w > 640 or w < 200:
-        scale = 640.0 / w
-        img_resized = cv2.resize(img, (int(w * scale), int(h * scale)))
-        variants.append(img_resized)
-
     return variants
 
 
 def _detect_best_face(detector, img):
     """
-    Try multiple image variants for detection.
+    Try multiple image variants for detection using a fixed standard input size (640x480 or 480x640)
+    to prevent OpenCV 4.6.0 DNN dynamic shape/layer errors.
     Returns the face row with the highest confidence, or None if nothing found.
     """
     best_face = None
     best_conf  = -1.0
 
-    for variant in _preprocess_for_detection(img):
-        h, w = variant.shape[:2]
-        
-        # OpenCV 4.6.0 DNN requires input size to be a multiple of 32 for YuNet element-wise layers alignment
-        w_32 = int(round(w / 32.0) * 32)
-        h_32 = int(round(h / 32.0) * 32)
-        w_32 = max(32, w_32)
-        h_32 = max(32, h_32)
-        
-        if w != w_32 or h != h_32:
-            variant_resized = cv2.resize(variant, (w_32, h_32))
-        else:
-            variant_resized = variant
+    orig_h, orig_w = img.shape[:2]
+    # Set fixed standard aspect-ratio shape for detection
+    if orig_w >= orig_h:
+        det_w, det_h = 640, 480
+    else:
+        det_w, det_h = 480, 640
 
-        detector.setInputSize((w_32, h_32))
+    for variant in _preprocess_for_detection(img):
+        # Always resize to the fixed standard shape to avoid dynamic shape reallocation bugs in OpenCV 4.6.0
+        variant_resized = cv2.resize(variant, (det_w, det_h))
+
+        detector.setInputSize((det_w, det_h))
         _, faces = detector.detect(variant_resized)
 
         if faces is not None and len(faces) > 0:
@@ -76,11 +66,9 @@ def _detect_best_face(detector, img):
                 conf = float(face[14])
                 if conf > best_conf:
                     best_conf = conf
-                    # Store the face coordinates remapped to original image size
-                    # If we used a resized variant, scale coordinates back
-                    orig_h, orig_w = img.shape[:2]
-                    scale_x = orig_w / w_32
-                    scale_y = orig_h / h_32
+                    # Scale face coordinates back to original image size
+                    scale_x = orig_w / det_w
+                    scale_y = orig_h / det_h
                     remapped = face.copy()
                     # Bounding box: x, y, w, h (indices 0-3)
                     remapped[0] *= scale_x
