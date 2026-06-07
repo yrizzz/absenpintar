@@ -4,6 +4,7 @@
 # Usage: bash .deploy.sh
 # Dijalankan di root folder project (tempat artisan berada)
 
+# Hentikan script jika ada error yang tidak di-handle
 set -e
 
 # Deteksi path project otomatis dari lokasi script ini
@@ -17,16 +18,16 @@ echo "╚═══════════════════════�
 echo "📁 Project path: $SCRIPT_DIR"
 echo ""
 
-# 1. Fix permission storage & cache
+# 1. Fix permission storage & cache (aman & tidak sensitif error)
 echo "🔑 [1/10] Memperbaiki permission storage & cache..."
-chmod -R 775 storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
 chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 echo "✅ Permission storage OK"
 
 # 2. Maintenance mode
 echo "🔧 [2/10] Mengaktifkan Maintenance Mode..."
-php artisan down || true
+php artisan down --no-interaction || true
 
 # 3. Pull kode terbaru (reset file yang di-generate script agar tidak konflik)
 echo "📥 [3/10] Menarik kode terbaru dari GitHub..."
@@ -37,30 +38,33 @@ git pull origin main
 sed -i "s|cwd: \".*\"|cwd: \"$SCRIPT_DIR\"|g" ecosystem.config.cjs
 echo "✅ ecosystem.config.cjs diupdate ke path: $SCRIPT_DIR"
 
-# 5. Composer install
+# 5. Composer install (non-interactive)
 echo "📦 [5/10] Menginstal dependensi PHP..."
-composer install --no-dev --optimize-autoloader
+composer install --no-dev --optimize-autoloader --no-interaction
 
-# 6. NPM build
+# 6. NPM build (non-interactive)
 echo "📦 [6/10] Mengompilasi Aset Frontend..."
-npm install --silent
+npm install --silent --no-audit --no-fund --no-progress
 npm run build
 
-# 7. Migrasi database
+# 7. Migrasi database (non-interactive)
 echo "🗄️  [7/10] Menjalankan migrasi database..."
-php artisan migrate --force
+php artisan migrate --force --no-interaction
 
-# 8. Storage link
+# 8. Storage link & Livewire assets cleanup
 echo "🔗 [8/10] Membuat Symlink Storage..."
-php artisan storage:link || true
+php artisan storage:link --no-interaction || true
+rm -rf public/vendor/livewire 2>/dev/null || true
 
 # 9. Clear & optimize cache
 echo "⚡ [9/10] Mengoptimalkan Cache Laravel..."
-php artisan optimize:clear
-php artisan optimize
+php artisan optimize:clear --no-interaction
+php artisan optimize --no-interaction
 
-# Re-fix permission setelah optimize
-chmod -R 775 storage bootstrap/cache
+# Re-fix permission setelah optimize agar files baru tetap writable
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
+chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 
 # 10. PM2 restart
 echo "🔄 [10/10] Me-restart service PM2..."
@@ -76,7 +80,7 @@ fi
 
 # Matikan maintenance mode
 echo "🚀 Menonaktifkan Maintenance Mode..."
-php artisan up
+php artisan up --no-interaction
 
 echo ""
 echo "╔══════════════════════════════════════════╗"
