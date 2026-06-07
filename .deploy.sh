@@ -31,10 +31,13 @@ else
     echo "✅ Dependensi Python OK"
 fi
 
-# 1. Fix permission storage & cache (aman & tidak sensitif error)
+# 1. Fix permission storage & cache (Gunakan 777 agar web server & CLI bebas menulis cache tanpa tabrakan permission)
 echo "🔑 [1/10] Memperbaiki permission storage & cache..."
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+chmod -R 777 storage bootstrap/cache 2>/dev/null || true
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
+chown -R www:www storage bootstrap/cache 2>/dev/null || \
+chown -R nginx:nginx storage bootstrap/cache 2>/dev/null || \
+chown -R apache:apache storage bootstrap/cache 2>/dev/null || \
 chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 echo "✅ Permission storage OK"
 
@@ -74,9 +77,12 @@ echo "⚡ [9/10] Mengoptimalkan Cache Laravel..."
 php artisan optimize:clear --no-interaction
 php artisan optimize --no-interaction
 
-# Re-fix permission setelah optimize agar files baru tetap writable
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+# Re-fix permission setelah optimize agar files baru yang di-generate root tetap writable oleh web server
+chmod -R 777 storage bootstrap/cache 2>/dev/null || true
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
+chown -R www:www storage bootstrap/cache 2>/dev/null || \
+chown -R nginx:nginx storage bootstrap/cache 2>/dev/null || \
+chown -R apache:apache storage bootstrap/cache 2>/dev/null || \
 chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 
 # 10. PM2 restart
