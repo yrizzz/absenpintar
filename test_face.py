@@ -18,7 +18,7 @@ def test_pipeline(img_path):
     print(f"✅ Image loaded with shape: {img.shape}")
 
     models_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-    yunet_model = os.path.join(models_dir, "face_detection_yunet_2023mar.onnx")
+    yunet_model = os.path.join(models_dir, "face_detection_yunet_2022mar.onnx")
     sface_model = os.path.join(models_dir, "face_recognition_sface_2021dec.onnx")
 
     print(f"2. Model paths:\n - YuNet: {yunet_model} (Exists: {os.path.exists(yunet_model)})\n - SFace: {sface_model} (Exists: {os.path.exists(sface_model)})")

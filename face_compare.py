@@ -108,7 +108,7 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
 
     # Paths to OpenCV Zoo Deep Learning Models
     models_dir   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-    yunet_model  = os.path.join(models_dir, "face_detection_yunet_2023mar.onnx")
+    yunet_model  = os.path.join(models_dir, "face_detection_yunet_2022mar.onnx")
     sface_model  = os.path.join(models_dir, "face_recognition_sface_2021dec.onnx")
 
     if not os.path.exists(yunet_model) or not os.path.exists(sface_model):
