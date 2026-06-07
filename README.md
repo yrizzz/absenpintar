@@ -1,4 +1,4 @@
-# AbsenPintar - Enterprise Attendance System
+# PresensiKu - Enterprise Attendance System
 
 ![Laravel](https://img.shields.io/badge/Laravel-13-red)
 ![Livewire](https://img.shields.io/badge/Livewire-4-purple)
@@ -65,7 +65,8 @@ Enterprise-grade web attendance and workforce presence system with advanced anti
 
 1. **Clone the repository**
 ```bash
-cd pulse-presence
+git clone https://github.com/yrizzz/presensiku.git
+cd presensiku
 ```
 
 2. **Install dependencies**
@@ -86,7 +87,7 @@ php artisan key:generate
 touch database/database.sqlite
 
 # For MySQL (production)
-mysql -u root -p -e "CREATE DATABASE pulse_presence CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p -e "CREATE DATABASE presensiku CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
 
 5. **Configure .env**
@@ -98,7 +99,7 @@ DB_CONNECTION=sqlite
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=pulse_presence
+DB_DATABASE=presensiku
 DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
@@ -131,10 +132,10 @@ After seeding, you can login with these credentials:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Super Admin | admin@AbsenPintar.com | password |
-| HR Admin | hr@AbsenPintar.com | password |
-| Manager | manager@AbsenPintar.com | password |
-| Employee | employee4@AbsenPintar.com | password |
+| Super Admin | admin@presensiku.com | password |
+| HR Admin | hr@presensiku.com | password |
+| Manager | manager@presensiku.com | password |
+| Employee | employee4@presensiku.com | password |
 
 ## 📱 Usage
 
@@ -242,8 +243,7 @@ Developed by enowX Labs AI
 ## 📞 Support
 
 For support and inquiries:
-- Email: support@AbsenPintar.com
-- Documentation: See IMPLEMENTATION_PROGRESS.md
+- Email: support@presensiku.com
 
 ## 🙏 Acknowledgments
 
