@@ -18,6 +18,19 @@ echo "╚═══════════════════════�
 echo "📁 Project path: $SCRIPT_DIR"
 echo ""
 
+# 0. Check and install system dependencies if missing (OpenCV & NumPy)
+echo "🔍 [0/10] Memeriksa dependensi Python (OpenCV & NumPy)..."
+if ! python3 -c "import cv2, numpy" 2>/dev/null; then
+    echo "⚠️ Dependensi Python tidak lengkap. Menginstal python3-opencv dan python3-numpy..."
+    if [ "$EUID" -eq 0 ]; then
+        apt-get update && apt-get install -y python3-opencv python3-numpy
+    else
+        sudo apt-get update && sudo apt-get install -y python3-opencv python3-numpy
+    fi
+else
+    echo "✅ Dependensi Python OK"
+fi
+
 # 1. Fix permission storage & cache (aman & tidak sensitif error)
 echo "🔑 [1/10] Memperbaiki permission storage & cache..."
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
