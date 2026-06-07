@@ -55,8 +55,20 @@ def _detect_best_face(detector, img):
 
     for variant in _preprocess_for_detection(img):
         h, w = variant.shape[:2]
-        detector.setInputSize((w, h))
-        _, faces = detector.detect(variant)
+        
+        # OpenCV 4.6.0 DNN requires input size to be a multiple of 32 for YuNet element-wise layers alignment
+        w_32 = int(round(w / 32.0) * 32)
+        h_32 = int(round(h / 32.0) * 32)
+        w_32 = max(32, w_32)
+        h_32 = max(32, h_32)
+        
+        if w != w_32 or h != h_32:
+            variant_resized = cv2.resize(variant, (w_32, h_32))
+        else:
+            variant_resized = variant
+
+        detector.setInputSize((w_32, h_32))
+        _, faces = detector.detect(variant_resized)
 
         if faces is not None and len(faces) > 0:
             # faces[i][14] is the confidence score
@@ -67,8 +79,8 @@ def _detect_best_face(detector, img):
                     # Store the face coordinates remapped to original image size
                     # If we used a resized variant, scale coordinates back
                     orig_h, orig_w = img.shape[:2]
-                    scale_x = orig_w / w
-                    scale_y = orig_h / h
+                    scale_x = orig_w / w_32
+                    scale_y = orig_h / h_32
                     remapped = face.copy()
                     # Bounding box: x, y, w, h (indices 0-3)
                     remapped[0] *= scale_x
