@@ -89,6 +89,19 @@ chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 echo "🔄 [10/10] Me-restart service PM2..."
 if command -v pm2 &> /dev/null; then
     pm2 delete presensiku-reverb presensiku-queue presensiku-scheduler 2>/dev/null || true
+    
+    # Membebaskan port Reverb secara otomatis berdasarkan konfigurasi .env
+    if [ -f .env ]; then
+        REVERB_PORT_TO_KILL=$(grep "^REVERB_SERVER_PORT=" .env | cut -d '=' -f2 | tr -d '\r')
+        if [ -z "$REVERB_PORT_TO_KILL" ]; then
+            REVERB_PORT_TO_KILL=$(grep "^REVERB_PORT=" .env | cut -d '=' -f2 | tr -d '\r')
+        fi
+        if [ ! -z "$REVERB_PORT_TO_KILL" ]; then
+            echo "🧹 Membebaskan port Reverb $REVERB_PORT_TO_KILL..."
+            fuser -k $REVERB_PORT_TO_KILL/tcp 2>/dev/null || true
+        fi
+    fi
+
     echo "🧹 Membersihkan sisa-sisa proses artisan yang menggantung di folder ini..."
     PROJECT_DIR=$(pwd)
     for pid in $(pgrep -f "artisan"); do
