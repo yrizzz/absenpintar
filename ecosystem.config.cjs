@@ -21,17 +21,6 @@ module.exports = {
       watch: false,
       out_file: "./storage/logs/queue.log",
       error_file: "./storage/logs/queue-error.log",
-    },
-    {
-      name: "presensiku-scheduler",
-      script: "artisan",
-      args: "schedule:work",
-      interpreter: "php",
-      cwd: "/www/wwwroot/presensiku.yrizzz.my.id/presensiku",
-      autorestart: true,
-      watch: false,
-      out_file: "./storage/logs/scheduler.log",
-      error_file: "./storage/logs/scheduler-error.log",
     }
   ]
 }

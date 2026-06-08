@@ -58,3 +58,4 @@ auth.json
 /scratch/
 /face_compare.py
 /models/
+__pycache__/
