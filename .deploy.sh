@@ -89,8 +89,14 @@ chown -R $(whoami):$(whoami) storage bootstrap/cache 2>/dev/null || true
 echo "🔄 [10/10] Me-restart service PM2..."
 if command -v pm2 &> /dev/null; then
     pm2 delete presensiku-reverb presensiku-queue presensiku-scheduler 2>/dev/null || true
-    echo "🧹 Membersihkan sisa-sisa proses artisan yang menggantung..."
-    pkill -f artisan || true
+    echo "🧹 Membersihkan sisa-sisa proses artisan yang menggantung di folder ini..."
+    PROJECT_DIR=$(pwd)
+    for pid in $(pgrep -f "artisan"); do
+        if [ "$(readlink -f /proc/$pid/cwd 2>/dev/null)" = "$PROJECT_DIR" ]; then
+            echo "Killing process $pid in $PROJECT_DIR..."
+            kill -9 $pid 2>/dev/null || true
+        fi
+    done
     pm2 start ecosystem.config.cjs
     pm2 save
     echo "✅ PM2 services berhasil dijalankan."
