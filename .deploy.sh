@@ -31,7 +31,61 @@ else
     echo "✅ Dependensi Python OK"
 fi
 
+# Auto-setup .env and Laravel Reverb keys
+echo "🔍 [0.5/10] Memeriksa konfigurasi .env dan Reverb..."
+if [ ! -f .env ]; then
+    echo "📄 File .env tidak ditemukan. Menyalin dari .env.example..."
+    cp .env.example .env
+fi
+
+setup_reverb_keys() {
+    local app_id=$(grep "^REVERB_APP_ID=" .env | cut -d '=' -f2- | tr -d '\r' | xargs 2>/dev/null)
+    local app_key=$(grep "^REVERB_APP_KEY=" .env | cut -d '=' -f2- | tr -d '\r' | xargs 2>/dev/null)
+    local app_sec=$(grep "^REVERB_APP_SECRET=" .env | cut -d '=' -f2- | tr -d '\r' | xargs 2>/dev/null)
+
+    if [ -z "$app_id" ] || [ -z "$app_key" ] || [ -z "$app_sec" ]; then
+        echo "🔑 Menghasilkan Reverb keys baru..."
+        
+        [ -z "$app_id" ] && app_id=$((100000 + RANDOM % 900000))
+        [ -z "$app_key" ] && app_key=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom 2>/dev/null | head -c 20)
+        [ -z "$app_sec" ] && app_sec=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom 2>/dev/null | head -c 20)
+
+        # Pastikan variabel reverb ada di .env
+        for var in REVERB_APP_ID REVERB_APP_KEY REVERB_APP_SECRET REVERB_HOST REVERB_PORT REVERB_SCHEME VITE_REVERB_APP_KEY VITE_REVERB_HOST VITE_REVERB_PORT VITE_REVERB_SCHEME; do
+            if ! grep -q "^$var=" .env; then
+                echo "$var=" >> .env
+            fi
+        done
+
+        # Update nilai
+        sed -i "s|^REVERB_APP_ID=.*|REVERB_APP_ID=$app_id|g" .env
+        sed -i "s|^REVERB_APP_KEY=.*|REVERB_APP_KEY=$app_key|g" .env
+        sed -i "s|^REVERB_APP_SECRET=.*|REVERB_APP_SECRET=$app_sec|g" .env
+        
+        if grep -q "^REVERB_HOST=\s*$" .env || ! grep -q "^REVERB_HOST=" .env; then
+            sed -i 's|^REVERB_HOST=.*|REVERB_HOST="localhost"|g' .env
+        fi
+        if grep -q "^REVERB_PORT=\s*$" .env || ! grep -q "^REVERB_PORT=" .env; then
+            sed -i "s|^REVERB_PORT=.*|REVERB_PORT=8080|g" .env
+        fi
+        if grep -q "^REVERB_SCHEME=\s*$" .env || ! grep -q "^REVERB_SCHEME=" .env; then
+            sed -i "s|^REVERB_SCHEME=.*|REVERB_SCHEME=http|g" .env
+        fi
+
+        sed -i 's|^VITE_REVERB_APP_KEY=.*|VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"|g' .env
+        sed -i 's|^VITE_REVERB_HOST=.*|VITE_REVERB_HOST="${REVERB_HOST}"|g' .env
+        sed -i 's|^VITE_REVERB_PORT=.*|VITE_REVERB_PORT="${REVERB_PORT}"|g' .env
+        sed -i 's|^VITE_REVERB_SCHEME=.*|VITE_REVERB_SCHEME="${REVERB_SCHEME}"|g' .env
+        
+        echo "✅ Reverb keys berhasil dikonfigurasi di .env."
+    else
+        echo "✅ Reverb keys sudah terkonfigurasi di .env."
+    fi
+}
+setup_reverb_keys
+
 # 1. Fix permission storage & cache (Gunakan 777 agar web server & CLI bebas menulis cache tanpa tabrakan permission)
+
 echo "🔑 [1/10] Memperbaiki permission storage & cache..."
 chmod -R 777 storage bootstrap/cache 2>/dev/null || true
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || \
@@ -57,6 +111,13 @@ echo "✅ ecosystem.config.cjs diupdate ke path: $SCRIPT_DIR"
 # 5. Composer install (non-interactive)
 echo "📦 [5/10] Menginstal dependensi PHP..."
 composer install --no-dev --optimize-autoloader --no-interaction
+
+# Generate APP_KEY jika kosong atau tidak ada di .env
+if [ -f .env ] && { grep -q "^APP_KEY=$" .env || grep -q "^APP_KEY=\s*$" .env || ! grep -q "^APP_KEY=" .env; }; then
+    echo "🔑 Menghasilkan APP_KEY..."
+    php artisan key:generate --force --no-interaction
+fi
+
 
 # 6. NPM build (non-interactive)
 echo "📦 [6/10] Mengompilasi Aset Frontend..."
