@@ -160,20 +160,39 @@
             </div>
         </div>
 
+
+
         {{-- Recap: filters + sort + pagination --}}
-        <div class="card p-6 sm:p-8">
+        <div class="card p-6 sm:p-8 mt-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div>
                     <h3 class="heading-3 flex items-center gap-2">
                         Rekapitulasi Kehadiran
-                        @if(!empty($selectedLogs))<span class="badge-info">{{ count($selectedLogs) }} terpilih</span>@endif
+                        @if(!empty($selectedLogs) && $view_mode === 'list')<span class="badge-info">{{ count($selectedLogs) }} terpilih</span>@endif
                     </h3>
                     <p class="label-sm mt-1">Saring, urutkan, dan ekspor log kehadiran lengkap beserta bukti biometrik.</p>
                 </div>
-                <button wire:click="downloadExcel" class="btn-success btn-sm">
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    Ekspor Terpilih
-                </button>
+                <div class="flex items-center gap-3">
+                    {{-- Toggle view mode --}}
+                    <div class="inline-flex rounded-lg p-0.5 bg-surface-muted border border-border">
+                        <button type="button" wire:click="$set('view_mode', 'grid')" 
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'grid' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+                            Tampilan Grid
+                        </button>
+                        <button type="button" wire:click="$set('view_mode', 'list')" 
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'list' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5"/></svg>
+                            Tampilan List
+                        </button>
+                    </div>
+                    @if($view_mode === 'list')
+                        <button wire:click="downloadExcel" class="btn-success btn-sm">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Ekspor Terpilih
+                        </button>
+                    @endif
+                </div>
             </div>
 
             {{-- Filter bar --}}
@@ -183,135 +202,268 @@
                         <label class="label">Cari karyawan</label>
                         <input type="text" wire:model.live.debounce.400ms="search" placeholder="Nama atau ID karyawan…">
                     </div>
-                    <div>
-                        <label class="label">Karyawan</label>
-                        <select wire:model.live="filter_user_id" class="cursor-pointer">
-                            <option value="">Semua</option>
-                            @foreach($employees as $emp)<option value="{{ $emp->id }}">{{ $emp->name }}</option>@endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label">Cabang</label>
-                        <select wire:model.live="filter_branch_id" class="cursor-pointer">
-                            <option value="">Semua</option>
-                            @foreach($branches as $br)<option value="{{ $br->id }}">{{ $br->name }}</option>@endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label">Tipe</label>
-                        <select wire:model.live="filter_type" class="cursor-pointer">
-                            <option value="">Semua</option>
-                            <option value="checkin">Masuk</option>
-                            <option value="checkout">Keluar</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label">Kerawanan</label>
-                        <select wire:model.live="filter_risk" class="cursor-pointer">
-                            <option value="">Semua</option>
-                            <option value="low">Rendah</option>
-                            <option value="medium">Sedang</option>
-                            <option value="high">Tinggi</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label">Status</label>
-                        <select wire:model.live="filter_status" class="cursor-pointer">
-                            <option value="">Semua</option>
-                            <option value="approved">Disetujui</option>
-                            <option value="pending">Diproses</option>
-                            <option value="flagged">Dicurigai</option>
-                            <option value="rejected">Ditolak</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label">Per halaman</label>
-                        <select wire:model.live="perPage" class="cursor-pointer">
-                            <option value="15">15</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
+                    @if($view_mode === 'grid')
+                        <div>
+                            <label class="label">Bulan</label>
+                            <select wire:model.live="matrix_month" class="cursor-pointer">
+                                @foreach([1=>'Januari', 2=>'Februari', 3=>'Maret', 4=>'April', 5=>'Mei', 6=>'Juni', 7=>'Juli', 8=>'Agustus', 9=>'September', 10=>'Oktober', 11=>'November', 12=>'Desember'] as $num => $name)
+                                    <option value="{{ $num }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Tahun</label>
+                            <select wire:model.live="matrix_year" class="cursor-pointer">
+                                @for($y = now()->year - 2; $y <= now()->year + 1; $y++)
+                                    <option value="{{ $y }}">{{ $y }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    @else
+                        <div>
+                            <label class="label">Karyawan</label>
+                            <select wire:model.live="filter_user_id" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                @foreach($employees as $emp)<option value="{{ $emp->id }}">{{ $emp->name }}</option>@endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Cabang</label>
+                            <select wire:model.live="filter_branch_id" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                @foreach($branches as $br)<option value="{{ $br->id }}">{{ $br->name }}</option>@endforeach
+                            </select>
+                        </div>
+                    @endif
                 </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="label">Tanggal mulai</label>
-                        <input type="date" wire:model.live="filter_start_date">
-                    </div>
-                    <div>
-                        <label class="label">Tanggal selesai</label>
-                        <input type="date" wire:model.live="filter_end_date">
-                    </div>
-                    <div class="flex items-end">
-                        <button wire:click="resetFilters" class="btn-secondary btn-sm w-full">Reset Semua Filter</button>
-                    </div>
+                    @if($view_mode === 'grid')
+                        <div>
+                            <label class="label">Cabang</label>
+                            <select wire:model.live="filter_branch_id" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                @foreach($branches as $br)<option value="{{ $br->id }}">{{ $br->name }}</option>@endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Per halaman</label>
+                            <select wire:model.live="perPage" class="cursor-pointer">
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button wire:click="resetFilters" class="btn-secondary btn-sm w-full">Reset Semua Filter</button>
+                        </div>
+                    @else
+                        <div>
+                            <label class="label">Tipe</label>
+                            <select wire:model.live="filter_type" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                <option value="checkin">Masuk</option>
+                                <option value="checkout">Keluar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Kerawanan</label>
+                            <select wire:model.live="filter_risk" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                <option value="low">Rendah</option>
+                                <option value="medium">Sedang</option>
+                                <option value="high">Tinggi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Status</label>
+                            <select wire:model.live="filter_status" class="cursor-pointer">
+                                <option value="">Semua</option>
+                                <option value="approved">Disetujui</option>
+                                <option value="pending">Diproses</option>
+                                <option value="flagged">Dicurigai</option>
+                                <option value="rejected">Ditolak</option>
+                            </select>
+                        </div>
+                    @endif
                 </div>
+
+                @if($view_mode === 'list')
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                        <div>
+                            <label class="label">Tanggal mulai</label>
+                            <input type="date" wire:model.live="filter_start_date">
+                        </div>
+                        <div>
+                            <label class="label">Tanggal selesai</label>
+                            <input type="date" wire:model.live="filter_end_date">
+                        </div>
+                        <div class="flex items-end">
+                            <button wire:click="resetFilters" class="btn-secondary btn-sm w-full">Reset Semua Filter</button>
+                        </div>
+                    </div>
+                @endif
             </div>
 
-            {{-- Table --}}
-            @if($recapLogs->isEmpty())
-                <div class="text-sm text-fg-muted text-center py-12 rounded-xl bg-surface-muted">Tidak ada kecocokan data untuk filter saat ini.</div>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-border label-xs uppercase tracking-wide">
-                                <th class="pb-3 pr-3" style="width:40px;"><input type="checkbox" wire:model.live="selectAll" class="rounded text-primary cursor-pointer" style="min-height:auto;width:auto;"></th>
-                                <th class="pb-3 pr-3" style="width:64px;">Foto</th>
-                                <th class="pb-3 pr-3">Karyawan</th>
-                                <th class="pb-3 pr-3">{!! $sortBtn('timestamp', 'Waktu') !!}</th>
-                                <th class="pb-3 pr-3">{!! $sortBtn('type', 'Tipe') !!}</th>
-                                <th class="pb-3 pr-3">Lokasi</th>
-                                <th class="pb-3 pr-3">{!! $sortBtn('accuracy', 'Presisi') !!}</th>
-                                <th class="pb-3 pr-3">{!! $sortBtn('risk_level', 'Kerawanan') !!}</th>
-                                <th class="pb-3 pr-3">{!! $sortBtn('status', 'Status') !!}</th>
-                                <th class="pb-3 text-right">{!! $sortBtn('is_late', 'Ketepatan') !!}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            @foreach($recapLogs as $log)
-                                <tr class="hover:bg-surface-muted transition-colors">
-                                    <td class="py-3 pr-3"><input type="checkbox" value="{{ $log->id }}" wire:model.live="selectedLogs" class="rounded text-primary cursor-pointer" style="min-height:auto;width:auto;"></td>
-                                    <td class="py-3 pr-3">
-                                        @if($log->selfie_path)
-                                            <div class="h-10 w-10 overflow-hidden rounded-lg border border-border bg-surface-muted"><img src="{{ asset('storage/' . $log->selfie_path) }}" class="w-full h-full object-cover" style="transform: scaleX(-1);"></div>
-                                        @else
-                                            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-xs text-fg-subtle">—</div>
-                                        @endif
-                                    </td>
-                                    <td class="py-3 pr-3 label-sm">
-                                        <span class="block font-medium text-fg">{{ $log->user->name ?? 'N/A' }}</span>
-                                        <span class="block label-xs">ID: {{ $log->user->employee_id ?? 'N/A' }}</span>
-                                    </td>
-                                    <td class="py-3 pr-3 label-sm whitespace-nowrap">{{ \Carbon\Carbon::parse($log->timestamp)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d M Y, H:i') }}</td>
-                                    <td class="py-3 pr-3">
-                                        @if($log->type === 'checkin')<span class="badge-rect-success">Masuk</span>@else<span class="badge-rect-info">Keluar</span>@endif
-                                    </td>
-                                    <td class="py-3 pr-3 label-sm">{{ $log->branch->name ?? 'Mobile / WFH' }}</td>
-                                    <td class="py-3 pr-3 label-sm whitespace-nowrap">± {{ $log->accuracy ?? '0' }}m</td>
-                                    <td class="py-3 pr-3">
-                                        @if($log->risk_level === 'high')<span class="badge-rect-danger">Tinggi</span>
-                                        @elseif($log->risk_level === 'medium')<span class="badge-rect-warning">Sedang</span>
-                                        @else<span class="badge-rect-success">Rendah</span>@endif
-                                    </td>
-                                    <td class="py-3 pr-3">
-                                        @if($log->status === 'approved')<span class="badge-rect-success">Disetujui</span>
-                                        @elseif($log->status === 'flagged')<span class="badge-rect-danger">Dicurigai</span>
-                                        @elseif($log->status === 'rejected')<span class="badge-rect-danger">Ditolak</span>
-                                        @else<span class="badge-rect-warning">Diproses</span>@endif
-                                    </td>
-                                    <td class="py-3 text-right">
-                                        @if($log->is_late)<span class="badge-rect-danger">Terlambat</span>@else<span class="badge-rect-success">Tepat waktu</span>@endif
-                                    </td>
+            {{-- Table Render --}}
+            @if($view_mode === 'grid')
+                @if($matrixUsers->isEmpty())
+                    <div class="text-sm text-fg-muted text-center py-12 rounded-xl bg-surface-muted">Tidak ada data karyawan yang cocok.</div>
+                @else
+                    <div class="overflow-x-auto border border-border rounded-xl">
+                        <table class="w-full text-left border-collapse table-fixed min-w-[1200px]">
+                            <thead>
+                                <tr class="border-b border-border bg-surface-muted label-xs uppercase tracking-wide">
+                                    {{-- Sticky Name Column Header --}}
+                                    <th class="p-3 sticky left-0 bg-surface-muted z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[220px]">
+                                        Nama Karyawan
+                                    </th>
+                                    {{-- Date Columns Header --}}
+                                    @foreach($matrixDays as $day)
+                                        <th class="p-2 text-center border-l border-border/60 {{ $day['is_sunday'] ? 'bg-rose-50/50 dark:bg-rose-950/20 text-rose-500 font-bold' : '' }} w-[40px]">
+                                            <span class="block text-[10px] opacity-70">{{ $day['day_name'] }}</span>
+                                            <span class="block text-xs mt-0.5">{{ $day['day'] }}</span>
+                                        </th>
+                                    @endforeach
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody class="divide-y divide-border/60">
+                                @foreach($matrixUsers as $user)
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                                        {{-- Sticky Name Cell --}}
+                                        <td class="p-3 sticky left-0 bg-surface z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] label-sm whitespace-nowrap">
+                                            <div class="flex flex-col">
+                                                <span class="font-semibold text-fg">{{ $user->name }}</span>
+                                                <span class="text-[10px] text-fg-subtle">ID: {{ $user->employee_id ?? 'N/A' }}</span>
+                                            </div>
+                                        </td>
+                                        {{-- Date cells --}}
+                                        @foreach($matrixDays as $day)
+                                            @php
+                                                $key = $user->id . '_' . $day['date_string'];
+                                                $log = $matrixLogs->get($key)?->first();
+                                                $leaveType = $matrixLeaves[$key] ?? null;
+                                            @endphp
+                                            <td class="p-1 text-center border-l border-border/60 {{ $day['is_sunday'] ? 'bg-rose-50/25 dark:bg-rose-950/15' : '' }}">
+                                                @if($day['is_sunday'])
+                                                    {{-- Sunday --}}
+                                                    <span class="text-[10px] font-bold text-rose-500 dark:text-rose-500/80 select-none">M</span>
+                                                @elseif($log)
+                                                    {{-- Present --}}
+                                                    <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all
+                                                        {{ $log->is_late 
+                                                            ? 'bg-amber-50 text-amber-600 border border-amber-250 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-500/20' 
+                                                            : 'bg-emerald-50 text-emerald-600 border border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' }}"
+                                                        title="Hadir pada {{ \Carbon\Carbon::parse($log->timestamp)->format('H:i') }}{{ $log->is_late ? ' (Terlambat)' : '' }}">
+                                                        ✓
+                                                    </div>
+                                                @elseif($leaveType)
+                                                    {{-- On Leave --}}
+                                                    <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-600 border border-blue-205 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-500/20 uppercase"
+                                                        title="Cuti: {{ ucfirst($leaveType) }}">
+                                                        C
+                                                    </div>
+                                                @else
+                                                    {{-- Absent / Empty --}}
+                                                    <span class="text-slate-350 dark:text-slate-700 select-none">-</span>
+                                                @endif
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div class="mt-6">{{ $recapLogs->links() }}</div>
+                    {{-- Legend & Pagination --}}
+                    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                            <span class="text-slate-400 dark:text-slate-500 font-medium">Keterangan:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <span class="text-slate-600 dark:text-slate-400">Hadir Tepat Waktu</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                <span class="text-slate-600 dark:text-slate-400">Hadir Terlambat</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                <span class="text-slate-600 dark:text-slate-400">Cuti / Izin Disetujui</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-rose-500 font-bold">M</span>
+                                <span class="text-slate-600 dark:text-slate-400">Hari Minggu (Libur)</span>
+                            </div>
+                        </div>
+                        <div>{{ $matrixUsers->links() }}</div>
+                    </div>
+                @endif
+            @else
+                {{-- List View --}}
+                @if($recapLogs->isEmpty())
+                    <div class="text-sm text-fg-muted text-center py-12 rounded-xl bg-surface-muted">Tidak ada kecocokan data untuk filter saat ini.</div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-border label-xs uppercase tracking-wide">
+                                    <th class="pb-3 pr-3" style="width:40px;"><input type="checkbox" wire:model.live="selectAll" class="rounded text-primary cursor-pointer" style="min-height:auto;width:auto;"></th>
+                                    <th class="pb-3 pr-3" style="width:64px;">Foto</th>
+                                    <th class="pb-3 pr-3">Karyawan</th>
+                                    <th class="pb-3 pr-3">{!! $sortBtn('timestamp', 'Waktu') !!}</th>
+                                    <th class="pb-3 pr-3">{!! $sortBtn('type', 'Tipe') !!}</th>
+                                    <th class="pb-3 pr-3">Lokasi</th>
+                                    <th class="pb-3 pr-3">{!! $sortBtn('accuracy', 'Presisi') !!}</th>
+                                    <th class="pb-3 pr-3">{!! $sortBtn('risk_level', 'Kerawanan') !!}</th>
+                                    <th class="pb-3 pr-3">{!! $sortBtn('status', 'Status') !!}</th>
+                                    <th class="pb-3 text-right">{!! $sortBtn('is_late', 'Ketepatan') !!}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                @foreach($recapLogs as $log)
+                                    <tr class="hover:bg-surface-muted transition-colors">
+                                        <td class="py-3 pr-3"><input type="checkbox" value="{{ $log->id }}" wire:model.live="selectedLogs" class="rounded text-primary cursor-pointer" style="min-height:auto;width:auto;"></td>
+                                        <td class="py-3 pr-3">
+                                            @if($log->selfie_path)
+                                                <div class="h-10 w-10 overflow-hidden rounded-lg border border-border bg-surface-muted"><img src="{{ asset('storage/' . $log->selfie_path) }}" class="w-full h-full object-cover" style="transform: scaleX(-1);"></div>
+                                            @else
+                                                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-xs text-fg-subtle">—</div>
+                                            @endif
+                                        </td>
+                                        <td class="py-3 pr-3 label-sm">
+                                            <span class="block font-medium text-fg">{{ $log->user->name ?? 'N/A' }}</span>
+                                            <span class="block label-xs">ID: {{ $log->user->employee_id ?? 'N/A' }}</span>
+                                        </td>
+                                        <td class="py-3 pr-3 label-sm whitespace-nowrap">{{ \Carbon\Carbon::parse($log->timestamp)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d M Y, H:i') }}</td>
+                                        <td class="py-3 pr-3">
+                                            @if($log->type === 'checkin')<span class="badge-rect-success">Masuk</span>@else<span class="badge-rect-info">Keluar</span>@endif
+                                        </td>
+                                        <td class="py-3 pr-3 label-sm">{{ $log->branch->name ?? 'Mobile / WFH' }}</td>
+                                        <td class="py-3 pr-3 label-sm whitespace-nowrap">± {{ $log->accuracy ?? '0' }}m</td>
+                                        <td class="py-3 pr-3">
+                                            @if($log->risk_level === 'high')<span class="badge-rect-danger">Tinggi</span>
+                                            @elseif($log->risk_level === 'medium')<span class="badge-rect-warning">Sedang</span>
+                                            @else<span class="badge-rect-success">Rendah</span>@endif
+                                        </td>
+                                        <td class="py-3 pr-3">
+                                            @if($log->status === 'approved')<span class="badge-rect-success">Disetujui</span>
+                                            @elseif($log->status === 'flagged')<span class="badge-rect-danger">Dicurigai</span>
+                                            @elseif($log->status === 'rejected')<span class="badge-rect-danger">Ditolak</span>
+                                            @else<span class="badge-rect-warning">Diproses</span>@endif
+                                        </td>
+                                        <td class="py-3 text-right">
+                                            @if($log->is_late)<span class="badge-rect-danger">Terlambat</span>@else<span class="badge-rect-success">Tepat waktu</span>@endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6">{{ $recapLogs->links() }}</div>
+                @endif
             @endif
         </div>
-
     </div>
 </div>

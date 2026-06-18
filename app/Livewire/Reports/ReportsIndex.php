@@ -18,6 +18,11 @@ class ReportsIndex extends Component
     public $report_period = 'monthly';
     public $report_type = 'presence_summary';
 
+    // View Mode: grid (matrix) or list
+    public $view_mode = 'grid';
+    public $matrix_month = '';
+    public $matrix_year = '';
+
     // Interactive recap filters
     public $filter_user_id = '';
     public $filter_branch_id = '';
@@ -38,6 +43,12 @@ class ReportsIndex extends Component
     public $selectAll = false;
 
     protected array $sortable = ['timestamp', 'accuracy', 'risk_level', 'status', 'type', 'is_late'];
+
+    public function mount()
+    {
+        $this->matrix_month = now()->month;
+        $this->matrix_year = now()->year;
+    }
 
     public function updated($name)
     {
@@ -214,6 +225,73 @@ class ReportsIndex extends Component
         $employees = \App\Models\User::orderBy('name')->get();
         $branches = \App\Models\Branch::orderBy('name')->get();
 
+        // Matrix calculation logic
+        $matrixMonth = (int) ($this->matrix_month ?: now()->month);
+        $matrixYear = (int) ($this->matrix_year ?: now()->year);
+
+        $daysInMonth = \Carbon\Carbon::create($matrixYear, $matrixMonth, 1)->daysInMonth;
+        $matrixDays = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $date = \Carbon\Carbon::create($matrixYear, $matrixMonth, $d);
+            $matrixDays[] = [
+                'day' => $d,
+                'date_string' => $date->toDateString(),
+                'is_sunday' => $date->isSunday(),
+                'day_name' => $date->translatedFormat('D'),
+            ];
+        }
+
+        $startOfMonth = \Carbon\Carbon::create($matrixYear, $matrixMonth, 1)->startOfMonth();
+        $endOfMonth = \Carbon\Carbon::create($matrixYear, $matrixMonth, 1)->endOfMonth();
+
+        // Group attendance logs by user_id and date
+        $matrixLogs = \App\Models\AttendanceLog::whereBetween('timestamp', [$startOfMonth, $endOfMonth])
+            ->where('type', 'checkin')
+            ->get()
+            ->groupBy(function($log) {
+                return $log->user_id . '_' . \Carbon\Carbon::parse($log->timestamp)->toDateString();
+            });
+
+        // Fetch active leaves within this month
+        $matrixLeaves = [];
+        $leavesList = \App\Models\LeaveRequest::where(function($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('start_date', [$startOfMonth, $endOfMonth])
+                  ->orWhereBetween('end_date', [$startOfMonth, $endOfMonth])
+                  ->orWhere(function($sub) use ($startOfMonth, $endOfMonth) {
+                      $sub->where('start_date', '<=', $startOfMonth)
+                          ->where('end_date', '>=', $endOfMonth);
+                  });
+            })
+            ->where('status', 'approved')
+            ->get();
+
+        foreach ($leavesList as $leave) {
+            $start = \Carbon\Carbon::parse($leave->start_date);
+            $end = \Carbon\Carbon::parse($leave->end_date);
+            for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+                if ($date->between($startOfMonth, $endOfMonth)) {
+                    $matrixLeaves[$leave->user_id . '_' . $date->toDateString()] = $leave->type;
+                }
+            }
+        }
+
+        // Paginate users for the matrix view
+        $userQuery = \App\Models\User::query();
+        if ($this->search) {
+            $term = $this->search;
+            $userQuery->where(function($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('employee_id', 'like', "%{$term}%");
+            });
+        }
+        if ($this->filter_branch_id) {
+            $userQuery->where('branch_id', $this->filter_branch_id);
+        }
+        if ($this->filter_user_id) {
+            $userQuery->where('id', $this->filter_user_id);
+        }
+        $matrixUsers = $userQuery->orderBy('name')->paginate($this->perPage);
+
         // Recap table — filtered, sorted, paginated
         $sortField = in_array($this->sortField, $this->sortable) ? $this->sortField : 'timestamp';
         $sortDir = $this->sortDirection === 'asc' ? 'asc' : 'desc';
@@ -234,6 +312,11 @@ class ReportsIndex extends Component
             'employees' => $employees,
             'branches' => $branches,
             'recapLogs' => $recapLogs,
+            // Matrix additions
+            'matrixUsers' => $matrixUsers,
+            'matrixDays' => $matrixDays,
+            'matrixLogs' => $matrixLogs,
+            'matrixLeaves' => $matrixLeaves,
         ]);
     }
 }
