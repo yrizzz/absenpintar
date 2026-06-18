@@ -229,14 +229,21 @@ class ReportsIndex extends Component
         $matrixMonth = (int) ($this->matrix_month ?: now()->month);
         $matrixYear = (int) ($this->matrix_year ?: now()->year);
 
+        $holidays = self::getNationalHolidays($matrixYear);
+
         $daysInMonth = \Carbon\Carbon::create($matrixYear, $matrixMonth, 1)->daysInMonth;
         $matrixDays = [];
         for ($d = 1; $d <= $daysInMonth; $d++) {
             $date = \Carbon\Carbon::create($matrixYear, $matrixMonth, $d);
+            $dateString = $date->toDateString();
+            $holidayName = $holidays[$dateString] ?? null;
+
             $matrixDays[] = [
                 'day' => $d,
-                'date_string' => $date->toDateString(),
+                'date_string' => $dateString,
                 'is_sunday' => $date->isSunday(),
+                'is_holiday' => !empty($holidayName),
+                'holiday_name' => $holidayName,
                 'day_name' => $date->translatedFormat('D'),
             ];
         }
@@ -245,16 +252,21 @@ class ReportsIndex extends Component
         $endOfMonth = \Carbon\Carbon::create($matrixYear, $matrixMonth, 1)->endOfMonth();
 
         // Group attendance logs by user_id and date
-        $matrixLogs = \App\Models\AttendanceLog::whereBetween('timestamp', [$startOfMonth, $endOfMonth])
-            ->where('type', 'checkin')
-            ->get()
-            ->groupBy(function($log) {
-                return $log->user_id . '_' . \Carbon\Carbon::parse($log->timestamp)->toDateString();
-            });
+        $logQuery = \App\Models\AttendanceLog::whereBetween('timestamp', [$startOfMonth, $endOfMonth])
+            ->where('type', 'checkin');
+        if ($this->filter_branch_id) {
+            $logQuery->where('branch_id', $this->filter_branch_id);
+        }
+        if ($this->filter_user_id) {
+            $logQuery->where('user_id', $this->filter_user_id);
+        }
+        $matrixLogs = $logQuery->get()->groupBy(function($log) {
+            return $log->user_id . '_' . \Carbon\Carbon::parse($log->timestamp)->toDateString();
+        });
 
         // Fetch active leaves within this month
         $matrixLeaves = [];
-        $leavesList = \App\Models\LeaveRequest::where(function($q) use ($startOfMonth, $endOfMonth) {
+        $leavesQuery = \App\Models\LeaveRequest::where(function($q) use ($startOfMonth, $endOfMonth) {
                 $q->whereBetween('start_date', [$startOfMonth, $endOfMonth])
                   ->orWhereBetween('end_date', [$startOfMonth, $endOfMonth])
                   ->orWhere(function($sub) use ($startOfMonth, $endOfMonth) {
@@ -262,8 +274,11 @@ class ReportsIndex extends Component
                           ->where('end_date', '>=', $endOfMonth);
                   });
             })
-            ->where('status', 'approved')
-            ->get();
+            ->where('status', 'approved');
+        if ($this->filter_user_id) {
+            $leavesQuery->where('user_id', $this->filter_user_id);
+        }
+        $leavesList = $leavesQuery->get();
 
         foreach ($leavesList as $leave) {
             $start = \Carbon\Carbon::parse($leave->start_date);
@@ -318,5 +333,38 @@ class ReportsIndex extends Component
             'matrixLogs' => $matrixLogs,
             'matrixLeaves' => $matrixLeaves,
         ]);
+    }
+
+    public static function getNationalHolidays($year)
+    {
+        if ($year == 2026) {
+            return [
+                '2026-01-01' => 'Tahun Baru Masehi',
+                '2026-01-18' => "Isra Mi'raj Nabi Muhammad SAW",
+                '2026-02-17' => 'Tahun Baru Imlek',
+                '2026-03-19' => 'Hari Suci Nyepi',
+                '2026-03-20' => 'Hari Raya Idul Fitri 1447 H',
+                '2026-03-21' => 'Hari Raya Idul Fitri 1447 H',
+                '2026-04-03' => 'Wafat Yesus Kristus',
+                '2026-04-05' => 'Hari Paskah',
+                '2026-05-01' => 'Hari Buruh Internasional',
+                '2026-05-14' => 'Hari Raya Waisak',
+                '2026-05-21' => 'Kenaikan Yesus Kristus',
+                '2026-05-27' => 'Hari Raya Idul Adha 1447 H',
+                '2026-06-01' => 'Hari Lahir Pancasila',
+                '2026-06-17' => 'Tahun Baru Islam 1448 H',
+                '2026-08-17' => 'Hari Kemerdekaan RI',
+                '2026-08-26' => 'Maulid Nabi Muhammad SAW',
+                '2026-12-25' => 'Hari Raya Natal',
+            ];
+        }
+
+        return [
+            "$year-01-01" => 'Tahun Baru Masehi',
+            "$year-05-01" => 'Hari Buruh Internasional',
+            "$year-06-01" => 'Hari Lahir Pancasila',
+            "$year-08-17" => 'Hari Kemerdekaan RI',
+            "$year-12-25" => 'Hari Raya Natal',
+        ];
     }
 }

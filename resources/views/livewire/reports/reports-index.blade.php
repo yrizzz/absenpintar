@@ -1,6 +1,58 @@
+<!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<div class="py-8 min-h-screen">
+<div class="py-8 min-h-screen" x-data="{
+    selectedLog: null,
+    showModal: false,
+    init() {
+        this.$watch('showModal', value => {
+            document.body.style.overflow = value ? 'hidden' : '';
+        });
+    },
+    detailMap: null,
+    detailUserMarker: null,
+    initDetailMap() {
+        this.$nextTick(() => {
+            if (!this.selectedLog) return;
+            const lat = parseFloat(this.selectedLog.latitude);
+            const lng = parseFloat(this.selectedLog.longitude);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            setTimeout(() => {
+                const mapEl = document.getElementById('detail-map');
+                if (!mapEl) { console.warn('[Map] detail-map element not found'); return; }
+
+                if (this.detailMap) {
+                    try { this.detailMap.remove(); } catch (e) { console.error(e); }
+                    this.detailMap = null;
+                    this.detailUserMarker = null;
+                }
+
+                this.detailMap = L.map('detail-map', { zoomControl: true, attributionControl: false }).setView([lat, lng], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.detailMap);
+
+                const userIcon = L.divIcon({
+                    className: 'custom-user-dot',
+                    html: `<div class='relative flex items-center justify-center'>
+                             <div class='absolute w-8 h-8 rounded-full bg-primary/30 animate-ping'></div>
+                             <div class='relative w-3.5 h-3.5 bg-primary rounded-full border-2 border-white'></div>
+                           </div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                this.detailUserMarker = L.marker([lat, lng], { icon: userIcon }).addTo(this.detailMap);
+                this.detailUserMarker.bindPopup('<strong class=\'text-xs text-slate-800\'>Lokasi Absensi</strong>').openPopup();
+
+                [100, 300, 600, 1200, 2000].forEach(delay => {
+                    setTimeout(() => { if (this.detailMap) this.detailMap.invalidateSize(); }, delay);
+                });
+            }, 250);
+        });
+    }
+}">
     <div class="px-4 sm:px-6 lg:px-8">
 
         @php
@@ -194,115 +246,134 @@
                     @endif
                 </div>
             </div>
-
             {{-- Filter bar --}}
-            <div class="rounded-xl border border-border bg-surface-muted p-4 mb-6 space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div class="lg:col-span-2">
-                        <label class="label">Cari karyawan</label>
-                        <input type="text" wire:model.live.debounce.400ms="search" placeholder="Nama atau ID karyawan…">
+            <div class="rounded-xl border border-border bg-surface-muted p-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {{-- Cari Karyawan --}}
+                    <div class="space-y-1">
+                        <label class="label text-xs font-semibold text-fg-muted">Cari Karyawan</label>
+                        <input type="text" wire:model.live.debounce.400ms="search" placeholder="Nama atau ID karyawan…"
+                            class="w-full rounded-lg border border-border bg-surface text-fg placeholder-fg-subtle text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 px-3">
                     </div>
+
+                    {{-- Select Karyawan --}}
+                    <div class="space-y-1">
+                        <label class="label text-xs font-semibold text-fg-muted">Karyawan</label>
+                        <select wire:model.live="filter_user_id"
+                            class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                            <option value="">Semua Karyawan</option>
+                            @foreach($employees as $emp)
+                                <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Select Cabang --}}
+                    <div class="space-y-1">
+                        <label class="label text-xs font-semibold text-fg-muted">Cabang</label>
+                        <select wire:model.live="filter_branch_id"
+                            class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                            <option value="">Semua Cabang</option>
+                            @foreach($branches as $br)
+                                <option value="{{ $br->id }}">{{ $br->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     @if($view_mode === 'grid')
-                        <div>
-                            <label class="label">Bulan</label>
-                            <select wire:model.live="matrix_month" class="cursor-pointer">
+                        {{-- Bulan --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Bulan</label>
+                            <select wire:model.live="matrix_month"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
                                 @foreach([1=>'Januari', 2=>'Februari', 3=>'Maret', 4=>'April', 5=>'Mei', 6=>'Juni', 7=>'Juli', 8=>'Agustus', 9=>'September', 10=>'Oktober', 11=>'November', 12=>'Desember'] as $num => $name)
                                     <option value="{{ $num }}">{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label class="label">Tahun</label>
-                            <select wire:model.live="matrix_year" class="cursor-pointer">
+
+                        {{-- Tahun --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Tahun</label>
+                            <select wire:model.live="matrix_year"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
                                 @for($y = now()->year - 2; $y <= now()->year + 1; $y++)
                                     <option value="{{ $y }}">{{ $y }}</option>
                                 @endfor
                             </select>
                         </div>
-                    @else
-                        <div>
-                            <label class="label">Karyawan</label>
-                            <select wire:model.live="filter_user_id" class="cursor-pointer">
-                                <option value="">Semua</option>
-                                @foreach($employees as $emp)<option value="{{ $emp->id }}">{{ $emp->name }}</option>@endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="label">Cabang</label>
-                            <select wire:model.live="filter_branch_id" class="cursor-pointer">
-                                <option value="">Semua</option>
-                                @foreach($branches as $br)<option value="{{ $br->id }}">{{ $br->name }}</option>@endforeach
-                            </select>
-                        </div>
-                    @endif
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    @if($view_mode === 'grid')
-                        <div>
-                            <label class="label">Cabang</label>
-                            <select wire:model.live="filter_branch_id" class="cursor-pointer">
-                                <option value="">Semua</option>
-                                @foreach($branches as $br)<option value="{{ $br->id }}">{{ $br->name }}</option>@endforeach
+                        {{-- Per Halaman --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Per Halaman</label>
+                            <select wire:model.live="perPage"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                                <option value="15">15 data</option>
+                                <option value="30">30 data</option>
+                                <option value="50">50 data</option>
                             </select>
-                        </div>
-                        <div>
-                            <label class="label">Per halaman</label>
-                            <select wire:model.live="perPage" class="cursor-pointer">
-                                <option value="15">15</option>
-                                <option value="30">30</option>
-                                <option value="50">50</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button wire:click="resetFilters" class="btn-secondary btn-sm w-full">Reset Semua Filter</button>
                         </div>
                     @else
-                        <div>
-                            <label class="label">Tipe</label>
-                            <select wire:model.live="filter_type" class="cursor-pointer">
-                                <option value="">Semua</option>
+                        {{-- Tipe --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Tipe Absen</label>
+                            <select wire:model.live="filter_type"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                                <option value="">Semua Tipe</option>
                                 <option value="checkin">Masuk</option>
                                 <option value="checkout">Keluar</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="label">Kerawanan</label>
-                            <select wire:model.live="filter_risk" class="cursor-pointer">
-                                <option value="">Semua</option>
+
+                        {{-- Kerawanan --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Kerawanan</label>
+                            <select wire:model.live="filter_risk"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                                <option value="">Semua Tingkat</option>
                                 <option value="low">Rendah</option>
                                 <option value="medium">Sedang</option>
                                 <option value="high">Tinggi</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="label">Status</label>
-                            <select wire:model.live="filter_status" class="cursor-pointer">
-                                <option value="">Semua</option>
+
+                        {{-- Status --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Status Validasi</label>
+                            <select wire:model.live="filter_status"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 cursor-pointer px-3">
+                                <option value="">Semua Status</option>
                                 <option value="approved">Disetujui</option>
                                 <option value="pending">Diproses</option>
                                 <option value="flagged">Dicurigai</option>
                                 <option value="rejected">Ditolak</option>
                             </select>
                         </div>
-                    @endif
-                </div>
 
-                @if($view_mode === 'list')
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                        <div>
-                            <label class="label">Tanggal mulai</label>
-                            <input type="date" wire:model.live="filter_start_date">
+                        {{-- Tanggal Mulai --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Tanggal Mulai</label>
+                            <input type="date" wire:model.live="filter_start_date"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 px-3">
                         </div>
-                        <div>
-                            <label class="label">Tanggal selesai</label>
-                            <input type="date" wire:model.live="filter_end_date">
+
+                        {{-- Tanggal Selesai --}}
+                        <div class="space-y-1">
+                            <label class="label text-xs font-semibold text-fg-muted">Tanggal Selesai</label>
+                            <input type="date" wire:model.live="filter_end_date"
+                                class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 px-3">
                         </div>
-                        <div class="flex items-end">
-                            <button wire:click="resetFilters" class="btn-secondary btn-sm w-full">Reset Semua Filter</button>
-                        </div>
+                    @endif
+
+                    {{-- Reset Button --}}
+                    <div class="flex items-end">
+                        <button type="button" wire:click="resetFilters" 
+                            class="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-border bg-surface hover:bg-surface-muted text-fg text-sm font-semibold transition-all active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4 text-fg-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+                            Reset Filter
+                        </button>
                     </div>
-                @endif
+                </div>
             </div>
 
             {{-- Table Render --}}
@@ -320,9 +391,10 @@
                                     </th>
                                     {{-- Date Columns Header --}}
                                     @foreach($matrixDays as $day)
-                                        <th class="p-2 text-center border-l border-border/60 {{ $day['is_sunday'] ? 'bg-rose-50/50 dark:bg-rose-950/20 text-rose-500 font-bold' : '' }} w-[40px]">
+                                        <th class="p-2 text-center border-l border-border/60 {{ ($day['is_sunday'] || $day['is_holiday']) ? 'bg-rose-50/50 dark:bg-rose-950/20 text-rose-500 font-bold' : '' }} w-[40px]"
+                                            @if($day['is_holiday']) title="{{ $day['holiday_name'] }}" @endif>
                                             <span class="block text-[10px] opacity-70">{{ $day['day_name'] }}</span>
-                                            <span class="block text-xs mt-0.5">{{ $day['day'] }}</span>
+                                            <span class="block text-xs mt-0.5 {{ $day['is_holiday'] ? 'underline decoration-rose-500 decoration-dotted cursor-help' : '' }}">{{ $day['day'] }}</span>
                                         </th>
                                     @endforeach
                                 </tr>
@@ -343,26 +415,55 @@
                                                 $key = $user->id . '_' . $day['date_string'];
                                                 $log = $matrixLogs->get($key)?->first();
                                                 $leaveType = $matrixLeaves[$key] ?? null;
+                                                $tzSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
+                                                $tzLabel = 'WIB';
+                                                if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
+                                                if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
                                             @endphp
-                                            <td class="p-1 text-center border-l border-border/60 {{ $day['is_sunday'] ? 'bg-rose-50/25 dark:bg-rose-950/15' : '' }}">
-                                                @if($day['is_sunday'])
-                                                    {{-- Sunday --}}
-                                                    <span class="text-[10px] font-bold text-rose-500 dark:text-rose-500/80 select-none">M</span>
-                                                @elseif($log)
+                                            <td class="p-1 text-center border-l border-border/60 {{ ($day['is_sunday'] || $day['is_holiday']) ? 'bg-rose-50/25 dark:bg-rose-950/15' : '' }}">
+                                                @if($log)
                                                     {{-- Present --}}
-                                                    <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all
+                                                    <button type="button" @click="selectedLog = {{ json_encode([
+                                                        'id' => $log->id,
+                                                        'type' => $log->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
+                                                        'timestamp' => \Carbon\Carbon::parse($log->timestamp)->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
+                                                        'latitude' => $log->latitude,
+                                                        'longitude' => $log->longitude,
+                                                        'accuracy' => $log->accuracy,
+                                                        'ip_address' => $log->ip_address,
+                                                        'work_mode' => strtoupper($log->work_mode ?? 'office'),
+                                                        'risk_score' => $log->risk_score ?? 0,
+                                                        'risk_level' => $log->risk_level === 'high' ? 'Tinggi' : ($log->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
+                                                        'risk_class' => $log->risk_level,
+                                                        'status' => $log->status === 'approved' ? 'Disetujui' : ($log->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
+                                                        'status_class' => $log->status,
+                                                        'is_late' => $log->is_late,
+                                                        'selfie_url' => $log->selfie_path ? asset('storage/' . $log->selfie_path) : null,
+                                                        'notes' => $log->notes ?? 'Tidak ada catatan tambahan.',
+                                                        'branch_name' => $log->branch->name ?? 'HQ Workspace',
+                                                        'device_hash' => substr(md5($log->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
+                                                        'employee_name' => $log->user->name ?? 'Karyawan',
+                                                        'resolved_address' => $log->metadata['resolved_address'] ?? null
+                                                    ]) }}; showModal = true; initDetailMap();"
+                                                    class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all hover:scale-110 active:scale-95 cursor-pointer
                                                         {{ $log->is_late 
                                                             ? 'bg-amber-50 text-amber-600 border border-amber-250 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-500/20' 
                                                             : 'bg-emerald-50 text-emerald-600 border border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' }}"
-                                                        title="Hadir pada {{ \Carbon\Carbon::parse($log->timestamp)->format('H:i') }}{{ $log->is_late ? ' (Terlambat)' : '' }}">
+                                                        title="Klik untuk detail. Hadir pada {{ \Carbon\Carbon::parse($log->timestamp)->format('H:i') }}{{ $log->is_late ? ' (Terlambat)' : '' }}">
                                                         ✓
-                                                    </div>
+                                                    </button>
                                                 @elseif($leaveType)
                                                     {{-- On Leave --}}
                                                     <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-600 border border-blue-205 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-500/20 uppercase"
                                                         title="Cuti: {{ ucfirst($leaveType) }}">
                                                         C
                                                     </div>
+                                                @elseif($day['is_sunday'])
+                                                    {{-- Sunday --}}
+                                                    <span class="text-[10px] font-bold text-rose-500 dark:text-rose-500/80 select-none">M</span>
+                                                @elseif($day['is_holiday'])
+                                                    {{-- National Holiday --}}
+                                                    <span class="text-[10px] font-bold text-rose-500 dark:text-rose-500/80 select-none cursor-help" title="{{ $day['holiday_name'] }}">H</span>
                                                 @else
                                                     {{-- Absent / Empty --}}
                                                     <span class="text-slate-350 dark:text-slate-700 select-none">-</span>
@@ -393,7 +494,11 @@
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span class="text-rose-500 font-bold">M</span>
-                                <span class="text-slate-600 dark:text-slate-400">Hari Minggu (Libur)</span>
+                                <span class="text-slate-600 dark:text-slate-400">Hari Minggu</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-rose-500 font-bold">H</span>
+                                <span class="text-slate-600 dark:text-slate-400">Hari Libur Nasional</span>
                             </div>
                         </div>
                         <div>{{ $matrixUsers->links() }}</div>
@@ -418,6 +523,7 @@
                                     <th class="pb-3 pr-3">{!! $sortBtn('risk_level', 'Kerawanan') !!}</th>
                                     <th class="pb-3 pr-3">{!! $sortBtn('status', 'Status') !!}</th>
                                     <th class="pb-3 text-right">{!! $sortBtn('is_late', 'Ketepatan') !!}</th>
+                                    <th class="pb-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-border">
@@ -455,6 +561,39 @@
                                         <td class="py-3 text-right">
                                             @if($log->is_late)<span class="badge-rect-danger">Terlambat</span>@else<span class="badge-rect-success">Tepat waktu</span>@endif
                                         </td>
+                                        <td class="py-3 text-right whitespace-nowrap">
+                                            @php
+                                                $tzSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
+                                                $tzLabel = 'WIB';
+                                                if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
+                                                if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
+                                            @endphp
+                                            <button type="button" @click="selectedLog = {{ json_encode([
+                                                'id' => $log->id,
+                                                'type' => $log->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
+                                                'timestamp' => \Carbon\Carbon::parse($log->timestamp)->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
+                                                'latitude' => $log->latitude,
+                                                'longitude' => $log->longitude,
+                                                'accuracy' => $log->accuracy,
+                                                'ip_address' => $log->ip_address,
+                                                'work_mode' => strtoupper($log->work_mode ?? 'office'),
+                                                'risk_score' => $log->risk_score ?? 0,
+                                                'risk_level' => $log->risk_level === 'high' ? 'Tinggi' : ($log->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
+                                                'risk_class' => $log->risk_level,
+                                                'status' => $log->status === 'approved' ? 'Disetujui' : ($log->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
+                                                'status_class' => $log->status,
+                                                'is_late' => $log->is_late,
+                                                'selfie_url' => $log->selfie_path ? asset('storage/' . $log->selfie_path) : null,
+                                                'notes' => $log->notes ?? 'Tidak ada catatan tambahan.',
+                                                'branch_name' => $log->branch->name ?? 'HQ Workspace',
+                                                'device_hash' => substr(md5($log->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
+                                                'employee_name' => $log->user->name ?? 'Karyawan',
+                                                'resolved_address' => $log->metadata['resolved_address'] ?? null
+                                            ]) }}; showModal = true; initDetailMap();"
+                                            class="text-xs font-semibold text-primary hover:underline cursor-pointer">
+                                                Detail
+                                            </button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -466,4 +605,5 @@
             @endif
         </div>
     </div>
+    <x-attendance.detail-modal :is-admin="true" />
 </div>
