@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Indonesian date/time formatting for translatedFormat() across the app.
+        \Carbon\Carbon::setLocale('id');
+
         // -------------------------------------------------------
         // Livewire 4 — Obfuscated routes (WordPress mockup)
         // Nginx sudah dikonfigurasi untuk:

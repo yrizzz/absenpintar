@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -17,6 +18,8 @@ use Spatie\Permission\Models\Permission;
 #[Title('Settings Workspace')]
 class SettingsIndex extends Component
 {
+    use WithPagination;
+
     public $activeTab = 'security'; // 'security', 'branches', 'roles'
 
     // Geofencing parameters
@@ -44,10 +47,45 @@ class SettingsIndex extends Component
     public $company_phone = '(021) 123-4567';
     public $company_email = 'hrd@presensiku.com';
 
-    // Search and filters
+    // Search and filters (employees / biometrics table)
     public $search = '';
     public $statusFilter = 'all'; // 'all', 'registered', 'pending'
     public $branchFilter = 'all'; // 'all', branch_id
+    public $userSortField = 'name';
+    public $userSortDir = 'asc';
+
+    // Branch table search & sort
+    public $branchSearch = '';
+    public $branchSortField = 'name';
+    public $branchSortDir = 'asc';
+
+    // Reset pagination when filters change
+    public function updatedSearch() { $this->resetPage('usersPage'); }
+    public function updatedStatusFilter() { $this->resetPage('usersPage'); }
+    public function updatedBranchFilter() { $this->resetPage('usersPage'); }
+    public function updatedBranchSearch() { $this->resetPage('branchesPage'); }
+
+    public function sortUsers($field)
+    {
+        if ($this->userSortField === $field) {
+            $this->userSortDir = $this->userSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->userSortField = $field;
+            $this->userSortDir = 'asc';
+        }
+        $this->resetPage('usersPage');
+    }
+
+    public function sortBranches($field)
+    {
+        if ($this->branchSortField === $field) {
+            $this->branchSortDir = $this->branchSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->branchSortField = $field;
+            $this->branchSortDir = 'asc';
+        }
+        $this->resetPage('branchesPage');
+    }
 
     // Registration Modal properties
     public $showRegisterModal = false;
@@ -672,8 +710,25 @@ class SettingsIndex extends Component
 
     public function render()
     {
-        $branches = Branch::all();
-        $query = User::query();
+        // All branches — used for dropdowns and the "active branches" summary cards.
+        $branches = Branch::orderBy('name')->get();
+
+        // Searchable / sortable / paginated branch management table.
+        $branchSortAllowed = ['name', 'code', 'radius', 'is_active'];
+        $bSort = in_array($this->branchSortField, $branchSortAllowed, true) ? $this->branchSortField : 'name';
+        $branchesTable = Branch::query()
+            ->when($this->branchSearch !== '', function ($q) {
+                $s = $this->branchSearch;
+                $q->where(function ($w) use ($s) {
+                    $w->where('name', 'like', "%{$s}%")
+                      ->orWhere('code', 'like', "%{$s}%")
+                      ->orWhere('address', 'like', "%{$s}%");
+                });
+            })
+            ->orderBy($bSort, $this->branchSortDir === 'desc' ? 'desc' : 'asc')
+            ->paginate(6, ['*'], 'branchesPage');
+
+        $query = User::query()->with(['branch', 'roles']);
 
         if (!empty($this->search)) {
             $query->where(function($q) {
@@ -710,6 +765,28 @@ class SettingsIndex extends Component
             $allUsers = $allUsers->filter(fn($u) => !$u->is_registered);
         }
 
+        // Sort (registration status is storage-derived, so sort the collection).
+        $allUsers = $allUsers->sortBy(function ($u) {
+            return match ($this->userSortField) {
+                'employee_id' => $u->employee_id,
+                'email' => mb_strtolower($u->email),
+                'branch' => mb_strtolower($u->branch->name ?? ''),
+                'is_registered' => $u->is_registered ? 1 : 0,
+                default => mb_strtolower($u->name),
+            };
+        }, SORT_REGULAR, $this->userSortDir === 'desc')->values();
+
+        // Manual pagination over the derived collection.
+        $userPerPage = 8;
+        $userPage = max(1, (int) ($this->paginators['usersPage'] ?? request()->query('usersPage', 1)));
+        $usersPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allUsers->forPage($userPage, $userPerPage)->values(),
+            $allUsers->count(),
+            $userPerPage,
+            $userPage,
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'pageName' => 'usersPage']
+        );
+
         // Stats calculations
         $totalEmployees = User::count();
         $enrolledCount = 0;
@@ -726,8 +803,9 @@ class SettingsIndex extends Component
         $allPermissions = Permission::all();
 
         return view('livewire.settings.settings-index', [
-            'users' => $allUsers,
+            'users' => $usersPaginated,
             'branches' => $branches,
+            'branchesTable' => $branchesTable,
             'roles' => $roles,
             'allPermissions' => $allPermissions,
             'stats' => [

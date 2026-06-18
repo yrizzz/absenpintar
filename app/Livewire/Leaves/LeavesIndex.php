@@ -241,17 +241,21 @@ class LeavesIndex extends Component
 
     // ---- Action modal helpers ----
 
-    public function openAction($id, $stage, $mode)
+    public $selectedLeave = null;
+
+    public function openAction($id, $stage)
     {
         $this->actionId = $id;
         $this->actionStage = $stage; // 'manager' | 'hr'
-        $this->actionMode = $mode;   // 'approve' | 'reject'
+        $this->selectedLeave = LeaveRequest::with('user', 'manager')->find($id);
         $this->actionNotes = '';
         $this->showActionModal = true;
     }
 
-    public function submitAction()
+    public function submitAction($mode)
     {
+        $this->actionMode = $mode; // 'approve' | 'reject'
+        
         // Rejection requires a reason; approval note is optional.
         if ($this->actionMode === 'reject') {
             $this->validate(['actionNotes' => 'required|string|max:500'], [], ['actionNotes' => 'catatan']);
@@ -268,7 +272,7 @@ class LeavesIndex extends Component
         }
 
         $this->showActionModal = false;
-        $this->reset(['actionId', 'actionStage', 'actionMode', 'actionNotes']);
+        $this->reset(['actionId', 'actionStage', 'actionMode', 'actionNotes', 'selectedLeave']);
     }
 
     protected function writeAudit(string $action, LeaveRequest $leave, array $newValues): void

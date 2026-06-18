@@ -34,6 +34,23 @@ class PermissionsIndex extends Component
     public $reviewSearch = '';
     public $reviewTypeFilter = 'all';
     public $reviewStatusFilter = 'pending'; // 'pending', 'approved', 'rejected', 'all'
+    public $reviewSortField = 'created_at';
+    public $reviewSortDir = 'desc';
+
+    public function sortReview($field)
+    {
+        $allowed = ['created_at', 'date', 'type', 'status'];
+        if (!in_array($field, $allowed, true)) {
+            return;
+        }
+        if ($this->reviewSortField === $field) {
+            $this->reviewSortDir = $this->reviewSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->reviewSortField = $field;
+            $this->reviewSortDir = 'asc';
+        }
+        $this->resetPage('reviewPage');
+    }
 
     // Modal Actions State
     public $showRejectionModal = false;

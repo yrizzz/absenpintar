@@ -20,6 +20,24 @@ class History extends Component
     public $filterStatus = '';
     public $searchEmployee = '';
     public $isAdmin = false;
+    public $sortField = 'timestamp';
+    public $sortDirection = 'desc';
+
+    protected array $sortable = ['timestamp', 'type', 'status', 'is_late', 'risk_level', 'accuracy'];
+
+    public function sortBy($field)
+    {
+        if (!in_array($field, $this->sortable, true)) {
+            return;
+        }
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
 
     public function mount()
     {
@@ -69,7 +87,8 @@ class History extends Component
             $query->where('status', $this->filterStatus);
         }
 
-        $attendances = $query->orderBy('timestamp', 'desc')->paginate(20);
+        $sortField = in_array($this->sortField, $this->sortable, true) ? $this->sortField : 'timestamp';
+        $attendances = $query->orderBy($sortField, $this->sortDirection === 'asc' ? 'asc' : 'desc')->paginate(20);
 
         return view('livewire.attendance.history', [
             'attendances' => $attendances,

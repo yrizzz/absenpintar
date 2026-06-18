@@ -15,6 +15,12 @@ class Login extends Component
     public string $password = '';
     public bool $remember = false;
 
+    public function fillDemo(string $email)
+    {
+        $this->email = $email;
+        $this->password = 'password';
+    }
+
     public function rules()
     {
         return [

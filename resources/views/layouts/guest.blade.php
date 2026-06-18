@@ -6,29 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Login' }} - PresensiKu</title>
+    <title>{{ $title ?? 'Login' }} — PresensiKu</title>
 
-    <!-- Premium Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap"
         rel="stylesheet">
 
-    <!-- Theme Initializer Script to prevent flashing -->
+    {{-- Theme initializer (light-first) --}}
     <script>
-        if (localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-            document.documentElement.classList.add('light');
-        } else {
-            document.documentElement.classList.remove('light');
-        }
+        (function () {
+            var t = localStorage.getItem('theme');
+            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 
-<body class="h-full bg-[#090e1a] text-slate-100 antialiased font-sans overflow-x-hidden">
+<body class="h-full text-fg antialiased font-sans overflow-x-hidden">
     {{ $slot }}
 
     @livewireScripts

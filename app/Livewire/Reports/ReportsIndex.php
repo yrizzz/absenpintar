@@ -5,6 +5,7 @@ namespace App\Livewire\Reports;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AttendanceLogsExport;
 
@@ -12,25 +13,60 @@ use App\Exports\AttendanceLogsExport;
 #[Title('Laporan & Telemetri Kehadiran')]
 class ReportsIndex extends Component
 {
+    use WithPagination;
+
     public $report_period = 'monthly';
     public $report_type = 'presence_summary';
 
-    // Interactive Recap Filters
+    // Interactive recap filters
     public $filter_user_id = '';
     public $filter_branch_id = '';
     public $filter_start_date = '';
     public $filter_end_date = '';
+    public $filter_type = '';
+    public $filter_risk = '';
+    public $filter_status = '';
+    public $search = '';
 
-    // Checklist Selection state
+    // Free sorting + pagination
+    public $sortField = 'timestamp';
+    public $sortDirection = 'desc';
+    public $perPage = 15;
+
+    // Checklist selection state
     public $selectedLogs = [];
     public $selectAll = false;
+
+    protected array $sortable = ['timestamp', 'accuracy', 'risk_level', 'status', 'type', 'is_late'];
+
+    public function updated($name)
+    {
+        if (str_starts_with($name, 'filter_') || $name === 'search' || $name === 'perPage') {
+            $this->resetPage();
+            $this->selectAll = false;
+        }
+    }
+
+    public function sortBy($field)
+    {
+        if (!in_array($field, $this->sortable)) {
+            return;
+        }
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
 
     public function updatedSelectAll($value)
     {
         if ($value) {
-            $query = \App\Models\AttendanceLog::orderBy('timestamp', 'desc');
+            $query = \App\Models\AttendanceLog::query();
             $this->applyFilters($query);
-            $this->selectedLogs = $query->pluck('id')->map(fn($id) => (string)$id)->toArray();
+            $this->selectedLogs = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
         } else {
             $this->selectedLogs = [];
         }
@@ -115,37 +151,47 @@ class ReportsIndex extends Component
         if ($this->filter_end_date) {
             $query->whereDate('timestamp', '<=', $this->filter_end_date);
         }
+        if ($this->filter_type) {
+            $query->where('type', $this->filter_type);
+        }
+        if ($this->filter_risk) {
+            $query->where('risk_level', $this->filter_risk);
+        }
+        if ($this->filter_status) {
+            $query->where('status', $this->filter_status);
+        }
+        if ($this->search) {
+            $term = $this->search;
+            $query->whereHas('user', function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('employee_id', 'like', "%{$term}%");
+            });
+        }
     }
 
     public function resetFilters()
     {
-        $this->reset(['filter_user_id', 'filter_branch_id', 'filter_start_date', 'filter_end_date', 'selectedLogs', 'selectAll']);
+        $this->reset([
+            'filter_user_id', 'filter_branch_id', 'filter_start_date', 'filter_end_date',
+            'filter_type', 'filter_risk', 'filter_status', 'search', 'selectedLogs', 'selectAll',
+        ]);
+        $this->resetPage();
     }
 
     public function render()
     {
-        // 1. Avg Accuracy
-        $avgAccuracy = \App\Models\AttendanceLog::avg('accuracy') ?? 8.2;
+        $A = \App\Models\AttendanceLog::class;
 
-        // 2. Total active logs
-        $totalPresenceLogs = \App\Models\AttendanceLog::where('type', 'checkin')->count();
+        // KPIs
+        $avgAccuracy = $A::avg('accuracy') ?? 8.2;
+        $totalPresenceLogs = $A::where('type', 'checkin')->count();
+        $riskEvents = $A::whereIn('risk_level', ['medium', 'high'])->count();
+        $overtimeCount = $A::where('type', 'overtime_start')->count();
+        $overtimeHours = $overtimeCount * 2.5;
 
-        // 3. Risk events count
-        $riskEvents = \App\Models\AttendanceLog::whereIn('risk_level', ['medium', 'high'])->count();
-
-        // 4. Overtime calculation
-        $overtimeCount = \App\Models\AttendanceLog::where('type', 'overtime_start')->count();
-        $overtimeHours = $overtimeCount * 2.5; // average 2.5 hours per overtime checkin
-
-        // 5. Weekly histogram per day
-        $daysOfWeek = [
-            'Monday' => 0,
-            'Tuesday' => 0,
-            'Wednesday' => 0,
-            'Thursday' => 0,
-            'Friday' => 0,
-        ];
-        $weeklyLogs = \App\Models\AttendanceLog::where('type', 'checkin')
+        // Weekly histogram (actual counts)
+        $daysOfWeek = ['Monday' => 0, 'Tuesday' => 0, 'Wednesday' => 0, 'Thursday' => 0, 'Friday' => 0];
+        $weeklyLogs = $A::where('type', 'checkin')
             ->whereBetween('timestamp', [now()->startOfWeek(), now()->endOfWeek()])
             ->get();
         foreach ($weeklyLogs as $l) {
@@ -154,30 +200,36 @@ class ReportsIndex extends Component
                 $daysOfWeek[$dayName]++;
             }
         }
-        $maxCount = max(array_values($daysOfWeek));
-        $heights = [];
-        foreach ($daysOfWeek as $day => $count) {
-            $heights[$day] = $maxCount > 0 ? round(($count / $maxCount) * 160) : 40;
-        }
 
-        // 6. Latest device fingerprints audited
+        // Risk distribution (donut)
+        $riskMedium = $A::where('risk_level', 'medium')->count();
+        $riskHigh = $A::where('risk_level', 'high')->count();
+        $riskLow = max($A::count() - $riskMedium - $riskHigh, 0);
+
+        // On-time vs late (donut)
+        $onTime = $A::where('type', 'checkin')->where('is_late', false)->count();
+        $late = $A::where('type', 'checkin')->where('is_late', true)->count();
+
         $latestDevices = \App\Models\DeviceFingerprint::with('user')->latest()->take(5)->get();
-
-        // 7. Recapitulation Filter Options
         $employees = \App\Models\User::orderBy('name')->get();
         $branches = \App\Models\Branch::orderBy('name')->get();
 
-        // 8. Filtered Recap Table Data
-        $recapQuery = \App\Models\AttendanceLog::with(['user', 'branch'])->orderBy('timestamp', 'desc');
+        // Recap table — filtered, sorted, paginated
+        $sortField = in_array($this->sortField, $this->sortable) ? $this->sortField : 'timestamp';
+        $sortDir = $this->sortDirection === 'asc' ? 'asc' : 'desc';
+        $recapQuery = $A::with(['user', 'branch']);
         $this->applyFilters($recapQuery);
-        $recapLogs = $recapQuery->get();
+        $recapLogs = $recapQuery->orderBy($sortField, $sortDir)->paginate($this->perPage);
 
         return view('livewire.reports.reports-index', [
             'avg_accuracy' => round($avgAccuracy, 1),
             'total_presence_logs' => $totalPresenceLogs,
             'risk_events' => $riskEvents,
             'overtime_hours' => $overtimeHours ?: 12.5,
-            'heights' => $heights,
+            'weeklyCounts' => array_values($daysOfWeek),
+            'riskDistribution' => [$riskLow, $riskMedium, $riskHigh],
+            'onTime' => $onTime,
+            'late' => $late,
             'latest_devices' => $latestDevices,
             'employees' => $employees,
             'branches' => $branches,
