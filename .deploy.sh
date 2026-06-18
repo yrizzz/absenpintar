@@ -11,6 +11,44 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Deteksi PHP yang tepat (terutama untuk aaPanel / Baota)
+PHP_PATH=$(which php)
+if [ -d "/www/server/php" ]; then
+    # Cari PHP di aaPanel yang terpasang extension redis
+    for php_bin in $(ls -r /www/server/php/*/bin/php 2>/dev/null); do
+        if "$php_bin" -m | grep -q -i "redis" 2>/dev/null; then
+            PHP_PATH="$php_bin"
+            break
+        fi
+    done
+    # Jika tidak ada yang memiliki redis, gunakan versi PHP tertinggi yang terinstal di aaPanel
+    if [ "$PHP_PATH" = "$(which php)" ]; then
+        for php_bin in $(ls -r /www/server/php/*/bin/php 2>/dev/null); do
+            PHP_PATH="$php_bin"
+            break
+        done
+    fi
+fi
+
+echo "Using PHP binary: $PHP_PATH"
+
+# Override command php agar menggunakan PHP_PATH yang terdeteksi
+php() {
+    "$PHP_PATH" "$@"
+}
+export -f php || true
+
+# Override command composer agar menggunakan PHP_PATH yang terdeteksi
+COMPOSER_PATH=$(which composer 2>/dev/null)
+composer() {
+    if [ -n "$COMPOSER_PATH" ]; then
+        "$PHP_PATH" "$COMPOSER_PATH" "$@"
+    else
+        command composer "$@"
+    fi
+}
+export -f composer || true
+
 echo ""
 echo "╔══════════════════════════════════════════╗"
 echo "║     PresensiKu — Deployment Script      ║"
