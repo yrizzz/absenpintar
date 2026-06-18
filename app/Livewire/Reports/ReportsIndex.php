@@ -20,14 +20,14 @@ class ReportsIndex extends Component
 
     // View Mode: grid (matrix) or list
     public $view_mode = 'grid';
-    public $matrix_month = '';
-    public $matrix_year = '';
+    public $matrix_month;
+    public $matrix_year;
 
     // Interactive recap filters
     public $filter_user_id = '';
     public $filter_branch_id = '';
-    public $filter_start_date = '';
-    public $filter_end_date = '';
+    public $filter_start_date;
+    public $filter_end_date;
     public $filter_type = '';
     public $filter_risk = '';
     public $filter_status = '';
@@ -46,8 +46,10 @@ class ReportsIndex extends Component
 
     public function mount()
     {
-        $this->matrix_month = now()->month;
-        $this->matrix_year = now()->year;
+        $this->matrix_month = (string) now()->month;
+        $this->matrix_year = (string) now()->year;
+        $this->filter_start_date = now()->startOfMonth()->toDateString();
+        $this->filter_end_date = now()->endOfMonth()->toDateString();
     }
 
     public function updated($name)
@@ -183,9 +185,12 @@ class ReportsIndex extends Component
     public function resetFilters()
     {
         $this->reset([
-            'filter_user_id', 'filter_branch_id', 'filter_start_date', 'filter_end_date',
-            'filter_type', 'filter_risk', 'filter_status', 'search', 'selectedLogs', 'selectAll',
+            'filter_user_id', 'filter_branch_id', 'filter_type', 'filter_risk', 'filter_status', 'search', 'selectedLogs', 'selectAll',
         ]);
+        $this->matrix_month = (string) now()->month;
+        $this->matrix_year = (string) now()->year;
+        $this->filter_start_date = now()->startOfMonth()->toDateString();
+        $this->filter_end_date = now()->endOfMonth()->toDateString();
         $this->resetPage();
     }
 
