@@ -6,9 +6,15 @@
 <div class="py-8 min-h-screen" x-data="{
     selectedLog: null,
     showModal: false,
+    selectedDevice: null,
+    showDeviceModal: false,
+    deviceViewMode: 'list',
     init() {
         this.$watch('showModal', value => {
-            document.body.style.overflow = value ? 'hidden' : '';
+            document.body.style.overflow = (value || this.showDeviceModal) ? 'hidden' : '';
+        });
+        this.$watch('showDeviceModal', value => {
+            document.body.style.overflow = (value || this.showModal) ? 'hidden' : '';
         });
     },
     detailMap: null,
@@ -192,23 +198,123 @@
                 </div>
             </div>
 
-            <div class="card p-6 lg:col-span-2">
-                <h3 class="heading-3 mb-4">Audit Integritas Perangkat (Terbaru)</h3>
-                @if($latest_devices->isEmpty())
-                    <div class="text-sm text-fg-muted text-center py-8 rounded-xl bg-surface-muted">Belum ada telemetri perangkat terdaftar.</div>
-                @else
-                    <div class="divide-y divide-border">
-                        @foreach($latest_devices as $d)
-                            <div class="flex items-center justify-between py-3">
-                                <div class="flex flex-col">
-                                    <span class="label-sm font-medium text-fg">{{ $d->browser }} on {{ $d->os }}</span>
-                                    <span class="label-xs">Karyawan: {{ $d->user->name ?? 'N/A' }}</span>
-                                </div>
-                                <span class="badge-rect-success">{{ $d->trusted ? 'Tepercaya' : 'Tidak Terverifikasi' }}</span>
-                            </div>
-                        @endforeach
+            <div class="card p-6 lg:col-span-2 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="heading-3">Audit Integritas Perangkat</h3>
+                        
+                        {{-- View Mode Toggle --}}
+                        <div class="inline-flex rounded-lg p-0.5 bg-surface-muted border border-border">
+                            <button type="button" @click="deviceViewMode = 'list'"
+                                class="px-2 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1"
+                                :class="deviceViewMode === 'list' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg'">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5"/></svg>
+                                List
+                            </button>
+                            <button type="button" @click="deviceViewMode = 'grid'"
+                                class="px-2 py-1 rounded-md text-[10px] font-semibold transition-all flex items-center gap-1"
+                                :class="deviceViewMode === 'grid' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg'">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+                                Grid
+                            </button>
+                        </div>
                     </div>
-                @endif
+
+                    @if($latest_devices->isEmpty())
+                        <div class="text-sm text-fg-muted text-center py-8 rounded-xl bg-surface-muted">Belum ada telemetri perangkat terdaftar.</div>
+                    @else
+                        {{-- List View (Table) --}}
+                        <div x-show="deviceViewMode === 'list'" class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-border label-xs uppercase tracking-wide">
+                                        <th class="pb-2 text-[10px] text-fg-muted">Karyawan</th>
+                                        <th class="pb-2 text-[10px] text-fg-muted">Browser & OS</th>
+                                        <th class="pb-2 text-[10px] text-fg-muted">Platform</th>
+                                        <th class="pb-2 text-[10px] text-fg-muted">Status</th>
+                                        <th class="pb-2 text-[10px] text-fg-muted text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border/40">
+                                    @foreach($latest_devices as $d)
+                                        <tr class="hover:bg-surface-muted/50 transition-colors">
+                                            <td class="py-2 text-xs font-medium text-fg">{{ $d->user->name ?? 'N/A' }}</td>
+                                            <td class="py-2 text-xs text-fg-subtle">{{ $d->browser }} on {{ $d->os }}</td>
+                                            <td class="py-2 text-xs text-fg-subtle">{{ $d->platform ?? 'Desktop' }}</td>
+                                            <td class="py-2">
+                                                @if($d->trusted)
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20">Tepercaya</span>
+                                                @else
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-500/20">Unverified</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-2 text-right">
+                                                <button type="button" @click="selectedDevice = {{ json_encode([
+                                                    'id' => $d->id,
+                                                    'user_name' => $d->user->name ?? 'N/A',
+                                                    'employee_id' => $d->user->employee_id ?? 'N/A',
+                                                    'device_hash' => $d->device_hash,
+                                                    'browser' => $d->browser,
+                                                    'os' => $d->os,
+                                                    'platform' => $d->platform ?? 'Desktop/Web',
+                                                    'timezone' => $d->timezone ?? 'Asia/Jakarta',
+                                                    'language' => $d->language ?? 'id-ID',
+                                                    'screen_resolution' => $d->screen_resolution ?? '1920x1080',
+                                                    'hardware_concurrency' => $d->hardware_concurrency ?? '8',
+                                                    'gpu_info' => $d->gpu_info ?? 'Intel / Apple GPU',
+                                                    'trusted' => $d->trusted,
+                                                    'last_used' => \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s')
+                                                ]) }}; showDeviceModal = true;"
+                                                class="text-[11px] font-bold text-primary hover:underline cursor-pointer">
+                                                    Detail
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- Grid View (Cards) --}}
+                        <div x-show="deviceViewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-3" style="display: none;">
+                            @foreach($latest_devices as $d)
+                                <div @click="selectedDevice = {{ json_encode([
+                                        'id' => $d->id,
+                                        'user_name' => $d->user->name ?? 'N/A',
+                                        'employee_id' => $d->user->employee_id ?? 'N/A',
+                                        'device_hash' => $d->device_hash,
+                                        'browser' => $d->browser,
+                                        'os' => $d->os,
+                                        'platform' => $d->platform ?? 'Desktop/Web',
+                                        'timezone' => $d->timezone ?? 'Asia/Jakarta',
+                                        'language' => $d->language ?? 'id-ID',
+                                        'screen_resolution' => $d->screen_resolution ?? '1920x1080',
+                                        'hardware_concurrency' => $d->hardware_concurrency ?? '8',
+                                        'gpu_info' => $d->gpu_info ?? 'Intel / Apple GPU',
+                                        'trusted' => $d->trusted,
+                                        'last_used' => \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s')
+                                    ]) }}; showDeviceModal = true;"
+                                    class="p-3 rounded-lg border border-border bg-surface hover:bg-surface-muted/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-start justify-between">
+                                            <span class="text-xs font-semibold text-fg line-clamp-1">{{ $d->user->name ?? 'N/A' }}</span>
+                                            @if($d->trusted)
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500" title="Tepercaya"></span>
+                                            @else
+                                                <span class="w-2 h-2 rounded-full bg-amber-500" title="Tidak Terverifikasi"></span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[10px] text-fg-subtle mt-1">{{ $d->browser }} on {{ $d->os }}</p>
+                                    </div>
+                                    <div class="mt-2 flex items-center justify-between text-[9px] text-fg-muted">
+                                        <span>{{ $d->platform ?? 'Desktop' }}</span>
+                                        <span>{{ \Carbon\Carbon::parse($d->last_used_at)->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -606,4 +712,126 @@
         </div>
     </div>
     <x-attendance.detail-modal :is-admin="true" />
+
+    {{-- Device / Login Telemetry Detail Modal --}}
+    <div x-show="showDeviceModal" 
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-95"
+        style="display: none;"
+        @click.away="showDeviceModal = false"
+        @keydown.escape.window="showDeviceModal = false">
+        
+        <div class="relative w-full max-w-lg overflow-hidden rounded-xl border border-border bg-surface shadow-xl flex flex-col max-h-[85vh]">
+            {{-- Modal Header --}}
+            <div class="p-4 border-b border-border flex items-center justify-between bg-surface-muted">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25"/></svg>
+                    <div>
+                        <h4 class="font-bold text-fg text-sm">Detail Telemetri Perangkat</h4>
+                        <p class="text-[10px] text-fg-subtle">Informasi fingerprint unik perangkat login</p>
+                    </div>
+                </div>
+                <button type="button" @click="showDeviceModal = false" class="p-1 rounded-lg text-fg-subtle hover:bg-surface-muted hover:text-fg transition-all cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            {{-- Modal Body --}}
+            <div class="p-5 space-y-4 overflow-y-auto" x-data="{ copied: false }">
+                <template x-if="selectedDevice">
+                    <div class="space-y-4">
+                        {{-- Karyawan Info --}}
+                        <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-muted border border-border/60">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                <span x-text="selectedDevice.user_name.charAt(0)"></span>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-semibold text-fg" x-text="selectedDevice.user_name"></h5>
+                                <p class="text-[10px] text-fg-subtle">ID Karyawan: <span x-text="selectedDevice.employee_id"></span></p>
+                            </div>
+                        </div>
+
+                        {{-- Technical Specs Grid --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Sistem Operasi</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.os"></span>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Browser</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.browser"></span>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Platform</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.platform"></span>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Zona Waktu</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.timezone"></span>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Resolusi Layar</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.screen_resolution"></span>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-border/50 bg-surface">
+                                <span class="text-[10px] text-fg-muted block">Bahasa</span>
+                                <span class="text-xs font-semibold text-fg block mt-0.5" x-text="selectedDevice.language"></span>
+                            </div>
+                        </div>
+
+                        {{-- Advanced Telemetry --}}
+                        <div class="space-y-2 pt-2">
+                            <h6 class="text-[11px] font-bold uppercase tracking-wider text-fg-muted">Detail Hardware</h6>
+                            <div class="divide-y divide-border/40 border-t border-b border-border/40">
+                                <div class="flex items-center justify-between py-2 text-xs">
+                                    <span class="text-fg-subtle">Core CPU</span>
+                                    <span class="font-semibold text-fg" x-text="selectedDevice.hardware_concurrency"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 text-xs">
+                                    <span class="text-fg-subtle">Informasi GPU</span>
+                                    <span class="font-semibold text-fg text-right max-w-[250px] truncate" x-text="selectedDevice.gpu_info" :title="selectedDevice.gpu_info"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 text-xs">
+                                    <span class="text-fg-subtle">Status Verifikasi</span>
+                                    <template x-if="selectedDevice.trusted">
+                                        <span class="text-emerald-500 font-bold">Tepercaya (Device Terdaftar)</span>
+                                    </template>
+                                    <template x-if="!selectedDevice.trusted">
+                                        <span class="text-amber-500 font-bold">Tidak Terverifikasi (Kredensial Baru)</span>
+                                    </template>
+                                </div>
+                                <div class="flex items-center justify-between py-2 text-xs">
+                                    <span class="text-fg-subtle">Terakhir Aktif</span>
+                                    <span class="font-medium text-fg" x-text="selectedDevice.last_used"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Fingerprint Hash --}}
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold uppercase tracking-wider text-fg-muted block">Device Hash (Fingerprint ID)</label>
+                            <div class="flex items-center gap-2 p-2 rounded bg-slate-900 text-slate-100 font-mono text-[10px] select-all relative overflow-hidden border border-slate-800">
+                                <span class="truncate flex-1" x-text="selectedDevice.device_hash"></span>
+                                <button type="button" @click="navigator.clipboard.writeText(selectedDevice.device_hash); copied = true; setTimeout(() => copied = false, 2000)" 
+                                    class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-slate-100 cursor-pointer">
+                                    <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <svg x-show="copied" class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            {{-- Modal Footer --}}
+            <div class="p-3 border-t border-border flex justify-end bg-surface-muted">
+                <button type="button" @click="showDeviceModal = false" class="btn-secondary btn-sm px-4 cursor-pointer">Tutup</button>
+            </div>
+        </div>
+    </div>
 </div>

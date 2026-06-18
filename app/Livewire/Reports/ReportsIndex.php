@@ -221,7 +221,7 @@ class ReportsIndex extends Component
         $onTime = $A::where('type', 'checkin')->where('is_late', false)->count();
         $late = $A::where('type', 'checkin')->where('is_late', true)->count();
 
-        $latestDevices = \App\Models\DeviceFingerprint::with('user')->latest()->take(5)->get();
+        $latestDevices = \App\Models\DeviceFingerprint::with('user')->latest()->take(8)->get();
         $employees = \App\Models\User::orderBy('name')->get();
         $branches = \App\Models\Branch::orderBy('name')->get();
 
