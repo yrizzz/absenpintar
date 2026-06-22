@@ -92,6 +92,7 @@ class SettingsIndex extends Component
     public $new_name = '';
     public $new_email = '';
     public $new_employee_id = '';
+    public $new_phone = '';
     public $new_password = 'Password123!';
     public $new_branch_id = '';
     public $new_work_mode = 'wfo';
@@ -103,6 +104,7 @@ class SettingsIndex extends Component
     public $edit_name = '';
     public $edit_email = '';
     public $edit_employee_id = '';
+    public $edit_phone = '';
     public $edit_password = '';
     public $edit_branch_id = '';
     public $edit_work_mode = 'wfo';
@@ -129,6 +131,10 @@ class SettingsIndex extends Component
         // Enforce strict administrative authorization control
         if (!auth()->check() || !auth()->user()->hasAnyRole(['super_admin', 'hr_admin'])) {
             abort(403, 'Unauthorized access: Gated by HR administrative policy.');
+        }
+
+        if (request()->routeIs('settings.employees') || request()->query('tab') === 'employees') {
+            $this->activeTab = 'biometrics';
         }
 
         $this->radius = cache()->get('settings.radius', 200);
@@ -315,6 +321,7 @@ class SettingsIndex extends Component
             'new_name' => 'required|string|max:255',
             'new_email' => 'required|email|unique:users,email',
             'new_employee_id' => 'required|string|unique:users,employee_id|max:50',
+            'new_phone' => 'nullable|string|max:20',
             'new_password' => 'required|string|min:6',
             'new_branch_id' => 'required|exists:branches,id',
             'new_work_mode' => 'required|in:wfo,wfh,hybrid',
@@ -325,10 +332,11 @@ class SettingsIndex extends Component
             'name' => $this->new_name,
             'email' => $this->new_email,
             'employee_id' => $this->new_employee_id,
+            'phone' => $this->new_phone,
             'password' => bcrypt($this->new_password),
             'branch_id' => $this->new_branch_id,
             'work_mode' => $this->new_work_mode,
-            'is_active' => true,
+            'status' => 'active',
         ]);
 
         // Assign Spatie Role
@@ -344,6 +352,7 @@ class SettingsIndex extends Component
                 'name' => $newUser->name,
                 'employee_id' => $newUser->employee_id,
                 'email' => $newUser->email,
+                'phone' => $newUser->phone,
                 'branch' => $newUser->branch->name ?? 'HQ Branch',
                 'work_mode' => $newUser->work_mode,
                 'role' => $this->new_role,
@@ -355,7 +364,7 @@ class SettingsIndex extends Component
         session()->flash('success', "Akun karyawan '{$newUser->name}' berhasil didaftarkan.");
 
         // Reset variables
-        $this->reset(['new_name', 'new_email', 'new_employee_id', 'new_branch_id', 'new_work_mode', 'new_role']);
+        $this->reset(['new_name', 'new_email', 'new_employee_id', 'new_phone', 'new_branch_id', 'new_work_mode', 'new_role']);
         $this->new_password = 'Password123!';
         $this->showRegisterModal = false;
     }
@@ -369,10 +378,11 @@ class SettingsIndex extends Component
         $this->edit_name = $user->name;
         $this->edit_email = $user->email;
         $this->edit_employee_id = $user->employee_id;
+        $this->edit_phone = $user->phone ?? '';
         $this->edit_password = '';
         $this->edit_branch_id = $user->branch_id;
         $this->edit_work_mode = $user->work_mode ?? 'wfo';
-        $this->edit_is_active = (bool) ($user->is_active ?? true);
+        $this->edit_is_active = $user->status === 'active';
         $this->edit_role = $user->roles->first()?->name ?? 'employee';
         $this->edit_date_of_birth = $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '';
         $this->edit_joined_at = $user->joined_at ? $user->joined_at->format('Y-m-d') : '';
@@ -420,6 +430,7 @@ class SettingsIndex extends Component
             'edit_name' => 'required|string|max:255',
             'edit_email' => 'required|email|unique:users,email,' . $this->selectedUserId,
             'edit_employee_id' => 'required|string|unique:users,employee_id,' . $this->selectedUserId . '|max:50',
+            'edit_phone' => 'nullable|string|max:20',
             'edit_password' => 'nullable|string|min:6',
             'edit_branch_id' => 'required|exists:branches,id',
             'edit_work_mode' => 'required|in:wfo,wfh,hybrid',
@@ -435,9 +446,10 @@ class SettingsIndex extends Component
             'name' => $this->edit_name,
             'email' => $this->edit_email,
             'employee_id' => $this->edit_employee_id,
+            'phone' => $this->edit_phone ?: null,
             'branch_id' => $this->edit_branch_id,
             'work_mode' => $this->edit_work_mode,
-            'is_active' => $this->edit_is_active,
+            'status' => $this->edit_is_active ? 'active' : 'inactive',
             'date_of_birth' => $this->edit_date_of_birth ?: null,
             'joined_at' => $this->edit_joined_at ?: null,
             'annual_leave_quota' => $this->edit_annual_leave_quota,
@@ -462,9 +474,10 @@ class SettingsIndex extends Component
                 'name' => $user->name,
                 'email' => $user->email,
                 'employee_id' => $user->employee_id,
+                'phone' => $user->phone,
                 'branch' => $user->branch->name ?? 'N/A',
                 'work_mode' => $user->work_mode,
-                'is_active' => $user->is_active,
+                'status' => $user->status,
                 'role' => $this->edit_role,
                 'date_of_birth' => $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : null,
                 'joined_at' => $user->joined_at ? $user->joined_at->format('Y-m-d') : null,

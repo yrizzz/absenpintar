@@ -1173,17 +1173,28 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label class="block label-xs mb-1.5">Email Kantor</label>
-                    <input wire:model="new_email" type="email" placeholder="Contoh: budi.santoso@perusahaan.com"
-                        required
-                        class="w-full text-xs placeholder:text-fg-subtle">
-                    @error('new_email')
-                        <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
-                    @enderror
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block label-xs mb-1.5">Email Kantor</label>
+                        <input wire:model="new_email" type="email" placeholder="Contoh: budi.santoso@perusahaan.com"
+                            required
+                            class="w-full text-xs placeholder:text-fg-subtle">
+                        @error('new_email')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block label-xs mb-1.5">Nomor Telepon (WhatsApp)</label>
+                        <input wire:model="new_phone" type="text" placeholder="Contoh: 081234567890"
+                            class="w-full text-xs placeholder:text-fg-subtle">
+                        @error('new_phone')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block label-xs mb-1.5">Nomor Induk Karyawan (EMP ID)</label>
                         <input wire:model="new_employee_id" type="text" placeholder="Contoh: EMP1042" required
@@ -1203,7 +1214,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block label-xs mb-1.5">Cabang Kantor</label>
                         <select wire:model="new_branch_id" required
@@ -1283,7 +1294,7 @@
 
             <form wire:submit.prevent="saveBranch"
                 class="space-y-4 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block label-xs mb-1.5">Nama Cabang</label>
                         <input wire:model="branch_name" type="text" placeholder="Contoh: Surabaya Branch" required
@@ -1312,7 +1323,7 @@
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block label-xs mb-1.5">Latitude</label>
                         <input wire:model="branch_latitude" type="text" placeholder="Contoh: -7.257472" required
@@ -1459,7 +1470,7 @@
 
                     <!-- Right Column: Personal & Employee details -->
                     <div class="md:col-span-8 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Nama Lengkap</label>
                                 <input wire:model="edit_name" type="text" required
@@ -1479,7 +1490,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Alamat Email</label>
                                 <input wire:model="edit_email" type="email" required
@@ -1490,6 +1501,17 @@
                             </div>
 
                             <div>
+                                <label class="block label-xs mb-1.5">Nomor Telepon (WhatsApp)</label>
+                                <input wire:model="edit_phone" type="text" placeholder="Contoh: 081234567890"
+                                    class="w-full text-xs">
+                                @error('edit_phone')
+                                    <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
                                 <label class="block label-xs mb-1.5">Ubah Sandi Baru (Opsional)</label>
                                 <input wire:model="edit_password" type="password"
                                     placeholder="Kosongkan jika tidak diubah"
@@ -1498,9 +1520,7 @@
                                     <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Tanggal Lahir</label>
                                 <input wire:model="edit_date_of_birth" type="date"
@@ -1509,7 +1529,9 @@
                                     <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                                 @enderror
                             </div>
+                        </div>
 
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Tanggal Masuk Kerja (Joined)</label>
                                 <input wire:model="edit_joined_at" type="date"
@@ -1518,9 +1540,18 @@
                                     <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                                 @enderror
                             </div>
+
+                            <div>
+                                <label class="block label-xs mb-1.5">Kuota Cuti Tahunan</label>
+                                <input wire:model="edit_annual_leave_quota" type="number" required min="0" max="100"
+                                    class="w-full text-xs">
+                                @error('edit_annual_leave_quota')
+                                    <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="block label-xs mb-1.5">Cabang Kantor</label>
                                 <select wire:model="edit_branch_id" required
@@ -1558,15 +1589,6 @@
                                     <option value="super_admin">Super Admin</option>
                                 </select>
                                 @error('edit_role')
-                                    <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="block label-xs mb-1.5">Kuota Cuti Tahunan</label>
-                                <input wire:model="edit_annual_leave_quota" type="number" required min="0" max="100"
-                                    class="w-full text-xs">
-                                @error('edit_annual_leave_quota')
                                     <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -1627,7 +1649,7 @@
                 </div>
 
                 <!-- Footer Section: Toggles & Permanently Delete -->
-                <div class="pt-4 border-t border-border flex items-center justify-between">
+                <div class="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="flex items-center">
                         <button type="button" @click="$wire.edit_is_active = !$wire.edit_is_active"
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"

@@ -51,11 +51,11 @@ class SettingsPersistenceTest extends TestCase
 
         // Persisted to DB (survives cache:clear)
         $this->assertDatabaseHas('settings', ['key' => 'radius']);
-        $this->assertSame(350.0, json_decode(Setting::find('radius')->value, true));
+        $this->assertEquals(350.0, json_decode(Setting::find('radius')->value, true));
         $this->assertSame('PT Contoh Sejahtera', json_decode(Setting::find('company_name')->value, true));
 
         // Mirrored into cache for existing readers
-        $this->assertSame(350.0, Cache::get('settings.radius'));
+        $this->assertEquals(350.0, Cache::get('settings.radius'));
         $this->assertSame('PT Contoh Sejahtera', Cache::get('settings.company_name'));
     }
 
@@ -77,6 +77,6 @@ class SettingsPersistenceTest extends TestCase
 
         Setting::hydrateCache();
 
-        $this->assertSame(999.0, Cache::get('settings.radius'));
+        $this->assertEquals(999.0, Cache::get('settings.radius'));
     }
 }

@@ -17,6 +17,7 @@
     $icoPerm = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />';
     $icoReport = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />';
     $icoCog = '<path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+    $icoUsers = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-3.833-6.24H18.5a1.5 1.5 0 00-1.5 1.5v3.128zm-9 0c.221.034.444.052.668.052a9.053 9.053 0 005.084-1.562 1.5 1.5 0 00-1.5-1.5H7.5a4.125 4.125 0 00-3.833 6.24A9.278 9.278 0 007.5 19.5a9.34 9.34 0 00.668-.052M12 14.25a3 3 0 100-6 3 3 0 000 6zm-7.5-3a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm15 0a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" />';
 @endphp
 
 <div class="flex h-full flex-col bg-surface">
@@ -53,8 +54,9 @@
         @if($user->hasAnyRole(['super_admin', 'hr_admin']))
             <div class="space-y-1">
                 <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">Administrasi</p>
+                {!! $navLink('settings.employees', 'settings.employees', 'Kelola Karyawan', $icoUsers) !!}
                 {!! $navLink('reports.index', 'reports.*', 'Laporan & Telemetri', $icoReport) !!}
-                {!! $navLink('settings.index', 'settings.*', 'Panel Kontrol', $icoCog) !!}
+                {!! $navLink('settings.index', 'settings.index', 'Panel Kontrol', $icoCog) !!}
             </div>
         @endif
     </nav>

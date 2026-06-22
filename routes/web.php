@@ -98,6 +98,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Settings routes (hr_admin, super_admin only)
     Route::middleware(['role:super_admin|hr_admin'])->prefix('settings')->name('settings.')->group(function () {
         Route::get('/', \App\Livewire\Settings\SettingsIndex::class)->name('index');
+        Route::get('/employees', \App\Livewire\Settings\SettingsIndex::class)->name('employees');
     });
     
     // ========================================================
