@@ -9,6 +9,7 @@
     selectedDevice: null,
     showDeviceModal: false,
     deviceViewMode: @entangle('device_view_mode'),
+    viewMode: @entangle('view_mode'),
     init() {
         this.$watch('showModal', value => {
             document.body.style.overflow = (value || this.showDeviceModal) ? 'hidden' : '';
@@ -329,35 +330,34 @@
 
 
         {{-- Recap: filters + sort + pagination --}}
-        <div class="card p-6 sm:p-8 mt-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <div class="card p-6 sm:p-8 mt-8">            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
                 <div>
                     <h3 class="heading-3 flex items-center gap-2">
                         Rekapitulasi Kehadiran
-                        @if(!empty($selectedLogs) && $view_mode === 'list')<span class="badge-info">{{ count($selectedLogs) }} terpilih</span>@endif
+                        <span x-show="viewMode === 'list' && {{ count($selectedLogs) > 0 ? 'true' : 'false' }}" class="badge-info" x-cloak>{{ count($selectedLogs) }} terpilih</span>
                     </h3>
                     <p class="label-sm mt-1">Saring, urutkan, dan ekspor log kehadiran lengkap beserta bukti biometrik.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     {{-- Toggle view mode --}}
                     <div class="inline-flex rounded-lg p-0.5 bg-surface-muted border border-border">
-                        <button type="button" wire:click="$set('view_mode', 'grid')" 
-                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'grid' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+                        <button type="button" @click="viewMode = 'grid'" 
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5"
+                            :class="viewMode === 'grid' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25a2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
                             Matriks Bulanan
                         </button>
-                        <button type="button" wire:click="$set('view_mode', 'list')" 
-                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'list' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
+                        <button type="button" @click="viewMode = 'list'" 
+                            class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5"
+                            :class="viewMode === 'list' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg'">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5"/></svg>
                             Daftar Log Harian
                         </button>
                     </div>
-                    @if($view_mode === 'list')
-                        <button wire:click="downloadExcel" class="btn-success btn-sm">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            Ekspor Terpilih
-                        </button>
-                    @endif
+                    <button x-show="viewMode === 'list'" wire:click="downloadExcel" class="btn-success btn-sm" x-cloak>
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Ekspor Terpilih
+                    </button>
                 </div>
             </div>
             {{-- Filter bar --}}
@@ -394,7 +394,7 @@
                         </select>
                     </div>
 
-                    @if($view_mode === 'grid')
+                    <div class="contents" x-show="viewMode === 'grid'">
                         {{-- Bulan --}}
                         <div class="space-y-1">
                             <label class="label text-xs font-semibold text-fg-muted">Bulan</label>
@@ -427,7 +427,8 @@
                                 <option value="50">50 data</option>
                             </select>
                         </div>
-                    @else
+                    </div>
+                    <div class="contents" x-show="viewMode === 'list'" x-cloak>
                         {{-- Tipe --}}
                         <div class="space-y-1">
                             <label class="label text-xs font-semibold text-fg-muted">Tipe Absen</label>
@@ -477,7 +478,7 @@
                             <input type="date" wire:model.live="filter_end_date"
                                 class="w-full rounded-lg border border-border bg-surface text-fg text-sm focus:border-primary focus:ring-1 focus:ring-primary h-10 px-3">
                         </div>
-                    @endif
+                    </div>
 
                     {{-- Reset Button --}}
                     <div class="flex items-end">
@@ -491,7 +492,7 @@
             </div>
 
             {{-- Table Render --}}
-            @if($view_mode === 'grid')
+            <div x-show="viewMode === 'grid'">
                 @if($matrixUsers->isEmpty())
                     <div class="text-sm text-fg-muted text-center py-12 rounded-xl bg-surface-muted">Tidak ada data karyawan yang cocok.</div>
                 @else
@@ -618,7 +619,9 @@
                         <div>{{ $matrixUsers->links() }}</div>
                     </div>
                 @endif
-            @else
+            </div>
+
+            <div x-show="viewMode === 'list'" x-cloak>
                 {{-- List View --}}
                 @if($recapLogs->isEmpty())
                     <div class="text-sm text-fg-muted text-center py-12 rounded-xl bg-surface-muted">Tidak ada kecocokan data untuk filter saat ini.</div>
@@ -716,7 +719,7 @@
 
                     <div class="mt-6">{{ $recapLogs->links() }}</div>
                 @endif
-            @endif
+            </div>
         </div>
     </div>
     <x-attendance.detail-modal :is-admin="true" />

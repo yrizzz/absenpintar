@@ -211,6 +211,30 @@ class ReportsIndex extends Component
         $this->resetPage();
     }
 
+    public function approveAttendance($logId)
+    {
+        $log = \App\Models\AttendanceLog::findOrFail($logId);
+        $log->status = 'approved';
+        $log->save();
+
+        \App\Models\SuspiciousEvent::where('attendance_log_id', $log->id)
+            ->update(['status' => 'resolved']);
+
+        session()->flash('success', 'Absensi ' . ($log->user->name ?? 'Karyawan') . ' berhasil disetujui.');
+    }
+
+    public function rejectAttendance($logId)
+    {
+        $log = \App\Models\AttendanceLog::findOrFail($logId);
+        $log->status = 'rejected';
+        $log->save();
+
+        \App\Models\SuspiciousEvent::where('attendance_log_id', $log->id)
+            ->update(['status' => 'rejected']);
+
+        session()->flash('success', 'Absensi ' . ($log->user->name ?? 'Karyawan') . ' berhasil ditolak.');
+    }
+
     public function render()
     {
         $A = \App\Models\AttendanceLog::class;
