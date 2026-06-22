@@ -312,7 +312,7 @@
   /* ---------- Modal ---------- */
   .modal-overlay {
     background: color-mix(in srgb, #0f172a 45%, transparent);
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
   .modal-glass {
     background: var(--surface);

@@ -3,7 +3,7 @@
     $navLink = function ($route, $pattern, $label, $icon) {
         $active = request()->routeIs($pattern);
         $cls = $active
-            ? 'bg-primary-soft text-primary'
+            ? 'bg-primary text-primary-fg'
             : 'text-fg-muted hover:bg-surface-muted hover:text-fg';
         return '<a href="' . route($route) . '" @click="sidebarOpen = false"'
             . ' class="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ' . $cls . '">'
@@ -64,13 +64,13 @@
     {{-- User --}}
     <div class="flex-shrink-0 border-t border-border p-3 space-y-1.5">
         <a href="{{ route('profile') }}" @click="sidebarOpen = false"
-            class="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('profile') ? 'bg-primary-soft' : 'hover:bg-surface-muted' }}">
-            <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary text-primary-fg text-sm font-semibold uppercase">
+            class="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors {{ request()->routeIs('profile') ? 'bg-primary text-primary-fg' : 'hover:bg-surface-muted' }}">
+            <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg {{ request()->routeIs('profile') ? 'bg-surface text-primary' : 'bg-primary text-primary-fg' }} text-sm font-semibold uppercase">
                 {{ strtoupper(substr($user->name, 0, 1)) }}
             </span>
             <span class="min-w-0 flex-1">
-                <span class="block truncate text-sm font-medium text-fg">{{ $user->name }}</span>
-                <span class="block truncate text-xs text-fg-muted">{{ $user->employee_id ?? $user->email }}</span>
+                <span class="block truncate text-sm font-medium {{ request()->routeIs('profile') ? 'text-primary-fg' : 'text-fg' }}">{{ $user->name }}</span>
+                <span class="block truncate text-xs {{ request()->routeIs('profile') ? 'text-primary-fg/80' : 'text-fg-muted' }}">{{ $user->employee_id ?? $user->email }}</span>
             </span>
         </a>
         <form method="POST" action="{{ route('logout') }}">
