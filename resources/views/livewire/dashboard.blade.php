@@ -533,7 +533,7 @@
                 @else
                     <div class="space-y-3.5">
                         @foreach ($todayAttendance as $attendance)
-                            <div @click="selectedLog = {{ json_encode([
+                            <div @click="selectedLog = {{ \Illuminate\Support\Js::from([
                                 'id' => $attendance->id,
                                 'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
                                 'timestamp' => $attendance->timestamp->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('H:i:s, d F Y'),

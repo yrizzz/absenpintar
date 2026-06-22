@@ -208,7 +208,7 @@
                                     </td>
                                     <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-right">
                                         <div class="flex items-center justify-end gap-3">
-                                            <button @click="selectedLog = {{ json_encode([
+                                            <button @click="selectedLog = {{ \Illuminate\Support\Js::from([
                                                 'id' => $attendance->id,
                                                 'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
                                                 'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
@@ -280,7 +280,7 @@
                             </div>
 
                             <div class="mt-3 flex items-center gap-3 border-t border-border pt-3">
-                                <button @click="selectedLog = {{ json_encode([
+                                <button @click="selectedLog = {{ \Illuminate\Support\Js::from([
                                     'id' => $attendance->id,
                                     'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
                                     'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
@@ -374,7 +374,7 @@
                                                     }
                                                 @endphp
                                                 <button type="button" 
-                                                        @click="clickedDayLogs = {{ json_encode($dayLogs) }}; 
+                                                        @click="clickedDayLogs = {{ \Illuminate\Support\Js::from($dayLogs) }}; 
                                                                 clickedDayDate = '{{ \Carbon\Carbon::parse($filterMonth . '-' . sprintf('%02d', $dayNum))->translatedFormat('d F Y') }}'; 
                                                                 clickedDayEmployeeName = '{{ addslashes($user->name) }}'; 
                                                                 showDayLogsModal = true;"

@@ -71,6 +71,11 @@ Route::middleware(['auth', 'active'])->group(function () {
                 if ($branch_id) {
                     if ($report_type === 'presence_summary' || $report_type === 'coordinates_log') {
                         $query->where('branch_id', $branch_id);
+                    } else {
+                        // For system_logs (DeviceFingerprint) or leaves_audit
+                        $query->whereHas('user', function ($q) use ($branch_id) {
+                            $q->where('branch_id', $branch_id);
+                        });
                     }
                 }
                 if ($start_date) {
@@ -78,6 +83,9 @@ Route::middleware(['auth', 'active'])->group(function () {
                         $query->whereDate('timestamp', '>=', $start_date);
                     } elseif ($report_type === 'leaves_audit') {
                         $query->whereDate('start_date', '>=', $start_date);
+                    } else {
+                        // system_logs (DeviceFingerprint)
+                        $query->whereDate('last_used_at', '>=', $start_date);
                     }
                 }
                 if ($end_date) {
@@ -85,6 +93,9 @@ Route::middleware(['auth', 'active'])->group(function () {
                         $query->whereDate('timestamp', '<=', $end_date);
                     } elseif ($report_type === 'leaves_audit') {
                         $query->whereDate('end_date', '<=', $end_date);
+                    } else {
+                        // system_logs (DeviceFingerprint)
+                        $query->whereDate('last_used_at', '<=', $end_date);
                     }
                 }
             }

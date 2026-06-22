@@ -20,6 +20,7 @@ class ReportsIndex extends Component
 
     // View Mode: grid (matrix) or list
     public $view_mode = 'grid';
+    public $device_view_mode = 'list';
     public $matrix_month;
     public $matrix_year;
 
@@ -122,6 +123,11 @@ class ReportsIndex extends Component
                 if ($this->filter_user_id) {
                     $query->where('user_id', $this->filter_user_id);
                 }
+                if ($this->filter_branch_id) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('branch_id', $this->filter_branch_id);
+                    });
+                }
                 if ($this->filter_start_date) {
                     $query->whereDate('start_date', '>=', $this->filter_start_date);
                 }
@@ -138,6 +144,17 @@ class ReportsIndex extends Component
             } else {
                 if ($this->filter_user_id) {
                     $query->where('user_id', $this->filter_user_id);
+                }
+                if ($this->filter_branch_id) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('branch_id', $this->filter_branch_id);
+                    });
+                }
+                if ($this->filter_start_date) {
+                    $query->whereDate('last_used_at', '>=', $this->filter_start_date);
+                }
+                if ($this->filter_end_date) {
+                    $query->whereDate('last_used_at', '<=', $this->filter_end_date);
                 }
             }
             $logs = $query->get();

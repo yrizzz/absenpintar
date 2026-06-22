@@ -8,7 +8,7 @@
     showModal: false,
     selectedDevice: null,
     showDeviceModal: false,
-    deviceViewMode: 'list',
+    deviceViewMode: @entangle('device_view_mode'),
     init() {
         this.$watch('showModal', value => {
             document.body.style.overflow = (value || this.showDeviceModal) ? 'hidden' : '';
@@ -187,7 +187,15 @@
                     <button type="submit" class="btn-primary btn-sm w-full">Susun Data Telemetri</button>
                 </form>
                 <div class="mt-6 pt-6 border-t border-border space-y-2">
-                    <a href="{{ route('reports.print', ['type' => $report_type, 'period' => $report_period]) }}" target="_blank" class="btn-secondary btn-sm w-full">
+                    <a href="{{ route('reports.print', [
+                        'type' => $report_type,
+                        'period' => $report_period,
+                        'user_id' => $filter_user_id,
+                        'branch_id' => $filter_branch_id,
+                        'start_date' => $filter_start_date,
+                        'end_date' => $filter_end_date,
+                        'selected_ids' => !empty($selectedLogs) ? implode(',', $selectedLogs) : null
+                    ]) }}" target="_blank" class="btn-secondary btn-sm w-full">
                         <svg class="h-4 w-4 text-danger" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         Cetak / Simpan PDF
                     </a>
@@ -219,7 +227,7 @@
                             </button>
                         </div>
                     </div>
-
+ 
                     @if($latest_devices->isEmpty())
                         <div class="text-sm text-fg-muted text-center py-8 rounded-xl bg-surface-muted">Belum ada telemetri perangkat terdaftar.</div>
                     @else
@@ -249,7 +257,7 @@
                                                 @endif
                                             </td>
                                             <td class="py-2 text-right">
-                                                <button type="button" @click="selectedDevice = {{ json_encode([
+                                                <button type="button" @click="selectedDevice = {{ \Illuminate\Support\Js::from([
                                                     'id' => $d->id,
                                                     'user_name' => $d->user->name ?? 'N/A',
                                                     'employee_id' => $d->user->employee_id ?? 'N/A',
@@ -263,7 +271,7 @@
                                                     'hardware_concurrency' => $d->hardware_concurrency ?? '8',
                                                     'gpu_info' => $d->gpu_info ?? 'Intel / Apple GPU',
                                                     'trusted' => $d->trusted,
-                                                    'last_used' => \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s')
+                                                    'last_used' => $d->last_used_at ? \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s') : 'Belum Pernah'
                                                 ]) }}; showDeviceModal = true;"
                                                 class="text-[11px] font-bold text-primary hover:underline cursor-pointer">
                                                     Detail
@@ -276,9 +284,9 @@
                         </div>
 
                         {{-- Grid View (Cards) --}}
-                        <div x-show="deviceViewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-3" style="display: none;">
+                        <div x-show="deviceViewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-cloak>
                             @foreach($latest_devices as $d)
-                                <div @click="selectedDevice = {{ json_encode([
+                                <div @click="selectedDevice = {{ \Illuminate\Support\Js::from([
                                         'id' => $d->id,
                                         'user_name' => $d->user->name ?? 'N/A',
                                         'employee_id' => $d->user->employee_id ?? 'N/A',
@@ -292,7 +300,7 @@
                                         'hardware_concurrency' => $d->hardware_concurrency ?? '8',
                                         'gpu_info' => $d->gpu_info ?? 'Intel / Apple GPU',
                                         'trusted' => $d->trusted,
-                                        'last_used' => \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s')
+                                        'last_used' => $d->last_used_at ? \Carbon\Carbon::parse($d->last_used_at)->timezone(cache()->get('settings.timezone', 'Asia/Jakarta'))->translatedFormat('d F Y, H:i:s') : 'Belum Pernah'
                                     ]) }}; showDeviceModal = true;"
                                     class="p-3 rounded-lg border border-border bg-surface hover:bg-surface-muted/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between">
                                     <div>
@@ -308,7 +316,7 @@
                                     </div>
                                     <div class="mt-2 flex items-center justify-between text-[9px] text-fg-muted">
                                         <span>{{ $d->platform ?? 'Desktop' }}</span>
-                                        <span>{{ \Carbon\Carbon::parse($d->last_used_at)->diffForHumans() }}</span>
+                                        <span>{{ $d->last_used_at ? \Carbon\Carbon::parse($d->last_used_at)->diffForHumans() : 'Belum Pernah' }}</span>
                                     </div>
                                 </div>
                             @endforeach
@@ -336,12 +344,12 @@
                         <button type="button" wire:click="$set('view_mode', 'grid')" 
                             class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'grid' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-                            Tampilan Grid
+                            Matriks Bulanan
                         </button>
                         <button type="button" wire:click="$set('view_mode', 'list')" 
                             class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 {{ $view_mode === 'list' ? 'bg-surface text-primary shadow-sm font-bold' : 'text-fg-subtle hover:text-fg' }}">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5"/></svg>
-                            Tampilan List
+                            Daftar Log Harian
                         </button>
                     </div>
                     @if($view_mode === 'list')
@@ -529,7 +537,7 @@
                                             <td class="p-1 text-center border-l border-border/60 {{ ($day['is_sunday'] || $day['is_holiday']) ? 'bg-rose-50/25 dark:bg-rose-950/15' : '' }}">
                                                 @if($log)
                                                     {{-- Present --}}
-                                                    <button type="button" @click="selectedLog = {{ json_encode([
+                                                    <button type="button" @click="selectedLog = {{ \Illuminate\Support\Js::from([
                                                         'id' => $log->id,
                                                         'type' => $log->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
                                                         'timestamp' => \Carbon\Carbon::parse($log->timestamp)->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
@@ -674,7 +682,7 @@
                                                 if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
                                                 if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
                                             @endphp
-                                            <button type="button" @click="selectedLog = {{ json_encode([
+                                            <button type="button" @click="selectedLog = {{ \Illuminate\Support\Js::from([
                                                 'id' => $log->id,
                                                 'type' => $log->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
                                                 'timestamp' => \Carbon\Carbon::parse($log->timestamp)->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
@@ -748,7 +756,7 @@
                         {{-- Karyawan Info --}}
                         <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-muted border border-border/60">
                             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                                <span x-text="selectedDevice.user_name.charAt(0)"></span>
+                                <span x-text="(selectedDevice.user_name || '').charAt(0)"></span>
                             </div>
                             <div>
                                 <h5 class="text-xs font-semibold text-fg" x-text="selectedDevice.user_name"></h5>
