@@ -1,6 +1,8 @@
-<!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+{{-- Leaflet assets loaded via @assets so the component keeps a single root element (required by Livewire) --}}
+@assets
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+@endassets
 
 <div class="py-8 min-h-screen" x-data="{
     selectedLog: null,
@@ -9,6 +11,13 @@
         this.$watch('showModal', value => {
             document.body.style.overflow = value ? 'hidden' : '';
         });
+    },
+    toast: { show: false, message: '', type: 'success' },
+    showToast(message, type = 'success') {
+        this.toast.message = message;
+        this.toast.type = type;
+        this.toast.show = true;
+        setTimeout(() => { this.toast.show = false; }, 5000);
     },
     detailMap: null,
     detailUserMarker: null,
@@ -483,5 +492,30 @@
     </div>
 
     <x-attendance.detail-modal :is-admin="$isAdmin" />
+
+    {{-- Toast notification --}}
+    <div x-show="toast.show" x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="fixed bottom-5 right-5 z-50 max-w-sm w-full card shadow-md p-4 flex items-center gap-3.5">
+        <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-white"
+            :class="toast.type === 'info' ? 'bg-info' : 'bg-success'">
+            <template x-if="toast.type === 'info'">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </template>
+            <template x-if="toast.type !== 'info'">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </template>
+        </span>
+        <div class="flex-grow">
+            <span class="text-xs font-semibold text-primary block">Notifikasi</span>
+            <p class="text-sm font-medium text-fg mt-0.5" x-text="toast.message"></p>
+        </div>
+        <button @click="toast.show = false" class="text-fg-subtle hover:text-fg flex-shrink-0">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+    </div>
 
 </div>

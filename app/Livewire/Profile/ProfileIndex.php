@@ -103,17 +103,17 @@ class ProfileIndex extends Component
                 'model_id' => Auth::id(),
                 'new_values' => [
                     'registered_angles' => $angles,
-                    'is_complete' => count($angles) === 3
+                    'is_complete' => in_array('front', $angles, true)
                 ],
                 'metadata' => [
-                    'mode' => 'client_side_multi_angle',
+                    'mode' => 'client_side_single_angle',
                     'timestamp' => now()->toIso8601String(),
                 ],
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
             
-            session()->flash('success', 'Templat biometrik wajah multi-sudut berhasil didaftarkan! Vektor terverifikasi kini aktif.');
+            session()->flash('success', 'Templat biometrik wajah berhasil didaftarkan! Vektor terverifikasi kini aktif.');
             $this->step = 'overview';
         } catch (\Exception $e) {
             session()->flash('error', 'Pendaftaran wajah gagal: ' . $e->getMessage());

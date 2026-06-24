@@ -53,6 +53,12 @@ class CheckOut extends Component
             return redirect()->route('profile');
         }
 
+        // Cannot check out without an active check-in today
+        if (!$this->attendanceService->hasCheckedInToday(Auth::user())) {
+            session()->flash('error', 'Anda belum melakukan absen masuk hari ini, sehingga tidak dapat melakukan absen keluar.');
+            return redirect()->route('dashboard');
+        }
+
         // Check if already checked out today
         if ($this->attendanceService->hasCheckedOutToday(Auth::user())) {
             session()->flash('error', 'Anda sudah melakukan absen keluar hari ini.');
@@ -67,13 +73,14 @@ class CheckOut extends Component
             $currentTimeStr = now()->timezone($timezoneSetting)->format('H:i:s');
             $isEarlyLeave = $currentTimeStr < $workEndSetting;
 
-            // If early checkout and no permission request exists
+            // If early checkout and no approved early-leave permission exists for today.
+            // Note: these "ijin_*" dispensations live in PermissionRequest (type + date + status),
+            // consistent with AttendanceService — not in LeaveRequest.
             if ($isEarlyLeave) {
-                $hasApproval = Auth::user()->leaveRequests()
+                $hasApproval = Auth::user()->permissionRequests()
                     ->where('status', 'approved')
-                    ->whereDate('start_date', '<=', now())
-                    ->whereDate('end_date', '>=', now())
-                    ->whereIn('leave_type', ['ijin_pulang_awal', 'ijin_setengah_hari', 'ijin_tidak_masuk'])
+                    ->whereDate('date', now())
+                    ->whereIn('type', ['ijin_pulang_awal', 'ijin_setengah_hari', 'ijin_tidak_masuk'])
                     ->exists();
 
                 if (!$hasApproval) {
@@ -162,29 +169,28 @@ class CheckOut extends Component
         }
     }
 
-    public function compareLiveFace($imageData)
+    public function compareLiveFace($imageData, $stampedData = null)
     {
         try {
-            $this->selfieData = $imageData;
+            // Watermarked copy is stored for the audit trail; the clean copy is used for recognition.
+            $this->selfieData = $stampedData ?: $imageData;
 
-            // Decode base64 image temporarily
+            // Decode base64 image temporarily (clean, un-watermarked frame for accurate recognition)
             $rawImg = str_replace('data:image/jpeg;base64,', '', $imageData);
             $rawImg = str_replace(' ', '+', $rawImg);
             $imageDecoded = base64_decode($rawImg);
 
+            // Retained (not deleted) so submit() can re-verify against this clean frame server-side.
             $tempPath = 'selfies/' . Auth::id() . '/live_checkout_temp.jpg';
             Storage::disk('public')->put($tempPath, $imageDecoded);
 
             $masterPath = 'master_face/user_' . Auth::id() . '.jpg';
-            
+
             // Get current calibrated threshold from settings
             $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
             $calibratedThreshold = $settingThreshold * 0.70;
 
             $verification = $this->attendanceService->compareFaceSimilarity($masterPath, $tempPath, $calibratedThreshold);
-
-            // Clean up temporary image
-            Storage::disk('public')->delete($tempPath);
 
             $this->faceSimilarity = round($verification['similarity'], 1);
             $this->faceValid = $verification['verified'];
@@ -238,6 +244,12 @@ class CheckOut extends Component
             $fileName = 'selfies/' . Auth::id() . '/' . now()->format('Y-m-d_His') . '_checkout.jpg';
             Storage::disk('public')->put($fileName, $imageDecoded);
 
+            // Clean (un-watermarked) frame retained by compareLiveFace, used for accurate re-verification.
+            $verifyPath = 'selfies/' . Auth::id() . '/live_checkout_temp.jpg';
+            if (!Storage::disk('public')->exists($verifyPath)) {
+                $verifyPath = null;
+            }
+
             // Prepare attendance data
             $data = [
                 'latitude' => $this->latitude,
@@ -245,6 +257,7 @@ class CheckOut extends Component
                 'accuracy' => $this->accuracy,
                 'ip_address' => request()->ip(),
                 'selfie_path' => $fileName,
+                'verify_path' => $verifyPath,
                 'device_fingerprint' => $this->deviceFingerprint,
                 'shift_id' => Auth::user()->shifts()->first()?->id,
                 'resolved_address' => $this->resolvedAddress,
@@ -252,6 +265,11 @@ class CheckOut extends Component
 
             // Process check-out
             $attendance = $this->attendanceService->checkOut(Auth::user(), $data);
+
+            // Remove the temporary clean recognition frame once persisted.
+            if ($verifyPath) {
+                Storage::disk('public')->delete($verifyPath);
+            }
 
             $durationStr = $attendance->metadata['working_duration'] ?? 'Belum terhitung';
             session()->flash('success', "Absen keluar berhasil dilakukan! Durasi kerja hari ini: {$durationStr}.");

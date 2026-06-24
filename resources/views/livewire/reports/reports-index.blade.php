@@ -1,7 +1,9 @@
-<!-- Inject Leaflet Assets directly to avoid bundle overhead -->
+{{-- Assets loaded via @assets so the component keeps a single root element (required by Livewire) --}}
+@assets
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+@endassets
 
 <div class="py-8 min-h-screen" x-data="{
     selectedLog: null,

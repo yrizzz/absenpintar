@@ -145,8 +145,6 @@
                     enrollStage: 'capture_front',
 
                     frontImage: null,
-                    leftImage: null,
-                    rightImage: null,
 
                     stream: null,
                     devices: [],
@@ -167,25 +165,17 @@
                     get instructionText() {
                         if (this.enrollStage === 'capture_front') {
                             return 'Posisikan wajah Anda tepat di bagian tengah kotak deteksi.';
-                        } else if (this.enrollStage === 'capture_left') {
-                            return 'Putar kepala Anda perlahan ke arah KIRI (Profil Kiri).';
-                        } else if (this.enrollStage === 'capture_right') {
-                            return 'Putar kepala Anda perlahan ke arah KANAN (Profil Kanan).';
                         }
-                        return 'Semua foto wajah berhasil diambil. Tinjau foto Anda sebelum menyimpan.';
+                        return 'Foto wajah berhasil diambil. Tinjau foto Anda sebelum menyimpan.';
                     },
 
                     get stageBadge() {
-                        if (this.enrollStage === 'capture_front') return 'SUDUT 1/3: WAJAH DEPAN';
-                        if (this.enrollStage === 'capture_left') return 'SUDUT 2/3: WAJAH KIRI';
-                        if (this.enrollStage === 'capture_right') return 'SUDUT 3/3: WAJAH KANAN';
+                        if (this.enrollStage === 'capture_front') return 'WAJAH DEPAN';
                         return 'VERIFIKASI FOTO WAJAH';
                     },
 
                     get currentProgress() {
-                        if (this.enrollStage === 'capture_front') return 33;
-                        if (this.enrollStage === 'capture_left') return 66;
-                        if (this.enrollStage === 'capture_right') return 100;
+                        if (this.enrollStage === 'capture_front') return 50;
                         return 100;
                     },
 
@@ -322,16 +312,6 @@
 
                         if (this.enrollStage === 'capture_front') {
                             this.frontImage = dataUrl;
-                            this.enrollStage = 'capture_left';
-                            this.countdownSeconds = 3;
-                            this.shutterTriggered = false;
-                        } else if (this.enrollStage === 'capture_left') {
-                            this.leftImage = dataUrl;
-                            this.enrollStage = 'capture_right';
-                            this.countdownSeconds = 3;
-                            this.shutterTriggered = false;
-                        } else if (this.enrollStage === 'capture_right') {
-                            this.rightImage = dataUrl;
                             this.enrollStage = 'verify_details';
                             if (this.stream) {
                                 this.stream.getTracks().forEach(track => track.stop());
@@ -341,8 +321,6 @@
 
                     resetSequence() {
                         this.frontImage = null;
-                        this.leftImage = null;
-                        this.rightImage = null;
                         this.enrollStage = 'capture_front';
                         this.countdownSeconds = 3;
                         this.shutterTriggered = false;
@@ -350,7 +328,7 @@
                     },
 
                     confirmPhoto() {
-                        $wire.enrollFace(this.frontImage, this.leftImage, this.rightImage);
+                        $wire.enrollFace(this.frontImage);
                     }
                 }" x-init="await requestCameraAccess();">
 
@@ -380,8 +358,6 @@
                             @php
                                 $nodes = [
                                     ['capture_front', 'frontImage', '1', 'Depan'],
-                                    ['capture_left', 'leftImage', '2', 'Kiri'],
-                                    ['capture_right', 'rightImage', '3', 'Kanan'],
                                 ];
                             @endphp
                             @foreach ($nodes as [$stage, $img, $num, $lbl])
@@ -395,7 +371,7 @@
                             @endforeach
                             <div class="flex flex-col items-center z-10">
                                 <div class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold border-2 transition-all duration-300" :class="enrollStage === 'verify_details' ? 'bg-primary border-primary text-primary-fg' : 'border-border text-fg-subtle'">
-                                    <span x-text="enrollStage === 'verify_details' ? '✓' : '4'"></span>
+                                    <span x-text="enrollStage === 'verify_details' ? '✓' : '2'"></span>
                                 </div>
                                 <span class="text-xs font-medium mt-1.5" :class="enrollStage === 'verify_details' ? 'text-primary' : 'text-fg-subtle'">Selesai</span>
                             </div>
@@ -454,9 +430,6 @@
                         <div class="absolute inset-2 border border-dashed border-white/20 rounded-full animate-spin pointer-events-none z-10" style="animation-duration: 30s;"></div>
                         <div class="absolute inset-5 border border-white/15 rounded-full pointer-events-none z-10"></div>
 
-                        <div x-show="enrollStage === 'capture_left'" x-cloak class="absolute inset-x-10 top-1/2 -translate-y-1/2 rounded-full bg-primary px-3 py-1.5 pointer-events-none z-10 text-xs font-medium text-primary-fg tracking-wider animate-bounce">← Hadap Kiri</div>
-                        <div x-show="enrollStage === 'capture_right'" x-cloak class="absolute inset-x-10 top-1/2 -translate-y-1/2 rounded-full bg-primary px-3 py-1.5 pointer-events-none z-10 text-xs font-medium text-primary-fg tracking-wider animate-bounce">Hadap Kanan →</div>
-
                         <div class="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent z-10 pointer-events-none" style="animation: scanLine 2s linear infinite;"></div>
 
                         <div x-show="faceDetected && countdownSeconds > 0" x-cloak class="absolute inset-0 bg-slate-950/80 z-20 flex flex-col items-center justify-center pointer-events-none">
@@ -477,17 +450,15 @@
                     {{-- Verification gallery --}}
                     <div x-show="enrollStage === 'verify_details'" x-cloak class="rounded-xl border border-border bg-surface-muted p-5">
                         <h4 class="label-xs uppercase tracking-wide mb-4 text-left">Hasil Foto Wajah</h4>
-                        <div class="grid grid-cols-3 gap-3 mb-5">
-                            @foreach (['frontImage' => 'Depan', 'leftImage' => 'Kiri', 'rightImage' => 'Kanan'] as $imgVar => $lbl)
-                                <div class="relative overflow-hidden rounded-lg border border-border bg-surface aspect-square">
-                                    <img :src="{{ $imgVar }}" class="w-full h-full object-cover" style="transform: scaleX(-1)">
-                                    <div class="absolute bottom-0 inset-x-0 bg-primary text-primary-fg text-xs font-medium py-0.5 text-center">{{ $lbl }}</div>
-                                </div>
-                            @endforeach
+                        <div class="flex justify-center mb-5">
+                            <div class="relative overflow-hidden rounded-lg border border-border bg-surface aspect-square w-40">
+                                <img :src="frontImage" class="w-full h-full object-cover" style="transform: scaleX(-1)">
+                                <div class="absolute bottom-0 inset-x-0 bg-primary text-primary-fg text-xs font-medium py-0.5 text-center">Depan</div>
+                            </div>
                         </div>
                         <div class="flex items-center gap-2.5 rounded-lg border border-info/20 bg-info-soft p-3 text-xs font-medium text-info">
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            Ketiga foto berhasil diambil dan siap disimpan.
+                            Foto wajah berhasil diambil dan siap disimpan.
                         </div>
                     </div>
 

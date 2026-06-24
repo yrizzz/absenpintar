@@ -19,7 +19,7 @@ class AttendanceService
      */
     public function checkIn(User $user, array $data): AttendanceLog
     {
-        return DB::transaction(function () use ($user, $data) {
+        $attendance = DB::transaction(function () use ($user, $data) {
             // Validate and register device
             $deviceValidation = $this->deviceFingerprint->validateDevice(
                 $user,
@@ -32,16 +32,18 @@ class AttendanceService
             // Validate GPS accuracy
             $accuracyValidation = $this->geoValidation->validateAccuracy($data['accuracy']);
 
-            // Biometric Face Recognition Comparison Check
+            // Biometric Face Recognition Comparison Check.
+            // Re-verify against the clean (un-watermarked) frame when available so the
+            // watermark band never interferes with recognition; fall back to the stored selfie.
             $masterPath = 'master_face/user_' . $user->id . '.jpg';
-            $selfiePath = $data['selfie_path'] ?? null;
-            if ($selfiePath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
+            $verifyPath = $data['verify_path'] ?? ($data['selfie_path'] ?? null);
+            if ($verifyPath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
                 $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
                 // Calibrate the admin threshold (e.g. 0.95 -> 0.665 similarity required in Python)
                 $calibratedThreshold = $settingThreshold * 0.70;
 
-                $verification = $this->compareFaceSimilarity($masterPath, $selfiePath, $calibratedThreshold);
-                
+                $verification = $this->compareFaceSimilarity($masterPath, $verifyPath, $calibratedThreshold);
+
                 if (!$verification['verified']) {
                     throw new \Exception("Verifikasi biometrik gagal! " . $verification['message'] . " (Tingkat Kecocokan: " . round($verification['similarity'], 1) . "%, minimal dibutuhkan " . round($settingThreshold * 100.0, 1) . "%).");
                 }
@@ -62,7 +64,8 @@ class AttendanceService
             $impossibleTravelValidation = ['impossible' => false, 'risk_score' => 0];
             
             if ($lastAttendance) {
-                $timeDiff = now()->diffInSeconds($lastAttendance->timestamp);
+                // abs() keeps this correct across Carbon versions (Carbon 3 returns a signed diff).
+                $timeDiff = (int) abs(now()->diffInSeconds($lastAttendance->timestamp));
                 $impossibleTravelValidation = $this->geoValidation->detectImpossibleTravel(
                     $lastAttendance->latitude,
                     $lastAttendance->longitude,
@@ -170,7 +173,7 @@ class AttendanceService
      */
     public function checkOut(User $user, array $data): AttendanceLog
     {
-        return DB::transaction(function () use ($user, $data) {
+        $attendance = DB::transaction(function () use ($user, $data) {
             // Similar validation as check-in
             $deviceValidation = $this->deviceFingerprint->validateDevice(
                 $user,
@@ -182,16 +185,16 @@ class AttendanceService
 
             $accuracyValidation = $this->geoValidation->validateAccuracy($data['accuracy']);
 
-            // Biometric Face Recognition Comparison Check
+            // Biometric Face Recognition Comparison Check (clean frame preferred over watermarked).
             $masterPath = 'master_face/user_' . $user->id . '.jpg';
-            $selfiePath = $data['selfie_path'] ?? null;
-            if ($selfiePath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
+            $verifyPath = $data['verify_path'] ?? ($data['selfie_path'] ?? null);
+            if ($verifyPath && \Illuminate\Support\Facades\Storage::disk('local')->exists($masterPath)) {
                 $settingThreshold = (float) cache()->get('settings.biometric_liveness_threshold', 0.95);
                 // Calibrate the admin threshold (e.g. 0.95 -> 0.665 similarity required in Python)
                 $calibratedThreshold = $settingThreshold * 0.70;
 
-                $verification = $this->compareFaceSimilarity($masterPath, $selfiePath, $calibratedThreshold);
-                
+                $verification = $this->compareFaceSimilarity($masterPath, $verifyPath, $calibratedThreshold);
+
                 if (!$verification['verified']) {
                     throw new \Exception("Verifikasi biometrik gagal! " . $verification['message'] . " (Tingkat Kecocokan: " . round($verification['similarity'], 1) . "%, minimal dibutuhkan " . round($settingThreshold * 100.0, 1) . "%).");
                 }

@@ -341,14 +341,68 @@
                     ctx.scale(-1, 1);
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    const base64Data = canvas.toDataURL('image/jpeg', 0.90);
-                    await this.$wire.compareLiveFace(base64Data);
+                    // Reset transform so overlay text is not mirrored
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                    // Clean frame for face recognition (un-watermarked, best accuracy)
+                    const cleanData = canvas.toDataURL('image/jpeg', 0.90);
+
+                    // Stamped frame for the stored audit selfie (location + timestamp watermark)
+                    this.drawAttendanceWatermark(ctx, canvas.width, canvas.height);
+                    const stampedData = canvas.toDataURL('image/jpeg', 0.90);
+
+                    await this.$wire.compareLiveFace(cleanData, stampedData);
                 } catch (err) {
                     console.error('Face verification failed:', err);
                     this.errorMessage = 'Gagal memproses analisis wajah. Silakan coba lagi.';
                 } finally {
                     this.isAnalyzing = false;
                 }
+            },
+
+            // Stamps a GPS-camera style watermark (date/time + coordinates) onto the bottom of the canvas.
+            drawAttendanceWatermark(ctx, w, h) {
+                const pad = n => String(n).padStart(2, '0');
+                const now = new Date();
+                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const dateStr = days[now.getDay()] + ', ' + pad(now.getDate()) + '/' + pad(now.getMonth() + 1) + '/' + now.getFullYear()
+                    + '  ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+                const lat = this.$wire.latitude;
+                const lng = this.$wire.longitude;
+                const coordStr = (lat && lng)
+                    ? 'Lat ' + Number(lat).toFixed(6) + ', Lng ' + Number(lng).toFixed(6)
+                    : 'Lokasi GPS tidak tersedia';
+                const dist = this.$wire.distanceFromBranch;
+                const metaStr = (dist || dist === 0) ? ('Jarak dari cabang: ' + dist + ' m') : '';
+
+                const bandH = metaStr ? 74 : 58;
+                const x = 12;
+                let y = h - bandH + 22;
+
+                // Semi-transparent band so text stays legible over any background
+                ctx.save();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+                ctx.fillRect(0, h - bandH, w, bandH);
+
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 2;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial, sans-serif';
+                ctx.fillText('🕒 ' + dateStr, x, y);
+
+                y += 22;
+                ctx.font = '13px "Courier New", monospace';
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillText('📍 ' + coordStr, x, y);
+
+                if (metaStr) {
+                    y += 20;
+                    ctx.fillText(metaStr, x, y);
+                }
+                ctx.restore();
             },
 
             initGPS() {
