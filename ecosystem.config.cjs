@@ -21,6 +21,18 @@ module.exports = {
       watch: false,
       out_file: "./storage/logs/queue.log",
       error_file: "./storage/logs/queue-error.log",
+    },
+    {
+      // Runs Laravel's scheduler (e.g. weekly holidays:sync) without a system crontab.
+      name: "presensiku-scheduler",
+      script: "artisan",
+      args: "schedule:work",
+      interpreter: "php",
+      cwd: "/www/wwwroot/presensiku.yrizzz.my.id/presensiku",
+      autorestart: true,
+      watch: false,
+      out_file: "./storage/logs/scheduler.log",
+      error_file: "./storage/logs/scheduler-error.log",
     }
   ]
 }

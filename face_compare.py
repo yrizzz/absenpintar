@@ -37,11 +37,33 @@ def _preprocess_for_detection(img):
     return variants
 
 
-def _detect_best_face(detector, img):
+# YuNet model files in order of preference. Different OpenCV builds are picky about
+# which ONNX revision they can run (e.g. OpenCV 4.9 fails to load 2022mar but runs
+# 2023mar, while some older distro builds are the opposite). We try each until one
+# actually detects, so the same code works across whatever OpenCV the server ships.
+YUNET_MODELS = [
+    "face_detection_yunet_2023mar.onnx",
+    "face_detection_yunet_2022mar.onnx",
+]
+
+
+def _create_detector(model_path):
+    return cv2.FaceDetectorYN.create(
+        model_path,
+        "",
+        (320, 320),          # placeholder – overridden per image in _detect_best_face
+        YUNET_SCORE_THRESHOLD,
+        YUNET_NMS_THRESHOLD,
+        YUNET_TOP_K
+    )
+
+
+def _detect_with_model(detector, img):
     """
-    Try multiple image variants for detection using a fixed standard input size (640x480 or 480x640)
-    to prevent OpenCV 4.6.0 DNN dynamic shape/layer errors.
-    Returns the face row with the highest confidence, or None if nothing found.
+    Run detection for one detector across image variants at a fixed standard input
+    size (640x480 / 480x640) to avoid OpenCV DNN dynamic-shape/layer errors.
+    Returns the highest-confidence face row, or None if nothing found.
+    Raises cv2.error if the model is incompatible with this OpenCV build.
     """
     best_face = None
     best_conf  = -1.0
@@ -84,6 +106,43 @@ def _detect_best_face(detector, img):
     return best_face
 
 
+# Remember which YuNet ONNX the current OpenCV build can actually run, so subsequent
+# images in the same process skip the trial-and-error.
+_WORKING_MODEL = None
+
+
+def _detect_best_face(models_dir, img):
+    """
+    Detect the best face, trying each candidate YuNet model until one runs on this
+    OpenCV build. Returns the face row (or None if no face found). Raises the last
+    cv2.error only if every available model is incompatible.
+    """
+    global _WORKING_MODEL
+
+    order = ([_WORKING_MODEL] if _WORKING_MODEL else []) + \
+            [m for m in YUNET_MODELS if m != _WORKING_MODEL]
+
+    last_err = None
+    for model_name in order:
+        if not model_name:
+            continue
+        path = os.path.join(models_dir, model_name)
+        if not os.path.exists(path):
+            continue
+        try:
+            detector = _create_detector(path)
+            face = _detect_with_model(detector, img)
+            _WORKING_MODEL = model_name
+            return face
+        except cv2.error as e:
+            last_err = e
+            continue
+
+    if last_err is not None:
+        raise last_err
+    return None
+
+
 def verify_faces(img1_path, img2_path, threshold=0.65):
     # Check if files exist
     if not os.path.exists(img1_path) or not os.path.exists(img2_path):
@@ -108,10 +167,10 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
 
     # Paths to OpenCV Zoo Deep Learning Models
     models_dir   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-    yunet_model  = os.path.join(models_dir, "face_detection_yunet_2022mar.onnx")
     sface_model  = os.path.join(models_dir, "face_recognition_sface_2021dec.onnx")
+    has_yunet    = any(os.path.exists(os.path.join(models_dir, m)) for m in YUNET_MODELS)
 
-    if not os.path.exists(yunet_model) or not os.path.exists(sface_model):
+    if not has_yunet or not os.path.exists(sface_model):
         return {
             "verified": False,
             "distance": 1.0,
@@ -120,26 +179,16 @@ def verify_faces(img1_path, img2_path, threshold=0.65):
         }
 
     try:
-        # Initialize YuNet face detector
-        # Score threshold lowered to 0.55 so glasses-wearing faces are detected.
-        detector = cv2.FaceDetectorYN.create(
-            yunet_model,
-            "",
-            (320, 320),          # placeholder – overridden per image in _detect_best_face
-            YUNET_SCORE_THRESHOLD,
-            YUNET_NMS_THRESHOLD,
-            YUNET_TOP_K
-        )
-
         # Initialize SFace face recognizer
         recognizer = cv2.FaceRecognizerSF.create(
             sface_model,
             ""
         )
 
-        # Detect best face in each image (tries original + CLAHE + resized variants)
-        face1 = _detect_best_face(detector, img1)
-        face2 = _detect_best_face(detector, img2)
+        # Detect best face in each image (tries original + CLAHE + resized variants),
+        # automatically selecting a YuNet model the installed OpenCV can run.
+        face1 = _detect_best_face(models_dir, img1)
+        face2 = _detect_best_face(models_dir, img2)
 
         if face1 is None:
             return {

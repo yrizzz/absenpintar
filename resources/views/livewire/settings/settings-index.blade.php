@@ -62,6 +62,17 @@
                             <span>Perusahaan</span>
                         </button>
 
+                        <!-- Tab: Hari Libur Nasional -->
+                        <button wire:click="$set('activeTab', 'holidays')" type="button"
+                            class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'holidays' ? 'tab-active' : 'text-fg-muted hover:text-fg hover:bg-surface-muted bg-surface-muted lg:bg-transparent border border-border lg:border-0' }}">
+                            <svg class="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0 {{ $activeTab === 'holidays' ? 'text-primary-fg' : 'text-fg-muted' }}"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Hari Libur Nasional</span>
+                        </button>
+
                         <!-- Tab 4: Kantor Cabang & Geofence -->
                         <button wire:click="$set('activeTab', 'branches')" type="button"
                             class="px-3.5 py-2.5 lg:px-4 lg:py-3 label-xs font-bold rounded-xl lg:rounded-xl transition-all flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-1.5 lg:gap-2 text-center lg:text-left flex-shrink-0 min-h-[68px] lg:min-h-0 {{ $activeTab === 'branches' ? 'tab-active' : 'text-fg-muted hover:text-fg hover:bg-surface-muted bg-surface-muted lg:bg-transparent border border-border lg:border-0' }}">
@@ -383,6 +394,109 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                @endif
+
+                <!-- ========================================================== -->
+                <!-- TAB: HARI LIBUR NASIONAL -->
+                <!-- ========================================================== -->
+                @if ($activeTab === 'holidays')
+                    <div class="card p-6 sm:p-8 max-w-4xl mx-auto space-y-8">
+                        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                            <div>
+                                <h3 class="heading-3">Hari Libur Nasional</h3>
+                                <p class="label-sm mt-1">Tanggal di sini ditandai <span class="font-bold text-danger">libur</span>
+                                    pada ceklis bulanan Riwayat Kehadiran &amp; Laporan. Tambahkan libur yang berubah
+                                    tiap tahun (Idul Fitri, Imlek, Nyepi, dll). Lima libur tanggal-tetap
+                                    (Tahun Baru, Hari Buruh, Pancasila, Kemerdekaan, Natal) sudah otomatis tiap tahun.</p>
+                            </div>
+                            <div class="flex items-end gap-3 flex-shrink-0">
+                                <div>
+                                    <label class="block label-xs mb-2">Tahun</label>
+                                    <select wire:model.live="holidayYear" class="text-xs">
+                                        @foreach ($holidayYears as $y)
+                                            <option value="{{ $y }}">{{ $y }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="button" wire:click="syncHolidays" wire:loading.attr="disabled" wire:target="syncHolidays"
+                                    class="btn-sm btn-secondary whitespace-nowrap">
+                                    <svg class="w-4 h-4" wire:loading.class="animate-spin" wire:target="syncHolidays" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span wire:loading.remove wire:target="syncHolidays">Sinkronkan Otomatis</span>
+                                    <span wire:loading wire:target="syncHolidays">Menyinkronkan…</span>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="label-xs text-fg-muted -mt-4">
+                            Tombol <span class="font-semibold">Sinkronkan Otomatis</span> menarik hari libur resmi (termasuk Idul Fitri &amp; cuti bersama)
+                            dari kalender nasional untuk {{ $holidayYears[1] ?? now()->year }}–{{ ($holidayYears[1] ?? now()->year) + 2 }}.
+                            Sistem juga menyinkronkan ulang otomatis setiap minggu.
+                        </p>
+
+                        <!-- Add form -->
+                        <form wire:submit.prevent="addHoliday" class="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-4 sm:items-end bg-surface-muted rounded-xl p-4">
+                            <div>
+                                <label class="block label-xs mb-2">Tanggal</label>
+                                <input wire:model="holiday_date" type="date" class="text-xs">
+                                @error('holiday_date') <span class="label-xs text-danger block mt-1">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block label-xs mb-2">Nama Hari Libur</label>
+                                <input wire:model="holiday_name" type="text" placeholder="mis. Hari Raya Idul Fitri 1448 H" class="w-full text-xs">
+                                @error('holiday_name') <span class="label-xs text-danger block mt-1">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <button type="submit" class="btn-sm btn-primary w-full sm:w-auto">Tambah</button>
+                            </div>
+                        </form>
+
+                        <!-- Holiday list -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr class="text-left label-xs border-b border-border">
+                                        <th class="py-2 pr-4">Tanggal</th>
+                                        <th class="py-2 pr-4">Hari</th>
+                                        <th class="py-2 pr-4">Keterangan</th>
+                                        <th class="py-2 pr-4 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($holidayRows as $row)
+                                        <tr class="border-b border-border/60">
+                                            <td class="py-2.5 pr-4 font-mono tabular-nums">{{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}</td>
+                                            <td class="py-2.5 pr-4 text-fg-muted">{{ $row['day_name'] }}</td>
+                                            <td class="py-2.5 pr-4">
+                                                {{ $row['name'] }}
+                                                @if ($row['source'] === 'manual')
+                                                    <span class="ml-1.5 inline-flex items-center rounded-full bg-info-soft px-2 py-0.5 text-[10px] font-medium text-info">manual</span>
+                                                @elseif ($row['source'] === 'fixed')
+                                                    <span class="ml-1.5 inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium text-fg-muted">tetap</span>
+                                                @else
+                                                    <span class="ml-1.5 inline-flex items-center rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium text-fg-muted">otomatis</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-2.5 pr-4 text-right">
+                                                @if ($row['id'])
+                                                    <button type="button"
+                                                        wire:click="deleteHoliday({{ $row['id'] }})"
+                                                        wire:confirm="Hapus hari libur '{{ $row['name'] }}'?"
+                                                        class="text-danger hover:underline font-medium">Hapus</button>
+                                                @else
+                                                    <span class="text-fg-subtle text-[11px]">—</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="py-6 text-center text-fg-muted">Belum ada hari libur untuk tahun ini.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 @endif
 

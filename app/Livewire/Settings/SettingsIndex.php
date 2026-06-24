@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Livewire\Reports\ReportsIndex;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\AttendanceLog;
@@ -63,6 +64,11 @@ class SettingsIndex extends Component
     public $branch_radius = 200;
     public $branch_is_active = true;
 
+    // Holiday management (Settings → Hari Libur tab)
+    public $holidayYear;
+    public $holiday_date = '';
+    public $holiday_name = '';
+
     public function updatedBranchSearch() { $this->resetPage('branchesPage'); }
 
     public function sortBranches($field)
@@ -87,7 +93,11 @@ class SettingsIndex extends Component
             $this->activeTab = 'branches';
         } elseif (request()->query('tab') === 'roles') {
             $this->activeTab = 'roles';
+        } elseif (request()->query('tab') === 'holidays') {
+            $this->activeTab = 'holidays';
         }
+
+        $this->holidayYear = (int) now()->year;
 
         $this->radius = cache()->get('settings.radius', 200);
         $this->gps_margin = cache()->get('settings.gps_margin', 15);
@@ -286,6 +296,88 @@ class SettingsIndex extends Component
     }
 
     // ==========================================
+    // NATIONAL HOLIDAY MANAGEMENT
+    // ==========================================
+
+    public function addHoliday()
+    {
+        $this->validate([
+            'holiday_date' => 'required|date|unique:holidays,date',
+            'holiday_name' => 'required|string|max:150',
+        ], [], [
+            'holiday_date' => 'tanggal',
+            'holiday_name' => 'nama hari libur',
+        ]);
+
+        $holiday = \App\Models\Holiday::create([
+            'date' => $this->holiday_date,
+            'name' => $this->holiday_name,
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('holidays.' . \Carbon\Carbon::parse($holiday->date)->year);
+
+        \App\Models\AuditLog::create([
+            'user_id'    => auth()->id(),
+            'action'     => 'holiday.created',
+            'model_type' => \App\Models\Holiday::class,
+            'model_id'   => $holiday->id,
+            'new_values' => ['date' => $holiday->date->toDateString(), 'name' => $holiday->name],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        $this->holidayYear = (int) \Carbon\Carbon::parse($holiday->date)->year;
+        $this->reset(['holiday_date', 'holiday_name']);
+        session()->flash('success', "Hari libur '{$holiday->name}' berhasil ditambahkan.");
+    }
+
+    public function syncHolidays()
+    {
+        $currentYear = (int) now()->year;
+        $years = [$currentYear, $currentYear + 1, $currentYear + 2];
+
+        try {
+            $result = \App\Services\HolidayService::sync($years);
+        } catch (\Throwable $e) {
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
+
+        \App\Models\AuditLog::create([
+            'user_id'    => auth()->id(),
+            'action'     => 'holiday.synced',
+            'new_values' => ['years' => $years, 'added' => $result['added']],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        session()->flash('success', "Sinkronisasi selesai. {$result['added']} hari libur diperbarui dari kalender nasional untuk " . implode(', ', $years) . '.');
+    }
+
+    public function deleteHoliday($holidayId)
+    {
+        $holiday = \App\Models\Holiday::findOrFail($holidayId);
+        $year = (int) \Carbon\Carbon::parse($holiday->date)->year;
+        $name = $holiday->name;
+        $holiday->delete();
+
+        \Illuminate\Support\Facades\Cache::forget('holidays.' . $year);
+
+        \App\Models\AuditLog::create([
+            'user_id'    => auth()->id(),
+            'action'     => 'holiday.deleted',
+            'model_type' => \App\Models\Holiday::class,
+            'model_id'   => $holidayId,
+            'old_values' => ['name' => $name],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        session()->flash('success', "Hari libur '{$name}' berhasil dihapus.");
+    }
+
+    // ==========================================
     // SPATIE ROLE / PERMISSION TOGGLE
     // ==========================================
 
@@ -410,11 +502,39 @@ class SettingsIndex extends Component
         $roles = Role::with('permissions')->get();
         $allPermissions = Permission::all();
 
+        // Holiday tab: full national-holiday list for the selected year (fixed-date
+        // defaults + DB-managed entries), plus a small range of selectable years.
+        $year = (int) ($this->holidayYear ?: now()->year);
+        $holidayEntries = ReportsIndex::getNationalHolidays($year);
+        $fixedDates = array_keys(ReportsIndex::fixedNationalHolidays($year));
+
+        // Map each date in this year to its DB row (id + source), if any.
+        $dbHolidays = \App\Models\Holiday::whereYear('date', $year)->get()
+            ->keyBy(fn ($h) => $h->date->toDateString());
+
+        $holidayRows = [];
+        foreach ($holidayEntries as $date => $name) {
+            $row = $dbHolidays->get($date);
+            $holidayRows[] = [
+                'date'     => $date,
+                'name'     => $name,
+                'day_name' => \Carbon\Carbon::parse($date)->translatedFormat('l'),
+                'id'       => $row?->id,
+                // 'fixed' = produced automatically by code and not (yet) in the DB.
+                'source'   => $row?->source ?? (in_array($date, $fixedDates, true) ? 'fixed' : 'auto'),
+            ];
+        }
+
+        $nowYear = (int) now()->year;
+        $holidayYears = range($nowYear - 1, $nowYear + 3);
+
         return view('livewire.settings.settings-index', [
             'branches' => $branches,
             'branchesTable' => $branchesTable,
             'roles' => $roles,
             'allPermissions' => $allPermissions,
+            'holidayRows' => $holidayRows,
+            'holidayYears' => $holidayYears,
         ]);
     }
 }

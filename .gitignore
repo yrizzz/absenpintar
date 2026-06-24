@@ -59,3 +59,5 @@ auth.json
 /face_compare.py
 /models/
 __pycache__/
+/.venv/
+/venv/

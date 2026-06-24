@@ -156,6 +156,16 @@ if [ -f .env ] && { grep -q "^APP_KEY=$" .env || grep -q "^APP_KEY=\s*$" .env ||
     php artisan key:generate --force --no-interaction
 fi
 
+# Peringatan keamanan: pastikan konfigurasi aman untuk produksi (tidak menggagalkan deploy)
+if [ -f .env ]; then
+    if grep -qiE "^APP_DEBUG=(true|1)\b" .env; then
+        echo "⚠️  PERINGATAN: APP_DEBUG aktif di .env — matikan (APP_DEBUG=false) untuk produksi agar stack trace tidak bocor."
+    fi
+    if ! grep -qiE "^APP_ENV=production\b" .env; then
+        echo "⚠️  PERINGATAN: APP_ENV bukan 'production' — set APP_ENV=production untuk produksi."
+    fi
+fi
+
 
 # 6. NPM build (non-interactive)
 echo "📦 [6/10] Mengompilasi Aset Frontend..."
@@ -165,6 +175,10 @@ npm run build
 # 7. Migrasi database (non-interactive)
 echo "🗄️  [7/10] Menjalankan migrasi database..."
 php artisan migrate --force --no-interaction
+
+# Tarik hari libur nasional terbaru dari kalender (tidak menggagalkan deploy bila offline)
+echo "📅 Sinkronisasi hari libur nasional..."
+php artisan holidays:sync --no-interaction || echo "⚠️  Sinkronisasi libur dilewati (akan dicoba lagi mingguan)."
 
 # 8. Storage link & Livewire assets cleanup
 echo "🔗 [8/10] Membuat Symlink Storage..."

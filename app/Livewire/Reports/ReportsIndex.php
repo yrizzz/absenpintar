@@ -381,30 +381,43 @@ class ReportsIndex extends Component
         ]);
     }
 
+    /**
+     * National holidays for a given year as ['Y-m-d' => name].
+     *
+     * Combines the five fixed-date holidays (same date every year) — produced
+     * automatically here — with the variable-date and custom holidays managed by
+     * admins in Settings → Hari Libur (stored in the `holidays` table). DB entries
+     * win on date collisions. Cached per year so the matrix views stay cheap.
+     */
     public static function getNationalHolidays($year)
     {
-        if ($year == 2026) {
-            return [
-                '2026-01-01' => 'Tahun Baru Masehi',
-                '2026-01-18' => "Isra Mi'raj Nabi Muhammad SAW",
-                '2026-02-17' => 'Tahun Baru Imlek',
-                '2026-03-19' => 'Hari Suci Nyepi',
-                '2026-03-20' => 'Hari Raya Idul Fitri 1447 H',
-                '2026-03-21' => 'Hari Raya Idul Fitri 1447 H',
-                '2026-04-03' => 'Wafat Yesus Kristus',
-                '2026-04-05' => 'Hari Paskah',
-                '2026-05-01' => 'Hari Buruh Internasional',
-                '2026-05-14' => 'Hari Raya Waisak',
-                '2026-05-21' => 'Kenaikan Yesus Kristus',
-                '2026-05-27' => 'Hari Raya Idul Adha 1447 H',
-                '2026-06-01' => 'Hari Lahir Pancasila',
-                '2026-06-17' => 'Tahun Baru Islam 1448 H',
-                '2026-08-17' => 'Hari Kemerdekaan RI',
-                '2026-08-26' => 'Maulid Nabi Muhammad SAW',
-                '2026-12-25' => 'Hari Raya Natal',
-            ];
-        }
+        return \Illuminate\Support\Facades\Cache::remember(
+            "holidays.{$year}",
+            now()->addHours(12),
+            function () use ($year) {
+                $holidays = self::fixedNationalHolidays($year);
 
+                if (\Illuminate\Support\Facades\Schema::hasTable('holidays')) {
+                    \App\Models\Holiday::whereYear('date', $year)
+                        ->orderBy('date')
+                        ->get()
+                        ->each(function ($holiday) use (&$holidays) {
+                            $holidays[$holiday->date->toDateString()] = $holiday->name;
+                        });
+                }
+
+                ksort($holidays);
+
+                return $holidays;
+            }
+        );
+    }
+
+    /**
+     * The five holidays whose date never changes from year to year.
+     */
+    public static function fixedNationalHolidays($year): array
+    {
         return [
             "$year-01-01" => 'Tahun Baru Masehi',
             "$year-05-01" => 'Hari Buruh Internasional',
