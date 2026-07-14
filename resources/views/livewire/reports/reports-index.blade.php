@@ -580,9 +580,30 @@
                                                 @elseif($day['is_holiday'])
                                                     {{-- National Holiday --}}
                                                     <span class="text-[10px] font-bold text-rose-500 dark:text-rose-500/80 select-none cursor-help" title="{{ $day['holiday_name'] }}">H</span>
+                                                @elseif($day['date_string'] < now()->toDateString())
+                                                    {{-- Absent / Alpha (Tidak Masuk di masa lalu) --}}
+                                                    <button type="button" 
+                                                        @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin']))
+                                                            wire:click="initAbsenceAction('{{ $user->id }}', '{{ $day['date_string'] }}')"
+                                                            class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 hover:scale-110 active:scale-95 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20 transition-all cursor-pointer"
+                                                        @else
+                                                            class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20 cursor-default"
+                                                        @endif
+                                                        title="{{ auth()->user()->hasAnyRole(['super_admin', 'hr_admin']) ? 'Alpha. Klik untuk menambah keterangan.' : 'Alpha (Tidak Masuk)' }}">
+                                                        A
+                                                    </button>
                                                 @else
-                                                    {{-- Absent / Empty --}}
-                                                    <span class="text-slate-350 dark:text-slate-700 select-none">-</span>
+                                                    {{-- Today or Future (Empty) --}}
+                                                    @if(auth()->user()->hasAnyRole(['super_admin', 'hr_admin']))
+                                                        <button type="button" 
+                                                            wire:click="initAbsenceAction('{{ $user->id }}', '{{ $day['date_string'] }}')"
+                                                            class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium text-slate-350 dark:text-slate-700 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                                                            title="Klik untuk menambah keterangan tidak masuk">
+                                                            -
+                                                        </button>
+                                                    @else
+                                                        <span class="text-slate-350 dark:text-slate-700 select-none">-</span>
+                                                    @endif
                                                 @endif
                                             </td>
                                         @endforeach
@@ -607,6 +628,10 @@
                             <div class="flex items-center gap-1.5">
                                 <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                                 <span class="text-slate-600 dark:text-slate-400">Cuti / Izin Disetujui</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-rose-500 font-bold bg-rose-50 dark:bg-rose-950/20 px-1.5 py-0.5 rounded border border-rose-200 dark:border-rose-500/20 text-[10px]">A</span>
+                                <span class="text-slate-600 dark:text-slate-400 font-medium">Alpha / Tanpa Absen</span>
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span class="text-rose-500 font-bold">M</span>
@@ -846,4 +871,65 @@
             </div>
         </div>
     </div>
+</div>
+
+{{-- Modal Record Absence / Note --}}
+@if($showAbsenceModal)
+<div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        {{-- Background backdrop --}}
+        <div class="fixed inset-0 modal-overlay transition-opacity" aria-hidden="true" wire:click="closeAbsenceModal"></div>
+
+        {{-- Trick to center modal --}}
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        {{-- Modal panel --}}
+        <div class="inline-block align-bottom bg-surface rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
+            <div class="p-6">
+                <div class="flex items-center justify-between pb-3 border-b border-border">
+                    <h3 class="text-base font-bold text-fg flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Catat Ketiadaan / Absen Karyawan
+                    </h3>
+                    <button type="button" class="text-fg-muted hover:text-fg transition-colors cursor-pointer" wire:click="closeAbsenceModal">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="mt-4 space-y-4">
+                    <div class="bg-surface-muted p-3.5 rounded-xl border border-border/60 text-xs space-y-1.5">
+                        <div class="flex justify-between">
+                            <span class="text-fg-subtle">Nama Karyawan:</span>
+                            <span class="font-bold text-fg">{{ $selectedAbsenceUserName }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-fg-subtle">Tanggal Ketiadaan:</span>
+                            <span class="font-bold text-fg">{{ \Carbon\Carbon::parse($selectedAbsenceDate)->translatedFormat('l, d F Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-fg mb-1.5">Alasan / Jenis Keterangan</label>
+                        <input type="text" wire:model.defer="absenceReason" class="input-text text-sm w-full" placeholder="Contoh: Sakit dengan Surat Dokter, Dinas Luar, Keperluan Keluarga...">
+                        @error('absenceReason') <span class="text-xs text-danger mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-fg mb-1.5">Catatan Tambahan (Opsional)</label>
+                        <textarea wire:model.defer="absenceNotes" class="input-text text-sm w-full h-20 resize-none py-2" placeholder="Catatan internal departemen / persetujuan khusus..."></textarea>
+                        @error('absenceNotes') <span class="text-xs text-danger mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-border flex justify-end gap-2 bg-surface-muted">
+                <button type="button" class="btn-secondary btn-sm px-4 cursor-pointer" wire:click="closeAbsenceModal">Batal</button>
+                <button type="button" class="btn-primary btn-sm px-4 cursor-pointer bg-rose-600 hover:bg-rose-700 text-white border-rose-600 hover:border-rose-700" wire:click="saveAbsence">Simpan Keterangan</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 </div>

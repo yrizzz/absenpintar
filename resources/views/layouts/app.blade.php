@@ -55,7 +55,7 @@
 
         @auth
             {{-- Topbar --}}
-            <header class="sticky top-0 z-30 flex h-16 flex-shrink-0 items-center gap-2 border-b border-border bg-surface px-4 sm:px-6 lg:px-8">
+            <header class="sticky top-0 z-30 flex h-16 flex-shrink-0 items-center gap-2 border-b border-border bg-surface/80 backdrop-blur-md px-4 sm:px-6 lg:px-8">
                 <button type="button" @click="sidebarOpen = true" class="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-fg-muted hover:bg-surface-muted hover:text-fg transition-colors">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>

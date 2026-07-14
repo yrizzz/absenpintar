@@ -24,6 +24,14 @@ class ReportsIndex extends Component
     public $matrix_month;
     public $matrix_year;
 
+    // Absence entry modal properties
+    public $showAbsenceModal = false;
+    public $selectedAbsenceUserId;
+    public $selectedAbsenceUserName;
+    public $selectedAbsenceDate;
+    public $absenceReason = '';
+    public $absenceNotes = '';
+
     // Interactive recap filters
     public $filter_user_id = '';
     public $filter_branch_id = '';
@@ -336,6 +344,19 @@ class ReportsIndex extends Component
             }
         }
 
+        // Also fetch active approved PermissionRequests of type ijin_tidak_masuk within this month
+        $permissionsQuery = \App\Models\PermissionRequest::whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->where('type', 'ijin_tidak_masuk')
+            ->where('status', 'approved');
+        if ($this->filter_user_id) {
+            $permissionsQuery->where('user_id', $this->filter_user_id);
+        }
+        $permissionsList = $permissionsQuery->get();
+
+        foreach ($permissionsList as $perm) {
+            $matrixLeaves[$perm->user_id . '_' . $perm->date->toDateString()] = 'tidak_masuk';
+        }
+
         // Paginate users for the matrix view
         $userQuery = \App\Models\User::query();
         if ($this->search) {
@@ -425,5 +446,56 @@ class ReportsIndex extends Component
             "$year-08-17" => 'Hari Kemerdekaan RI',
             "$year-12-25" => 'Hari Raya Natal',
         ];
+    }
+
+    public function initAbsenceAction($userId, $dateString)
+    {
+        $user = \App\Models\User::findOrFail($userId);
+        $this->selectedAbsenceUserId = $userId;
+        $this->selectedAbsenceUserName = $user->name;
+        $this->selectedAbsenceDate = $dateString;
+        $this->absenceReason = 'Izin Tidak Masuk';
+        $this->absenceNotes = '';
+        $this->showAbsenceModal = true;
+    }
+
+    public function closeAbsenceModal()
+    {
+        $this->showAbsenceModal = false;
+        $this->reset(['selectedAbsenceUserId', 'selectedAbsenceUserName', 'selectedAbsenceDate', 'absenceReason', 'absenceNotes']);
+    }
+
+    public function saveAbsence()
+    {
+        $this->validate([
+            'selectedAbsenceUserId' => 'required|exists:users,id',
+            'selectedAbsenceDate' => 'required|date',
+            'absenceReason' => 'required|string|max:250',
+            'absenceNotes' => 'nullable|string|max:500',
+        ]);
+
+        // Remove any existing permission requests for the same day to avoid duplicate entries
+        \App\Models\PermissionRequest::where('user_id', $this->selectedAbsenceUserId)
+            ->where('date', $this->selectedAbsenceDate)
+            ->delete();
+
+        // Create an approved PermissionRequest representing this absence/leave
+        \App\Models\PermissionRequest::create([
+            'user_id' => $this->selectedAbsenceUserId,
+            'type' => 'ijin_tidak_masuk',
+            'date' => $this->selectedAbsenceDate,
+            'reason' => $this->absenceReason,
+            'status' => 'approved',
+            'status_dept_head' => 'approved',
+            'status_hr' => 'approved',
+            'dept_head_id' => auth()->id(),
+            'hr_id' => auth()->id(),
+            'dept_head_approved_at' => now(),
+            'hr_approved_at' => now(),
+            'approval_notes' => $this->absenceNotes ?: 'Dicatat langsung oleh Admin/HRD.',
+        ]);
+
+        session()->flash('success', 'Keterangan tidak masuk untuk ' . $this->selectedAbsenceUserName . ' pada ' . \Carbon\Carbon::parse($this->selectedAbsenceDate)->translatedFormat('d F Y') . ' berhasil disimpan.');
+        $this->closeAbsenceModal();
     }
 }

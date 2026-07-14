@@ -1,5 +1,16 @@
 <div class="py-6 min-h-screen" x-data="checkOutApp()" x-init="init()" x-on:destroy="destroy()">
 
+    <!-- Inject CSS for Face ID scanning neon animation -->
+    <style>
+        @keyframes scan {
+            0%, 100% { transform: translateY(0); opacity: 0.8; }
+            50% { transform: translateY(220px); opacity: 1; }
+        }
+        .animate-scan {
+            animation: scan 3s infinite ease-in-out;
+        }
+    </style>
+
     <!-- Inject Leaflet Assets directly to avoid bundle overhead -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -8,15 +19,15 @@
 
         {{-- Header --}}
         <div class="mb-6">
-            <a href="{{ route('dashboard') }}" class="btn-secondary btn-sm mb-3">
+            <a href="{{ route('dashboard') }}" class="btn-secondary btn-sm mb-3 inline-flex items-center gap-2 active:scale-95 transition-transform">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 Kembali ke Dasbor
             </a>
             <h1 class="heading-1 flex items-center gap-2.5">
-                <span class="h-2.5 w-2.5 rounded-full bg-info"></span>
+                <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
                 Presensi Keluar Live
             </h1>
-            <p class="label-sm mt-1">Dekatkan wajah dan pastikan Anda berada di dalam area kantor untuk melakukan absen keluar.</p>
+            <p class="label-sm mt-1">Posisikan wajah Anda pada lingkaran kamera dan pastikan berada di area radius kantor.</p>
         </div>
 
         {{-- Flash / runtime errors --}}
@@ -34,26 +45,33 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            {{-- Telemetry column --}}
-            <div class="lg:col-span-5 order-1 lg:order-2 space-y-6">
-                <div class="card p-5 space-y-5">
+            {{-- Left Column (Desktop: Map, Geofence Details; Mobile: Second position) --}}
+            <div class="lg:col-span-5 order-2 lg:order-1 space-y-6">
+                
+                {{-- Map card --}}
+                <div wire:ignore class="card overflow-hidden shadow-md">
+                    <div class="px-4 py-3 border-b border-border bg-surface-muted flex items-center justify-between">
+                        <span class="label-xs uppercase tracking-wide text-primary flex items-center gap-2">
+                            <svg class="h-4 w-4 text-info" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                            Peta Lokasi Kantor
+                        </span>
+                        <span class="badge-success">GPS Aktif</span>
+                    </div>
+                    <div id="leaflet-map" wire:ignore class="h-60 w-full relative z-0"></div>
+                </div>
+
+                {{-- Location telemetry details --}}
+                <div class="card p-5 space-y-4 shadow-md">
                     <div class="flex items-center justify-between border-b border-border pb-2.5">
-                        <span class="label-xs uppercase tracking-wide text-primary">Matrix Validasi Kehadiran</span>
-                        <span class="label-xs font-mono">Absen Keluar</span>
+                        <span class="label-xs uppercase tracking-wide text-primary font-bold">Detail Geofence & Koordinat</span>
+                        <span class="label-xs font-mono text-fg-muted">Absen Keluar</span>
                     </div>
 
-                    {{-- Auto-detect alert --}}
-                    <div x-show="$wire.locationValid && $wire.faceValid" x-cloak class="flex items-center justify-center gap-2 rounded-xl border border-success/30 bg-success-soft p-3 text-sm font-medium text-success">
-                        <svg class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        <span>Parameter terpenuhi. Mengirim otomatis…</span>
-                    </div>
-
-                    {{-- Location telemetry --}}
-                    <div class="rounded-xl border border-border bg-surface-muted p-4 space-y-3.5">
+                    <div class="space-y-3.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-fg flex items-center gap-2">
+                            <span class="text-xs font-medium text-fg flex items-center gap-2">
                                 <svg class="h-4 w-4 text-info" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                Geofence Lokasi Kantor
+                                Area Kantor
                             </span>
                             <span x-show="!$wire.latitude" class="badge-neutral">Melacak…</span>
                             <span x-show="$wire.latitude && $wire.locationValid" x-cloak class="badge-success">Dalam radius</span>
@@ -62,17 +80,17 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <span class="label-xs uppercase tracking-wide block">Jarak Anda</span>
-                                <span x-show="$wire.latitude" x-cloak class="font-mono font-medium text-fg text-sm" x-text="$wire.distanceFromBranch + ' meter'"></span>
+                                <span class="label-xs uppercase tracking-wide block text-fg-muted">Jarak Anda</span>
+                                <span x-show="$wire.latitude" x-cloak class="font-mono font-bold text-fg text-sm" x-text="$wire.distanceFromBranch + ' meter'"></span>
                                 <span x-show="!$wire.latitude" class="font-mono font-medium text-fg text-sm">Mencari GPS…</span>
                             </div>
                             <div>
-                                <span class="label-xs uppercase tracking-wide block">Radius Batas</span>
-                                <span class="font-mono font-medium text-fg text-sm" x-text="$wire.maxRadius + ' meter'"></span>
+                                <span class="label-xs uppercase tracking-wide block text-fg-muted">Batas Maksimal</span>
+                                <span class="font-mono font-bold text-fg text-sm" x-text="$wire.maxRadius + ' meter'"></span>
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-fg-muted">
+                        <div class="flex items-start gap-2 rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-fg-muted">
                             <span class="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" :class="$wire.locationValid ? 'bg-success' : 'bg-danger'"></span>
                             <p x-text="$wire.locationMessage"></p>
                         </div>
@@ -80,134 +98,115 @@
                         <div x-show="$wire.resolvedAddress" x-cloak class="flex items-start gap-2 rounded-lg border border-info/20 bg-info-soft px-3 py-2 text-xs text-fg-muted">
                             <svg class="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-info" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             <div>
-                                <span class="block text-xs font-medium text-info mb-0.5">Alamat Terdeteksi</span>
-                                <p x-text="$wire.resolvedAddress"></p>
+                                <span class="block text-xs font-semibold text-info mb-0.5">Alamat GPS Terdeteksi</span>
+                                <p class="text-[11px] leading-relaxed text-fg" x-text="$wire.resolvedAddress"></p>
                             </div>
                         </div>
-                    </div>
-
-                    {{-- Biometric telemetry --}}
-                    <div class="rounded-xl border border-border bg-surface-muted p-4 space-y-3.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-fg flex items-center gap-2">
-                                <svg class="h-4 w-4 text-info" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                Verifikasi Wajah
-                            </span>
-                            <span x-show="!$wire.selfieData && !cameraActive" class="badge-neutral">Menunggu…</span>
-                            <span x-show="!$wire.selfieData && cameraActive" x-cloak class="badge-info">Kamera aktif</span>
-                            <span x-show="$wire.selfieData && $wire.faceValid" x-cloak class="badge-success">Wajah cocok</span>
-                            <span x-show="$wire.selfieData && !$wire.faceValid" x-cloak class="badge-danger">Tidak cocok</span>
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="label-xs uppercase tracking-wide">Tingkat Kemiripan</span>
-                                <span class="font-mono font-semibold" :class="$wire.faceValid ? 'text-success' : 'text-danger'" x-text="$wire.faceSimilarity + '%'"></span>
-                            </div>
-                            <div class="w-full bg-surface rounded-full h-1.5 overflow-hidden border border-border">
-                                <div class="h-full rounded-full transition-all duration-500" :class="$wire.faceValid ? 'bg-success' : 'bg-danger'" :style="'width: ' + $wire.faceSimilarity + '%'"></div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-fg-muted">
-                            <span class="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" :class="$wire.faceValid ? 'bg-success' : ($wire.selfieData ? 'bg-danger' : 'bg-fg-subtle')"></span>
-                            <p x-text="cameraActive && !$wire.selfieData ? 'Kamera aktif. Sistem memindai wajah secara otomatis…' : $wire.faceStatusMessage"></p>
-                        </div>
-                    </div>
-
-                    {{-- Submit --}}
-                    <div class="pt-3 border-t border-border flex justify-center">
-                        <button x-show="$wire.locationValid && $wire.faceValid" x-cloak wire:click="submit" type="button" class="btn-primary w-full">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            Kirim Kehadiran Keluar
-                        </button>
-                        <button x-show="!($wire.locationValid && $wire.faceValid)" disabled type="button" class="btn-disabled w-full">
-                            <svg class="h-3.5 w-3.5 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>Menunggu validasi AI &amp; GPS</span>
-                        </button>
                     </div>
                 </div>
+
             </div>
 
-            {{-- Camera & map column --}}
-            <div class="lg:col-span-7 order-2 lg:order-1 space-y-6">
+            {{-- Right Column (Desktop: Camera, Verification, Submit Button; Mobile: First position at the very top!) --}}
+            <div class="lg:col-span-7 order-1 lg:order-2 space-y-6">
+                
                 {{-- Camera card --}}
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden shadow-md">
                     <div class="px-4 py-3 border-b border-border bg-surface-muted flex items-center justify-between">
                         <span class="label-xs uppercase tracking-wide text-primary flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-info animate-ping"></span>
-                            Pemindai Verifikasi Wajah Aktif
+                            <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
+                            Pemindai Wajah AI Aktif
                         </span>
-                        <span class="badge-info">Live</span>
+                        <span class="badge-success">Live Scan</span>
                     </div>
 
-                    {{-- Camera viewport (intentionally dark in both themes) --}}
-                    <div class="relative bg-slate-950 aspect-video flex items-center justify-center overflow-hidden">
-                        <video x-ref="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100" :class="cameraActive ? '' : 'hidden'"></video>
+                    {{-- Main Viewport --}}
+                    <div class="p-6 bg-surface flex flex-col items-center">
+                        
+                        {{-- Circular Camera Container --}}
+                        <div class="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full border-4 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-950">
+                            
+                            {{-- Scanning Neon Line --}}
+                            <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-x-0 h-1 z-20 bg-gradient-to-r from-transparent via-primary to-transparent animate-scan shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
 
-                        <div x-show="!cameraActive" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3 z-10">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 border border-white/10 text-slate-400">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            {{-- Live Video --}}
+                            <video x-ref="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100" :class="cameraActive ? '' : 'hidden'"></video>
+
+                            {{-- Camera Off State --}}
+                            <div x-show="!cameraActive" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 space-y-2.5 z-10">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-slate-400">
+                                    <svg class="h-5.5 w-5.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-semibold text-white">Mengaktifkan kamera…</h4>
+                                    <p class="text-[10px] text-slate-400 max-w-[180px] mx-auto mt-0.5">Izinkan akses kamera untuk verifikasi wajah.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 class="text-sm font-medium text-white">Mengaktifkan kamera…</h4>
-                                <p class="text-xs text-slate-400 max-w-xs mt-1">Berikan akses izin kamera agar sistem dapat memverifikasi wajah Anda.</p>
+
+                            {{-- Face Mask Guide --}}
+                            <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-6 rounded-full border-2 border-dashed border-white/30 pointer-events-none z-10 animate-pulse"></div>
+
+                            {{-- AI Analisis Overlay --}}
+                            <div x-show="isAnalyzing" x-cloak class="absolute inset-0 flex items-center justify-center bg-black/60 z-25 pointer-events-none">
+                                <div class="flex flex-col items-center gap-2 text-white">
+                                    <svg class="h-7 w-7 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                    <span class="text-[11px] font-semibold tracking-wider uppercase">Menganalisis wajah…</span>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Face guide overlay --}}
-                        <div x-show="cameraActive && !isAnalyzing" x-cloak class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full border border-white/25">
-                                <div class="h-2 w-2 rounded-full bg-white/50"></div>
+                        {{-- Quick Status Badges --}}
+                        <div class="flex items-center gap-3 mt-5">
+                            <!-- GPS Status Badge -->
+                            <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold shadow-sm"
+                                :class="$wire.locationValid ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20'">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="$wire.locationValid ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                                GPS: <span x-text="$wire.locationValid ? 'OK' : 'Luar Area'"></span>
                             </div>
-                            <div class="absolute bottom-4 rounded-full border border-white/15 bg-black/50 px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider text-white">
-                                Posisikan wajah di sini
+
+                            <!-- Face Match Status Badge -->
+                            <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold shadow-sm"
+                                :class="$wire.faceValid ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20'">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="$wire.faceValid ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                                Wajah: <span x-text="$wire.faceValid ? 'Cocok' : 'Memindai…'"></span>
                             </div>
                         </div>
 
-                        <div x-show="cameraActive && !isAnalyzing" x-cloak class="absolute inset-4 rounded-xl border-2 border-white/25 pointer-events-none z-10">
-                            <div class="absolute top-0 left-0 h-5 w-5 border-t-2 border-l-2 border-white/70 rounded-tl"></div>
-                            <div class="absolute top-0 right-0 h-5 w-5 border-t-2 border-r-2 border-white/70 rounded-tr"></div>
-                            <div class="absolute bottom-0 left-0 h-5 w-5 border-b-2 border-l-2 border-white/70 rounded-bl"></div>
-                            <div class="absolute bottom-0 right-0 h-5 w-5 border-b-2 border-r-2 border-white/70 rounded-br"></div>
+                        {{-- Face similarity bar --}}
+                        <div class="w-full max-w-sm mt-5 space-y-1.5 bg-surface-muted p-3.5 rounded-xl border border-border">
+                            <div class="flex justify-between items-center text-[11px] font-semibold">
+                                <span class="text-fg-subtle uppercase tracking-wider">Akurasi Kemiripan Wajah</span>
+                                <span class="font-mono text-sm font-bold" :class="$wire.faceValid ? 'text-success' : 'text-danger'" x-text="$wire.faceSimilarity + '%'"></span>
+                            </div>
+                            <div class="w-full bg-surface rounded-full h-2 overflow-hidden border border-border">
+                                <div class="h-full rounded-full transition-all duration-300" :class="$wire.faceValid ? 'bg-success' : 'bg-danger'" :style="'width: ' + $wire.faceSimilarity + '%'"></div>
+                            </div>
+                            <p class="text-[10px] text-fg-muted mt-1 leading-relaxed" x-text="cameraActive && !$wire.selfieData ? 'Posisikan wajah Anda dengan jelas di depan kamera.' : $wire.faceStatusMessage"></p>
                         </div>
 
-                        <div x-show="isAnalyzing" x-cloak class="absolute inset-0 flex items-start justify-end p-3 z-20 pointer-events-none">
-                            <div class="flex items-center gap-1.5 rounded-md border border-white/15 bg-black/50 px-2.5 py-1 text-xs font-medium tracking-wider text-white">
-                                <svg class="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                                Analisis…
-                            </div>
+                        {{-- Auto-detect processing message --}}
+                        <div x-show="$wire.locationValid && $wire.faceValid" x-cloak class="w-full max-w-sm mt-4 flex items-center justify-center gap-2 rounded-xl border border-success/30 bg-success-soft p-3 text-xs font-semibold text-success shadow-sm">
+                            <svg class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <span>AI &amp; GPS Valid. Mengirim otomatis…</span>
                         </div>
-                    </div>
 
-                    <div class="p-4 bg-surface-muted border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <div class="text-xs text-fg-muted text-center sm:text-left">
-                            <span class="block text-sm font-medium text-fg mb-0.5">Petunjuk wajah</span>
-                            Pastikan pencahayaan cukup dan wajah terlihat jelas tanpa aksesoris berlebih.
+                        {{-- Big Submit / Action Button --}}
+                        <div class="w-full max-w-sm mt-5">
+                            <button x-show="$wire.locationValid && $wire.faceValid" x-cloak wire:click="submit" type="button" 
+                                class="w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 text-sm font-bold text-white bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 active:scale-95 transition-all shadow-lg shadow-rose-500/20 cursor-pointer">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                KIRIM ABSEN KELUAR
+                            </button>
+                            <button x-show="!($wire.locationValid && $wire.faceValid)" disabled type="button" 
+                                class="w-full flex items-center justify-center gap-2.5 rounded-2xl py-4 text-xs font-bold text-fg-muted bg-surface-muted border border-border cursor-not-allowed">
+                                <svg class="h-4 w-4 animate-spin text-fg-muted" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                MENUNGGU VALIDASI GPS &amp; WAJAH
+                            </button>
                         </div>
-                        <div x-show="cameraActive" x-cloak class="w-full sm:w-auto">
-                            <div class="flex items-center justify-center gap-2 rounded-xl border border-info/30 bg-info-soft px-5 py-2.5 text-sm font-medium text-info select-none">
-                                <span class="relative flex h-2 w-2">
-                                    <span :class="isAnalyzing ? 'animate-ping' : ''" class="absolute inline-flex h-full w-full rounded-full bg-info opacity-75"></span>
-                                    <span class="relative inline-flex h-2 w-2 rounded-full bg-info"></span>
-                                </span>
-                                <span x-text="isAnalyzing ? 'Menganalisis wajah…' : 'Mendeteksi wajah otomatis…'"></span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
-                {{-- Map card --}}
-                <div wire:ignore class="card overflow-hidden">
-                    <div class="px-4 py-3 border-b border-border bg-surface-muted flex items-center justify-between">
-                        <span class="label-xs uppercase tracking-wide text-primary flex items-center gap-2">
-                            <svg class="h-4 w-4 text-info" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
-                            Peta Lokasi Presensi
-                        </span>
-                        <span class="badge-success">GPS aktif</span>
-                    </div>
-                    <div id="leaflet-map" wire:ignore class="h-60 w-full relative z-0"></div>
-                </div>
             </div>
 
         </div>
@@ -360,7 +359,7 @@
                 }
             },
 
-            // Stamps a GPS-camera style watermark (date/time + coordinates) onto the bottom of the canvas.
+            // Stamps a GPS-camera style watermark (date/time + coordinates + address) onto the bottom of the canvas.
             drawAttendanceWatermark(ctx, w, h) {
                 const pad = n => String(n).padStart(2, '0');
                 const now = new Date();
@@ -370,37 +369,84 @@
 
                 const lat = this.$wire.latitude;
                 const lng = this.$wire.longitude;
+                const acc = this.$wire.accuracy;
                 const coordStr = (lat && lng)
-                    ? 'Lat ' + Number(lat).toFixed(6) + ', Lng ' + Number(lng).toFixed(6)
+                    ? 'Lat ' + Number(lat).toFixed(6) + ', Lng ' + Number(lng).toFixed(6) + ' (Akurasi: ' + Math.round(acc) + 'm)'
                     : 'Lokasi GPS tidak tersedia';
+                
                 const dist = this.$wire.distanceFromBranch;
-                const metaStr = (dist || dist === 0) ? ('Jarak dari cabang: ' + dist + ' m') : '';
+                const maxR = this.$wire.maxRadius;
+                const distStr = (dist || dist === 0)
+                    ? 'Jarak dari kantor: ' + dist + ' m (Maks: ' + maxR + ' m)'
+                    : '';
 
-                const bandH = metaStr ? 74 : 58;
+                const addr = this.$wire.resolvedAddress;
+                const addrStr = addr ? 'Alamat: ' + addr : '';
+
+                // Calculate band height dynamically
+                let lineCount = 2; // Date + Coordinates
+                if (distStr) lineCount++;
+                if (addrStr) lineCount += 2; // Give address 2 lines for wrapping
+
+                const bandH = 20 + (lineCount * 18);
                 const x = 12;
-                let y = h - bandH + 22;
+                let y = h - bandH + 15;
 
-                // Semi-transparent band so text stays legible over any background
+                // Semi-transparent dark background band
                 ctx.save();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
                 ctx.fillRect(0, h - bandH, w, bandH);
 
                 ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 2;
+                ctx.shadowColor = 'rgba(0,0,0,0.9)';
+                ctx.shadowBlur = 3;
 
+                // Draw Date & Time
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 16px Arial, sans-serif';
+                ctx.font = 'bold 15px Arial, sans-serif';
                 ctx.fillText('🕒 ' + dateStr, x, y);
+                y += 18;
 
-                y += 22;
-                ctx.font = '13px "Courier New", monospace';
-                ctx.fillStyle = '#e2e8f0';
+                // Draw Coordinates
+                ctx.font = '12px "Courier New", monospace';
+                ctx.fillStyle = '#f8fafc';
                 ctx.fillText('📍 ' + coordStr, x, y);
+                y += 18;
 
-                if (metaStr) {
-                    y += 20;
-                    ctx.fillText(metaStr, x, y);
+                // Draw Distance
+                if (distStr) {
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillText('🏢 ' + distStr, x, y);
+                    y += 18;
+                }
+
+                // Draw Address with simple wrapping
+                if (addrStr) {
+                    ctx.fillStyle = '#94a3b8';
+                    const maxW = w - 24;
+                    // Simple word wrap
+                    const words = addrStr.split(' ');
+                    let line = '';
+                    let lines = [];
+                    ctx.font = '11px Arial, sans-serif';
+                    
+                    for (let n = 0; n < words.length; n++) {
+                        let testLine = line + words[n] + ' ';
+                        let metrics = ctx.measureText(testLine);
+                        if (metrics.width > maxW && n > 0) {
+                            lines.push(line);
+                            line = words[n] + ' ';
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    lines.push(line);
+                    
+                    // Draw maximum 2 lines of address to avoid drawing off the image
+                    for (let i = 0; i < Math.min(lines.length, 2); i++) {
+                        ctx.fillText(lines[i], x, y);
+                        y += 15;
+                    }
                 }
                 ctx.restore();
             },
