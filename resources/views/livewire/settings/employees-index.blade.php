@@ -513,7 +513,7 @@
                         <span class="block label-xs mb-2.5 text-center font-bold uppercase tracking-wider text-fg-muted">Template Wajah</span>
 
                         @if ($selectedUser && $selectedUser->hasRegisteredFace())
-                            <div class="relative w-full aspect-square max-w-[170px] rounded-2xl overflow-hidden border-4 border-emerald-500/25 shadow-lg shadow-emerald-500/10 group">
+                            <div class="relative w-full aspect-[3/4] max-w-[170px] rounded-2xl overflow-hidden border-4 border-emerald-500/25 shadow-lg shadow-emerald-500/10 group">
                                 <img src="{{ $selectedUser->getMasterFaceUrl() }}"
                                     class="w-full h-full object-cover -scale-x-100 transition-transform duration-300 group-hover:scale-110">
                                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950/80 to-transparent p-2.5 pt-6 flex items-center justify-center">
@@ -524,7 +524,7 @@
                                 </div>
                             </div>
                         @else
-                            <div class="relative w-full aspect-square max-w-[170px] bg-surface-muted border border-dashed border-border rounded-2xl overflow-hidden flex flex-col items-center justify-center shadow-inner group">
+                            <div class="relative w-full aspect-[3/4] max-w-[170px] bg-surface-muted border border-dashed border-border rounded-2xl overflow-hidden flex flex-col items-center justify-center shadow-inner group">
                                 <div class="absolute inset-0 bg-gradient-to-tr from-warning/5 to-transparent"></div>
                                 <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-warning/40 rounded-tl-lg"></div>
                                 <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-warning/40 rounded-tr-lg"></div>

@@ -523,7 +523,7 @@
                         <div class="card overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
                             
                             {{-- Photo Thumbnail --}}
-                            <div class="relative aspect-[4/3] w-full bg-slate-950 overflow-hidden border-b border-border">
+                            <div class="relative aspect-[3/4] w-full bg-slate-950 overflow-hidden border-b border-border">
                                 @if($selfieUrl)
                                     <img src="{{ $selfieUrl }}" alt="Absen {{ $attendance->user->name ?? 'Karyawan' }}"
                                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"

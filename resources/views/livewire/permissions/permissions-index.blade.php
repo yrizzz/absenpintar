@@ -230,30 +230,30 @@
                     @else
                         {{-- Desktop table --}}
                         <div class="hidden md:block overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[1000px]">
                                 <thead>
                                     <tr class="border-b border-border label-xs uppercase tracking-wide">
-                                        <th class="px-5 py-3.5 w-[240px]">Karyawan</th>
-                                        <th class="px-5 py-3.5 w-[140px]">Kategori</th>
-                                        <th class="px-5 py-3.5 w-[160px]">Tanggal</th>
-                                        <th class="px-5 py-3.5">Alasan & Lampiran</th>
-                                        <th class="px-5 py-3.5 text-center w-[150px]">Persetujuan Ganda</th>
-                                        <th class="px-5 py-3.5 text-right w-[200px]">Aksi Review</th>
+                                        <th class="px-5 py-3.5 w-[260px] min-w-[260px]">Karyawan</th>
+                                        <th class="px-5 py-3.5 w-[140px] min-w-[140px]">Kategori</th>
+                                        <th class="px-5 py-3.5 w-[160px] min-w-[160px]">Tanggal</th>
+                                        <th class="px-5 py-3.5 min-w-[240px]">Alasan &amp; Lampiran</th>
+                                        <th class="px-5 py-3.5 text-center w-[160px] min-w-[160px]">Persetujuan Ganda</th>
+                                        <th class="px-5 py-3.5 text-right w-[240px] min-w-[240px]">Aksi Review</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-border">
                                     @foreach($reviewRequests as $req)
                                         <tr class="hover:bg-surface-muted transition-colors align-middle">
-                                            <td class="px-5 py-4">
+                                            <td class="px-5 py-4 whitespace-nowrap">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-9 h-9 rounded-lg bg-primary text-primary-fg flex items-center justify-center font-semibold text-sm uppercase">{{ strtoupper(substr($req->user->name, 0, 1)) }}</div>
                                                     <div>
-                                                        <div class="label-md">{{ $req->user->name }}</div>
+                                                        <div class="label-md whitespace-nowrap">{{ $req->user->name }}</div>
                                                         <div class="text-xs font-mono text-fg-subtle mt-0.5">#{{ $req->user->employee_id }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="px-5 py-4">
+                                            <td class="px-5 py-4 whitespace-nowrap">
                                                 @switch($req->type)
                                                     @case('ijin_datang_terlambat') <span class="badge-rect-warning">Terlambat</span> @break
                                                     @case('ijin_pulang_awal') <span class="badge-rect-danger">Pulang Awal</span> @break
@@ -261,7 +261,7 @@
                                                     @default <span class="badge-rect-neutral">Tidak Masuk</span>
                                                 @endswitch
                                             </td>
-                                            <td class="px-5 py-4">
+                                            <td class="px-5 py-4 whitespace-nowrap">
                                                 <div class="label-md">{{ $req->date->translatedFormat('d M Y') }}</div>
                                                 @if($req->type !== 'ijin_tidak_masuk')
                                                     <div class="label-xs mt-1 normal-case tracking-normal">{{ substr($req->start_time, 0, 5) }} – {{ substr($req->end_time, 0, 5) }}</div>
@@ -297,7 +297,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="px-5 py-4">
+                                            <td class="px-5 py-4 text-right">
                                                 <div class="flex items-center justify-end gap-2">
                                                     <button wire:click="viewDetail({{ $req->id }})" type="button" class="btn-secondary btn-xs">Detail</button>
                                                     @if($req->user_id === auth()->id())

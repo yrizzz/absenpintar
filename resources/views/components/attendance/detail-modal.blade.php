@@ -51,7 +51,7 @@
     /* Left column media */
     .atd-foto-box {
         border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
-        background: var(--surface-muted); position: relative; aspect-ratio: 4 / 3;
+        background: var(--surface-muted); position: relative; aspect-ratio: 3 / 4;
     }
     .atd-foto-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .atd-media-badge {
