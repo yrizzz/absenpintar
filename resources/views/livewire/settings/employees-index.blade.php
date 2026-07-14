@@ -150,11 +150,10 @@
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="border-b border-border bg-surface-muted label-xs font-bold text-fg-muted">
-                                <x-sort-th field="name" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" class="whitespace-nowrap px-5 py-4" style="width: 34%;">Karyawan</x-sort-th>
-                                <x-sort-th field="branch" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" class="whitespace-nowrap px-5 py-4" style="width: 22%;">Cabang & Mode Kerja</x-sort-th>
-                                <x-sort-th field="is_registered" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" align="center" class="whitespace-nowrap px-5 py-4" style="width: 18%;">Status Registrasi Wajah</x-sort-th>
-                                <th class="px-5 py-4 text-center whitespace-nowrap" style="width: 14%;">Sudut Telemetri</th>
-                                <th class="px-5 py-4 text-right whitespace-nowrap" style="width: 12%;">Aksi</th>
+                                <x-sort-th field="name" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" class="whitespace-nowrap px-5 py-4" style="width: 40%;">Karyawan</x-sort-th>
+                                <x-sort-th field="branch" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" class="whitespace-nowrap px-5 py-4" style="width: 25%;">Cabang & Mode Kerja</x-sort-th>
+                                <x-sort-th field="is_registered" :sort="$userSortField" :dir="$userSortDir" method="sortUsers" align="center" class="whitespace-nowrap px-5 py-4" style="width: 20%;">Status Registrasi Wajah</x-sort-th>
+                                <th class="px-5 py-4 text-right whitespace-nowrap" style="width: 15%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border font-medium text-fg-muted">
@@ -198,21 +197,6 @@
                                                 <span class="w-1.5 h-1.5 rounded-full bg-danger mr-1.5"></span>
                                                 Belum Terdaftar
                                             </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-5 py-4 text-center">
-                                        @if ($u->is_registered)
-                                            <div class="flex items-center justify-center space-x-1.5">
-                                                <span class="label-xs font-bold text-primary mr-1 bg-primary-soft px-2 py-0.5 rounded-md border border-primary/10">{{ $u->registered_angles }}/3</span>
-                                                <div class="flex space-x-1">
-                                                    <span class="w-2.5 h-2.5 rounded-full transition-transform hover:scale-125 {{ $u->registered_angles >= 1 ? 'bg-success shadow-[0_0_6px_rgba(5,150,105,0.4)]' : 'bg-surface-muted border border-border' }}" title="Sudut Tengah (Front)"></span>
-                                                    <span class="w-2.5 h-2.5 rounded-full transition-transform hover:scale-125 {{ $u->registered_angles >= 2 ? 'bg-info shadow-[0_0_6px_rgba(2,132,199,0.4)]' : 'bg-surface-muted border border-border' }}" title="Profil Kiri"></span>
-                                                    <span class="w-2.5 h-2.5 rounded-full transition-transform hover:scale-125 {{ $u->registered_angles >= 3 ? 'bg-primary shadow-[0_0_6px_rgba(37,99,235,0.4)]' : 'bg-surface-muted border border-border' }}" title="Profil Kanan"></span>
-                                                </div>
-                                            </div>
-                                        @else
-                                            <span class="badge-rect-neutral text-[10px] uppercase font-bold tracking-wider">0 Sudut Terkunci</span>
                                         @endif
                                     </td>
 
@@ -315,20 +299,14 @@
                                 @endif
                             </div>
 
-                            <div class="mt-3 grid grid-cols-2 gap-3 text-xs bg-surface-muted/50 p-3 rounded-lg border border-border/50">
+                            <div class="mt-3 flex items-center justify-between bg-surface-muted/50 p-3 rounded-lg border border-border/50 text-xs">
                                 <div>
-                                    <div class="label-xs text-fg-subtle font-bold uppercase tracking-wider">Cabang & Mode</div>
+                                    <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider">Cabang Penempatan</div>
                                     <div class="label-sm font-bold text-fg truncate mt-0.5">{{ $u->branch->name ?? 'Belum Ditentukan' }}</div>
-                                    <span class="badge-rect-info mt-1 inline-block text-[9px] font-bold">{{ ucfirst($u->work_mode) }}</span>
                                 </div>
-                                <div>
-                                    <div class="label-xs text-fg-subtle font-bold uppercase tracking-wider">Sudut Telemetri</div>
-                                    <div class="label-sm font-bold text-primary mt-0.5">{{ $u->is_registered ? $u->registered_angles . '/3 Terkunci' : '0 Terkunci' }}</div>
-                                    <div class="flex space-x-1 mt-1.5">
-                                        <span class="w-2 h-2 rounded-full {{ $u->registered_angles >= 1 ? 'bg-success shadow-[0_0_4px_rgba(5,150,105,0.4)]' : 'bg-surface-muted border border-border' }}"></span>
-                                        <span class="w-2 h-2 rounded-full {{ $u->registered_angles >= 2 ? 'bg-info shadow-[0_0_4px_rgba(2,132,199,0.4)]' : 'bg-surface-muted border border-border' }}"></span>
-                                        <span class="w-2 h-2 rounded-full {{ $u->registered_angles >= 3 ? 'bg-primary shadow-[0_0_4px_rgba(37,99,235,0.4)]' : 'bg-surface-muted border border-border' }}"></span>
-                                    </div>
+                                <div class="text-right flex-shrink-0">
+                                    <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider mb-1">Mode Kerja</div>
+                                    <span class="badge-rect-info inline-block text-[9.5px] font-bold">{{ strtoupper($u->work_mode) }}</span>
                                 </div>
                             </div>
 
@@ -535,37 +513,18 @@
                         <span class="block label-xs mb-2.5 text-center font-bold uppercase tracking-wider text-fg-muted">Template Wajah</span>
 
                         @if ($selectedUser && $selectedUser->hasRegisteredFace())
-                            <div class="grid grid-cols-3 gap-2 w-full max-w-[220px]">
-                                @foreach (['front' => 'Depan', 'left' => 'Kiri', 'right' => 'Kanan'] as $angle => $label)
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative w-full aspect-square bg-surface border border-border rounded-xl overflow-hidden flex items-center justify-center shadow-sm group">
-                                            @if ($selectedUser->getFaceAngleUrl($angle))
-                                                <img src="{{ $selectedUser->getFaceAngleUrl($angle) }}"
-                                                    class="w-full h-full object-cover {{ $angle === 'front' ? '-scale-x-100' : '' }} transition-transform duration-300 group-hover:scale-110">
-                                                <div class="absolute inset-0 bg-success/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                                            @else
-                                                <svg class="w-5 h-5 text-fg-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                </svg>
-                                            @endif
-                                        </div>
-                                        <span class="label-xs text-fg-muted font-semibold mt-1.5 text-center">{{ $label }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <div class="mt-3 text-center">
-                                <span class="badge-success font-bold text-[10px] uppercase shadow-sm">
-                                    <svg class="w-3.5 h-3.5 mr-1 text-success inline-block" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>{{ $selectedUser->registered_angles }}/3 Sudut Aktif
-                                </span>
+                            <div class="relative w-full aspect-square max-w-[170px] rounded-2xl overflow-hidden border-4 border-emerald-500/25 shadow-lg shadow-emerald-500/10 group">
+                                <img src="{{ $selectedUser->getMasterFaceUrl() }}"
+                                    class="w-full h-full object-cover -scale-x-100 transition-transform duration-300 group-hover:scale-110">
+                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950/80 to-transparent p-2.5 pt-6 flex items-center justify-center">
+                                    <span class="badge-success text-[9.5px] font-bold shadow-sm backdrop-blur-md">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-success mr-1.5 animate-pulse"></span>
+                                        WAJAH TERVERIFIKASI
+                                    </span>
+                                </div>
                             </div>
                         @else
-                            <div class="relative w-full aspect-square max-w-[180px] bg-surface-muted border border-dashed border-border rounded-xl overflow-hidden flex flex-col items-center justify-center shadow-inner group">
+                            <div class="relative w-full aspect-square max-w-[170px] bg-surface-muted border border-dashed border-border rounded-2xl overflow-hidden flex flex-col items-center justify-center shadow-inner group">
                                 <div class="absolute inset-0 bg-gradient-to-tr from-warning/5 to-transparent"></div>
                                 <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-warning/40 rounded-tl-lg"></div>
                                 <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-warning/40 rounded-tr-lg"></div>
@@ -573,13 +532,13 @@
                                 <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-warning/40 rounded-br-lg"></div>
                                 
                                 <div class="text-center text-fg-subtle p-4 relative z-10">
-                                    <svg class="w-12 h-12 mx-auto text-warning/60 mb-2.5 animate-pulse" fill="none"
+                                    <svg class="w-10 h-10 mx-auto text-warning/60 mb-2.5 animate-pulse" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                     <span class="label-xs text-warning font-bold block uppercase tracking-wider">Unregistered</span>
-                                    <span class="text-[10px] text-fg-subtle mt-1 block">Biometrik Wajah Kosong</span>
+                                    <span class="text-[9.5px] text-fg-subtle mt-1 block">Belum Ada Wajah</span>
                                 </div>
                             </div>
                         @endif

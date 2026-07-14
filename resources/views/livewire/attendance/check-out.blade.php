@@ -213,13 +213,22 @@
     </div>
 
     {{-- Processing overlay --}}
-    <div x-show="$wire.isSubmitting" x-cloak class="modal-overlay flex flex-col items-center justify-center z-50">
-        <div class="relative mb-6 h-20 w-20">
-            <div class="absolute inset-0 rounded-full border-4 border-t-success border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-            <div class="absolute inset-5 rounded-full bg-success animate-pulse"></div>
+    <div x-show="$wire.isSubmitting" x-cloak class="modal-overlay flex flex-col items-center justify-center z-50 p-4">
+        <!-- Captured selfie preview -->
+        <template x-if="$wire.selfieData">
+            <div class="mb-5 relative w-44 h-44 rounded-full overflow-hidden border-4 border-emerald-500 shadow-lg shadow-emerald-500/25">
+                <img :src="$wire.selfieData" class="w-full h-full object-cover transform -scale-x-100">
+                <div class="absolute inset-0 bg-emerald-500/10 flex items-center justify-center pointer-events-none">
+                    <svg class="h-12 w-12 text-emerald-400 drop-shadow-[0_2px_8px_rgba(16,185,129,0.5)] animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+            </div>
+        </template>
+        
+        <div class="relative mb-4 h-12 w-12">
+            <div class="absolute inset-0 rounded-full border-4 border-t-emerald-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
         </div>
-        <h3 class="text-lg font-semibold text-white">Presensi berhasil terdeteksi!</h3>
-        <p class="text-sm text-slate-300 mt-1.5">Mengirim data kehadiran keluar Anda ke sistem…</p>
+        <h3 class="text-lg font-bold text-white">Presensi Berhasil Terverifikasi!</h3>
+        <p class="text-sm text-slate-300 mt-1.5 text-center max-w-xs">Mengirim data kehadiran keluar Anda ke sistem…</p>
     </div>
 
     <!-- Script Block for Alpine.js Component -->

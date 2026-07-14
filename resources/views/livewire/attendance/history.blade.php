@@ -7,8 +7,12 @@
 <div class="py-8 min-h-screen" x-data="{
     selectedLog: null,
     showModal: false,
+    zoomPhotoUrl: null,
     init() {
         this.$watch('showModal', value => {
+            document.body.style.overflow = value ? 'hidden' : '';
+        });
+        this.$watch('zoomPhotoUrl', value => {
             document.body.style.overflow = value ? 'hidden' : '';
         });
     },
@@ -71,18 +75,18 @@
                     {{ $isAdmin ? 'Telusuri, verifikasi, dan filter log kehadiran semua karyawan secara mendalam.' : 'Telusuri, verifikasi, dan filter log kehadiran historis Anda secara mendalam.' }}
                 </p>
             </div>
-            <div class="mt-4 sm:mt-0 flex flex-wrap gap-2.5">
+            <div class="mt-4 sm:mt-0 grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
                 @php
                     $start = $filterMonth ? \Carbon\Carbon::parse($filterMonth . '-01')->startOfMonth()->toDateString() : now()->startOfMonth()->toDateString();
                     $end = $filterMonth ? \Carbon\Carbon::parse($filterMonth . '-01')->endOfMonth()->toDateString() : now()->toDateString();
                 @endphp
-                <a href="{{ route('letters.attendance-certificate', ['start_date' => $start, 'end_date' => $end]) }}" target="_blank" class="btn-secondary btn-sm">
+                <a href="{{ route('letters.attendance-certificate', ['start_date' => $start, 'end_date' => $end]) }}" target="_blank" class="btn-secondary btn-sm justify-center text-center">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                    Cetak Suket Kehadiran
+                    Cetak Suket
                 </a>
-                <a href="{{ route('attendance.checkin') }}" class="btn-primary btn-sm">
+                <a href="{{ route('attendance.checkin') }}" class="btn-primary btn-sm justify-center text-center">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                    Absen Masuk Baru
+                    Absen Baru
                 </a>
             </div>
         </div>
@@ -98,6 +102,11 @@
                                {{ $viewMode === 'table' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
                         Versi Tabel
                     </button>
+                    <button type="button" wire:click="$set('viewMode','gallery')"
+                        class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all
+                               {{ $viewMode === 'gallery' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
+                        Versi Galeri Foto
+                    </button>
                     <button type="button" wire:click="$set('viewMode','matrix')"
                         class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all
                                {{ $viewMode === 'matrix' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
@@ -106,8 +115,8 @@
                 </div>
             </div>
 
-            @if($viewMode === 'table')
-                {{-- Table filters --}}
+            @if($viewMode === 'table' || $viewMode === 'gallery')
+                {{-- Table & Gallery filters --}}
                 <div class="grid grid-cols-1 gap-4 {{ $isAdmin ? 'sm:grid-cols-4' : 'sm:grid-cols-3' }}">
                     @if($isAdmin)
                         <div class="space-y-1.5">
@@ -485,6 +494,124 @@
                     <div class="flex items-center gap-1.5"><span class="text-rose-500 font-bold">H</span><span class="text-fg-muted">Hari Libur Nasional</span></div>
                     <div class="flex items-center gap-1.5"><span class="text-slate-400">–</span><span class="text-fg-muted">Tidak Hadir</span></div>
                 </div>
+        @endif
+
+        {{-- Gallery View --}}
+        @if($viewMode === 'gallery')
+        <div class="space-y-6">
+            @if($attendances->isEmpty())
+                <div class="card p-12 text-center max-w-sm mx-auto">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-muted text-fg-muted mb-4">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                    </div>
+                    <h4 class="heading-3">Tidak ada foto ditemukan</h4>
+                    <p class="mt-1 label-sm">Gunakan filter yang berbeda atau lakukan absensi self-verification terlebih dahulu.</p>
+                </div>
+            @else
+                @php
+                    $tzSetting = cache()->get('settings.timezone', 'Asia/Jakarta');
+                    $tzLabel   = 'WIB';
+                    if ($tzSetting === 'Asia/Makassar') $tzLabel = 'WITA';
+                    if ($tzSetting === 'Asia/Jayapura') $tzLabel = 'WIT';
+                @endphp
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    @foreach($attendances as $attendance)
+                        @php
+                            $selfieUrl = $attendance->selfie_path ? asset('storage/' . $attendance->selfie_path) : null;
+                        @endphp
+                        <div class="card overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+                            
+                            {{-- Photo Thumbnail --}}
+                            <div class="relative aspect-[4/3] w-full bg-slate-950 overflow-hidden border-b border-border">
+                                @if($selfieUrl)
+                                    <img src="{{ $selfieUrl }}" alt="Absen {{ $attendance->user->name ?? 'Karyawan' }}"
+                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
+                                         @click="zoomPhotoUrl = '{{ $selfieUrl }}'">
+                                @else
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-fg-muted bg-surface-muted">
+                                        <svg class="h-10 w-10 opacity-40 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                                        <span class="text-xs font-semibold uppercase tracking-wider">No Photo</span>
+                                    </div>
+                                @endif
+
+                                {{-- Badges overlay --}}
+                                <div class="absolute top-3 left-3 right-3 flex justify-between items-start pointer-events-none">
+                                    <span class="px-2 py-1 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider">
+                                        {{ $attendance->type === 'checkin' ? 'Masuk' : 'Keluar' }}
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider
+                                        {{ $attendance->status === 'approved' ? 'bg-emerald-500/80 text-white' : ($attendance->status === 'flagged' ? 'bg-rose-500/80 text-white' : 'bg-amber-500/80 text-white') }}">
+                                        {{ $attendance->status === 'approved' ? 'OK' : ($attendance->status === 'flagged' ? 'Suspicious' : 'Pending') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Card Body --}}
+                            <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                                <div>
+                                    @if($isAdmin)
+                                        <h4 class="font-bold text-fg text-sm truncate" title="{{ $attendance->user->name ?? 'Karyawan' }}">
+                                            {{ $attendance->user->name ?? 'Karyawan' }}
+                                        </h4>
+                                        <p class="text-[11px] font-mono text-fg-subtle">ID: #{{ $attendance->user->employee_id ?? 'N/A' }}</p>
+                                    @endif
+                                    
+                                    <div class="mt-2 space-y-1 text-xs text-fg-muted">
+                                        <div class="flex items-center gap-1.5">
+                                            <svg class="h-3.5 w-3.5 flex-shrink-0 text-fg-subtle" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <span class="font-medium text-fg">{{ $attendance->timestamp->translatedFormat('d M Y, H:i') }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 truncate">
+                                            <svg class="h-3.5 w-3.5 flex-shrink-0 text-fg-subtle" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            <span class="truncate" title="{{ $attendance->branch->name ?? 'Office' }}">{{ $attendance->branch->name ?? 'Office' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Action Button --}}
+                                <div class="pt-3 border-t border-border flex items-center justify-between">
+                                    <button type="button"
+                                        @click="selectedLog = {{ \Illuminate\Support\Js::from([
+                                            'id' => $attendance->id,
+                                            'type' => $attendance->type === 'checkin' ? 'Absen Masuk' : 'Absen Keluar',
+                                            'timestamp' => $attendance->timestamp->timezone($tzSetting)->translatedFormat('H:i:s, d F Y') . ' ' . $tzLabel,
+                                            'latitude' => $attendance->latitude,
+                                            'longitude' => $attendance->longitude,
+                                            'accuracy' => $attendance->accuracy,
+                                            'ip_address' => $attendance->ip_address,
+                                            'work_mode' => strtoupper($attendance->work_mode ?? 'office'),
+                                            'risk_score' => $attendance->risk_score ?? 0,
+                                            'risk_level' => $attendance->risk_level === 'high' ? 'Tinggi' : ($attendance->risk_level === 'medium' ? 'Sedang' : 'Rendah'),
+                                            'risk_class' => $attendance->risk_level,
+                                            'status' => $attendance->status === 'approved' ? 'Disetujui' : ($attendance->status === 'flagged' ? 'Dicurigai' : 'Diproses'),
+                                            'status_class' => $attendance->status,
+                                            'is_late' => $attendance->is_late,
+                                            'selfie_url' => $selfieUrl,
+                                            'notes' => $attendance->notes ?? 'Tidak ada catatan tambahan.',
+                                            'branch_name' => $attendance->branch->name ?? 'HQ Workspace',
+                                            'device_hash' => substr(md5($attendance->device_fingerprint_id ?? 'default_fingerprint'), 0, 16),
+                                            'employee_name' => $attendance->user->name ?? 'Karyawan',
+                                            'resolved_address' => $attendance->metadata['resolved_address'] ?? null
+                                        ]) }}; showModal = true; initDetailMap();"
+                                        class="text-xs font-bold text-primary hover:underline cursor-pointer">
+                                        Lihat Detail
+                                    </button>
+                                    
+                                    @if($selfieUrl)
+                                        <button type="button" @click="zoomPhotoUrl = '{{ $selfieUrl }}'" class="p-1 rounded hover:bg-surface-muted text-fg-subtle hover:text-fg cursor-pointer" title="Perbesar Foto">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" /></svg>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Pagination --}}
+                <div class="mt-6 pt-5 border-t border-border">
+                    {{ $attendances->links() }}
+                </div>
             @endif
         </div>
         @endif
@@ -492,6 +619,25 @@
     </div>
 
     <x-attendance.detail-modal :is-admin="$isAdmin" />
+
+    {{-- Fullscreen Photo Zoom Lightbox Modal --}}
+    <div x-show="zoomPhotoUrl" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4"
+        @keydown.escape.window="zoomPhotoUrl = null"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        
+        <!-- Close Button -->
+        <button @click="zoomPhotoUrl = null" class="absolute top-5 right-5 z-[160] flex items-center justify-center p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer active:scale-95">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
+        <!-- Main Photo Box -->
+        <div class="relative max-w-4xl w-full h-full max-h-[85vh] flex items-center justify-center" @click.away="zoomPhotoUrl = null">
+            <img :src="zoomPhotoUrl" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl border border-white/10"
+                x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="scale-95 opacity-0" x-transition:enter-end="scale-100 opacity-100"
+                x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="scale-100 opacity-100" x-transition:leave-end="scale-95 opacity-0">
+        </div>
+    </div>
 
     {{-- Toast notification --}}
     <div x-show="toast.show" x-cloak

@@ -103,7 +103,7 @@
         </main>
 
         @auth
-            <footer class="border-t border-border bg-surface px-4 sm:px-6 lg:px-8 py-5 mb-16 lg:mb-0">
+            <footer class="hidden lg:block border-t border-border bg-surface px-4 sm:px-6 lg:px-8 py-5 mb-16 lg:mb-0">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-fg-muted">
                     <span>© {{ date('Y') }} PresensiKu — Enterprise Presence System</span>
                     <span class="flex items-center gap-2">
@@ -115,32 +115,71 @@
     </div>
 
     @auth
-        {{-- Mobile Sticky Navigation Bar --}}
-        <div class="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface/95 backdrop-blur-lg border-t border-border shadow-lg flex justify-around items-center h-16 pb-safe">
-            <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('dashboard') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                </svg>
-                <span class="text-[10px] mt-1 font-medium">Dasbor</span>
-            </a>
-            <a href="{{ route('attendance.index') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('attendance.*') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-[10px] mt-1 font-medium">Absensi</span>
-            </a>
-            <a href="{{ route('permissions.index') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('permissions.*') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span class="text-[10px] mt-1 font-medium">Izin</span>
-            </a>
-            <a href="{{ route('profile') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('profile') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-                <span class="text-[10px] mt-1 font-medium">Profil</span>
-            </a>
+        @php
+            $todayLogs = \App\Models\AttendanceLog::where('user_id', auth()->id())
+                ->whereDate('timestamp', today())
+                ->get();
+            $hasCheckInToday = $todayLogs->where('type', 'checkin')->isNotEmpty();
+            $hasCheckOutToday = $todayLogs->where('type', 'checkout')->isNotEmpty();
+            
+            if ($hasCheckInToday && !$hasCheckOutToday) {
+                $targetRoute = route('attendance.checkout');
+                $buttonLabel = 'OUT';
+                $buttonColor = 'bg-gradient-to-tr from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/40';
+                $pulseColor = 'bg-rose-500';
+            } else {
+                $targetRoute = route('attendance.checkin');
+                $buttonLabel = 'IN';
+                $buttonColor = 'bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/40';
+                $pulseColor = 'bg-emerald-500';
+            }
+        @endphp
+
+        {{-- Redesigned Mobile Sticky Navigation Bar --}}
+        <div class="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface/90 backdrop-blur-xl border-t border-border/80 shadow-[0_-8px_30px_rgb(0,0,0,0.12)] flex justify-between items-center h-20 px-2 pb-safe">
+            <!-- Left Side Buttons -->
+            <div class="flex justify-around items-center w-2/5 h-full">
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center text-center transition-colors {{ request()->routeIs('dashboard') ? 'text-primary font-semibold' : 'text-fg-muted hover:text-fg' }}">
+                    <svg class="h-5.5 w-5.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                    <span class="text-[9px] mt-1 tracking-wide">Dasbor</span>
+                </a>
+                <a href="{{ route('attendance.index') }}" class="flex flex-col items-center justify-center text-center transition-colors {{ request()->routeIs('attendance.index') ? 'text-primary font-semibold' : 'text-fg-muted hover:text-fg' }}">
+                    <svg class="h-5.5 w-5.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    </svg>
+                    <span class="text-[9px] mt-1 tracking-wide">Riwayat</span>
+                </a>
+            </div>
+
+            <!-- Central Floating Action Button -->
+            <div class="relative -mt-6 flex justify-center items-center w-1/5 z-50">
+                <a href="{{ $targetRoute }}" class="flex flex-col items-center justify-center w-15 h-15 rounded-full {{ $buttonColor }} transition-transform duration-300 hover:scale-105 active:scale-95 border-4 border-surface shadow-2xl relative select-none">
+                    <span class="absolute inset-0 rounded-full animate-ping opacity-20 {{ $pulseColor }} -z-10"></span>
+                    <svg class="h-5.5 w-5.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                    </svg>
+                    <span class="text-[8px] font-extrabold uppercase tracking-widest text-white mt-0.5 leading-none">{{ $buttonLabel }}</span>
+                </a>
+            </div>
+
+            <!-- Right Side Buttons -->
+            <div class="flex justify-around items-center w-2/5 h-full">
+                <a href="{{ route('permissions.index') }}" class="flex flex-col items-center justify-center text-center transition-colors {{ request()->routeIs('permissions.*') ? 'text-primary font-semibold' : 'text-fg-muted hover:text-fg' }}">
+                    <svg class="h-5.5 w-5.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="text-[9px] mt-1 tracking-wide">Izin</span>
+                </a>
+                <a href="{{ route('profile') }}" class="flex flex-col items-center justify-center text-center transition-colors {{ request()->routeIs('profile') ? 'text-primary font-semibold' : 'text-fg-muted hover:text-fg' }}">
+                    <svg class="h-5.5 w-5.5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    <span class="text-[9px] mt-1 tracking-wide">Profil</span>
+                </a>
+            </div>
         </div>
     @endauth
 

@@ -144,9 +144,9 @@
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             Foto Verifikasi
                         </div>
-                        <div class="atd-foto-box">
+                        <div class="atd-foto-box cursor-zoom-in group relative overflow-hidden" @click="zoomPhotoUrl = selectedLog.selfie_url" title="Klik untuk memperbesar foto">
                             <template x-if="selectedLog && selectedLog.selfie_url">
-                                <img :src="selectedLog.selfie_url" alt="Selfie">
+                                <img :src="selectedLog.selfie_url" alt="Selfie" class="transition-transform duration-300 group-hover:scale-105">
                             </template>
                             <template x-if="selectedLog && !selectedLog.selfie_url">
                                 <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--fg-subtle);">
@@ -154,7 +154,7 @@
                                     <span style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">Tidak ada selfie</span>
                                 </div>
                             </template>
-                            <div style="position:absolute; bottom:8px; left:8px; right:8px; display:flex; justify-content:space-between; pointer-events:none;">
+                            <div style="position:absolute; bottom:8px; left:8px; right:8px; display:flex; justify-content:space-between; pointer-events:none; z-index: 10;">
                                 <span class="atd-media-badge" style="color:#34d399;">Liveness ✓</span>
                                 <span class="atd-media-badge" style="color:#60a5fa;" x-text="selectedLog ? selectedLog.work_mode : ''"></span>
                             </div>
