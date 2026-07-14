@@ -437,7 +437,7 @@
                             <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
                             Akan Datang
                         </h3>
-                        <a href="{{ route('leaves.index') }}" class="text-xs font-semibold text-primary hover:underline">Lihat semua</a>
+                        <a href="{{ route('permissions.index') }}" class="text-xs font-semibold text-primary hover:underline">Lihat semua</a>
                     </div>
                     @forelse ($upcoming as $ev)
                         <div class="flex items-center gap-3.5 p-3 rounded-xl hover:bg-surface-muted transition-all duration-150 {{ ! $loop->last ? 'border-b border-border/50' : '' }}">
