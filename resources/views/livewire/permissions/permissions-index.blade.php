@@ -4,14 +4,14 @@
         {{-- Header --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="heading-1">Pengajuan Tidak Masuk</h1>
-                <p class="mt-1 label-sm">Pengajuan ketidakhadiran kerja penuh hari dengan alur persetujuan ganda.</p>
+                <h1 class="heading-1">Pengajuan Izin &amp; Ketidakhadiran</h1>
+                <p class="mt-1 label-sm">Pengajuan ketidakhadiran kerja penuh atau dispensasi waktu (datang terlambat, pulang awal, setengah hari) dengan alur persetujuan ganda.</p>
             </div>
             <div>
                 @if($step === 'index')
                     <button wire:click="$set('step', 'create')" type="button" class="btn-primary btn-sm">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                        Ajukan Tidak Masuk
+                        Buat Pengajuan Baru
                     </button>
                 @else
                     <button wire:click="$set('step', 'index')" type="button" class="btn-secondary btn-sm">
@@ -43,28 +43,58 @@
             <div class="card p-6 sm:p-8 max-w-3xl mx-auto">
                 <h3 class="heading-3 mb-6 flex items-center gap-2">
                     <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Formulir Pengajuan Tidak Masuk
+                    Formulir Pengajuan Izin / Ketidakhadiran
                 </h3>
 
                 <form wire:submit.prevent="submitRequest" class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="space-y-1.5">
                             <label class="label">Kategori Izin</label>
-                            <input type="text" readonly value="Tidak Masuk" class="w-full bg-surface-muted border-border cursor-not-allowed text-fg-muted font-medium rounded-xl h-10 px-3 text-xs">
-                            <input type="hidden" wire:model="type" value="ijin_tidak_masuk">
-                            <p class="label-xs">Mencatat ketidakhadiran kerja penuh hari.</p>
+                            <select wire:model.live="type" required class="w-full cursor-pointer h-10 text-xs">
+                                <option value="ijin_tidak_masuk">Tidak Masuk (Penuh)</option>
+                                <option value="ijin_datang_terlambat">Izin Datang Terlambat</option>
+                                <option value="ijin_pulang_awal">Izin Pulang Awal</option>
+                                <option value="ijin_setengah_hari">Izin Setengah Hari (1/2 Hari)</option>
+                            </select>
+                            @error('type') <span class="text-xs text-danger">{{ $message }}</span> @enderror
+                            <p class="label-xs text-fg-subtle">
+                                @if($type === 'ijin_tidak_masuk')
+                                    Mencatat ketidakhadiran kerja penuh hari.
+                                @elseif($type === 'ijin_datang_terlambat')
+                                    Izin masuk terlambat kerja (maksimal durasi sesuai ketentuan).
+                                @elseif($type === 'ijin_pulang_awal')
+                                    Izin pulang sebelum jam kerja berakhir (maksimal durasi sesuai ketentuan).
+                                @elseif($type === 'ijin_setengah_hari')
+                                    Izin meninggalkan pekerjaan selama setengah hari.
+                                @endif
+                            </p>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="label">Tanggal Tidak Masuk</label>
+                            <label class="label">Tanggal Pengajuan</label>
                             <input wire:model="date" type="date" required class="cursor-pointer">
                             @error('date') <span class="text-xs text-danger">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
+                    @if($type !== 'ijin_tidak_masuk')
+                        <div class="grid grid-cols-2 gap-5">
+                            <div class="space-y-1.5">
+                                <label class="label">Waktu Mulai</label>
+                                <input wire:model="start_time" type="time" required class="cursor-pointer">
+                                @error('start_time') <span class="text-xs text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="label">Waktu Selesai</label>
+                                <input wire:model="end_time" type="time" required class="cursor-pointer">
+                                @error('end_time') <span class="text-xs text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="space-y-1.5">
-                        <label class="label">Alasan Tidak Masuk</label>
-                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan tidak masuk Anda di sini secara jelas…" class="resize-none"></textarea>
+                        <label class="label">Alasan Pengajuan</label>
+                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan Anda di sini secara jelas…" class="resize-none"></textarea>
                         @error('reason') <span class="text-xs text-danger">{{ $message }}</span> @enderror
                     </div>
 
@@ -90,7 +120,7 @@
 
                     <div class="flex justify-end gap-3 pt-4 border-t border-border">
                         <button wire:click="$set('step', 'index')" type="button" class="btn-secondary btn-sm">Batal</button>
-                        <button type="submit" class="btn-primary btn-sm">Kirim Pengajuan Tidak Masuk</button>
+                        <button type="submit" class="btn-primary btn-sm">Kirim Pengajuan</button>
                     </div>
                 </form>
             </div>
@@ -128,7 +158,7 @@
                 <h3 class="heading-3 mb-5">Alur Persetujuan Ganda</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     @foreach ([
-                        ['01', 'Karyawan Mengajukan', 'Mengisi pengajuan tidak masuk disertai alasan & berkas pendukung.'],
+                        ['01', 'Karyawan Mengajukan', 'Mengisi pengajuan izin atau ketidakhadiran disertai alasan & berkas pendukung.'],
                         ['02', 'Kepala Divisi (Kadiv)', 'Melakukan review kesesuaian operasional & beban kerja di divisi terkait.'],
                         ['03', 'HR Manager (HRD)', 'Persetujuan akhir & sinkronisasi data dispensasi kehadiran sistem.'],
                         ['04', 'Cetak Surat Resmi', 'Sistem menerbitkan surat izin resmi bertanda tangan digital ber-barkod pengaman.'],
@@ -168,8 +198,8 @@
                 <div class="card p-6 sm:p-8">
                     <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 pb-6 border-b border-border">
                         <div>
-                            <h3 class="heading-3">Tinjau Pengajuan Tidak Masuk</h3>
-                            <p class="label-sm mt-1">Daftar permohonan aktif yang memerlukan verifikasi Kepala Divisi dan HR Manager.</p>
+                            <h3 class="heading-3">Tinjau Pengajuan Izin &amp; Ketidakhadiran</h3>
+                            <p class="label-sm mt-1">Daftar permohonan izin/tidak masuk aktif yang memerlukan verifikasi Kepala Divisi dan HR Manager.</p>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">

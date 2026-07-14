@@ -493,7 +493,8 @@
                     <div class="flex items-center gap-1.5"><span class="text-rose-500 font-bold">M</span><span class="text-fg-muted">Hari Minggu</span></div>
                     <div class="flex items-center gap-1.5"><span class="text-rose-500 font-bold">H</span><span class="text-fg-muted">Hari Libur Nasional</span></div>
                     <div class="flex items-center gap-1.5"><span class="text-slate-400">–</span><span class="text-fg-muted">Tidak Hadir</span></div>
-                </div>
+            @endif
+        </div>
         @endif
 
         {{-- Gallery View --}}

@@ -98,7 +98,7 @@
         @endif
 
         {{-- Content --}}
-        <main class="flex-grow pb-16 lg:pb-0">
+        <main class="flex-grow pb-28 lg:pb-0">
             {{ $slot }}
         </main>
 

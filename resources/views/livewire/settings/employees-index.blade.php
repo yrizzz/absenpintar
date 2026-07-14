@@ -144,9 +144,9 @@
                 </div>
             </div>
 
-            <!-- Main Ledger Table -->
-            <div class="border border-border rounded-xl overflow-hidden bg-surface shadow-sm">
-                <div class="hidden md:block overflow-x-auto">
+            <!-- Main Ledger Table (Desktop) -->
+            <div class="hidden md:block border border-border rounded-xl overflow-hidden bg-surface shadow-sm">
+                <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="border-b border-border bg-surface-muted label-xs font-bold text-fg-muted">
@@ -268,88 +268,88 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <!-- Mobile View -->
-                <div class="md:hidden divide-y divide-border">
-                    @forelse($users as $u)
-                        <div class="p-4 bg-surface hover:bg-surface-hover/10 transition-colors">
-                            <div class="flex items-start gap-3">
-                                @if ($u->hasRegisteredFace())
-                                    <div class="relative w-11 h-11 rounded-xl border-2 border-success/30 overflow-hidden bg-surface-muted flex-shrink-0 shadow-sm">
-                                        <img src="{{ $u->getMasterFaceUrl() }}" class="w-full h-full object-cover">
-                                        <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-surface"></span>
-                                    </div>
-                                @else
-                                    <div class="relative w-11 h-11 rounded-xl bg-surface-muted border-2 border-warning/30 flex items-center justify-center font-bold text-warning flex-shrink-0 shadow-sm">
-                                        {{ strtoupper(substr($u->name, 0, 1)) }}
-                                        <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-warning ring-2 ring-surface"></span>
-                                    </div>
-                                @endif
-                                <div class="min-w-0 flex-1">
-                                    <span class="label-sm font-bold text-fg block truncate">{{ $u->name }}</span>
-                                    <span class="label-xs text-fg-subtle block mt-0.5 font-medium truncate">#{{ $u->employee_id }} · {{ strtolower($u->email) }}</span>
+            <!-- Mobile View (Separate Cards) -->
+            <div class="md:hidden space-y-4">
+                @forelse($users as $u)
+                    <div class="p-4 bg-surface hover:bg-surface-hover/10 transition-colors border border-border rounded-2xl shadow-sm">
+                        <div class="flex items-start gap-3">
+                            @if ($u->hasRegisteredFace())
+                                <div class="relative w-11 h-11 rounded-xl border-2 border-success/30 overflow-hidden bg-surface-muted flex-shrink-0 shadow-sm">
+                                    <img src="{{ $u->getMasterFaceUrl() }}" class="w-full h-full object-cover">
+                                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-surface"></span>
                                 </div>
-                                @if ($u->is_registered)
-                                    <span class="badge-success flex-shrink-0 shadow-sm">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-success mr-1 animate-pulse"></span>
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span class="badge-danger flex-shrink-0 shadow-sm">Belum</span>
-                                @endif
+                            @else
+                                <div class="relative w-11 h-11 rounded-xl bg-surface-muted border-2 border-warning/30 flex items-center justify-center font-bold text-warning flex-shrink-0 shadow-sm">
+                                    {{ strtoupper(substr($u->name, 0, 1)) }}
+                                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-warning ring-2 ring-surface"></span>
+                                </div>
+                            @endif
+                            <div class="min-w-0 flex-1">
+                                <span class="label-sm font-bold text-fg block truncate">{{ $u->name }}</span>
+                                <span class="label-xs text-fg-subtle block mt-0.5 font-medium truncate">#{{ $u->employee_id }} · {{ strtolower($u->email) }}</span>
                             </div>
+                            @if ($u->is_registered)
+                                <span class="badge-success flex-shrink-0 shadow-sm">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-success mr-1 animate-pulse"></span>
+                                    Aktif
+                                </span>
+                            @else
+                                <span class="badge-danger flex-shrink-0 shadow-sm">Belum</span>
+                            @endif
+                        </div>
 
-                            <div class="mt-3 flex items-center justify-between bg-surface-muted/50 p-3 rounded-lg border border-border/50 text-xs">
-                                <div>
-                                    <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider">Cabang Penempatan</div>
-                                    <div class="label-sm font-bold text-fg truncate mt-0.5">{{ $u->branch->name ?? 'Belum Ditentukan' }}</div>
-                                </div>
-                                <div class="text-right flex-shrink-0">
-                                    <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider mb-1">Mode Kerja</div>
-                                    <span class="badge-rect-info inline-block text-[9.5px] font-bold">{{ strtoupper($u->work_mode) }}</span>
-                                </div>
+                        <div class="mt-3 flex items-center justify-between bg-surface-muted/50 p-3 rounded-lg border border-border/50 text-xs">
+                            <div>
+                                <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider">Cabang Penempatan</div>
+                                <div class="label-sm font-bold text-fg truncate mt-0.5">{{ $u->branch->name ?? 'Belum Ditentukan' }}</div>
                             </div>
-
-                            <div class="mt-3 flex items-center justify-end gap-2 border-t border-border pt-3">
-                                <button wire:click="openUserEditModal({{ $u->id }})" class="btn-secondary btn-xs shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform">Kelola</button>
-                                @if ($u->is_registered)
-                                    <button wire:click="revokeBiometrics({{ $u->id }})"
-                                        wire:confirm="Apakah Anda yakin ingin menghapus dan membatalkan kunci biometrik untuk {{ $u->name }}?"
-                                        class="btn-danger-outline btn-xs hover:scale-[1.02] active:scale-[0.98] transition-transform">Hapus Wajah</button>
-                                @else
-                                    <div x-data="{ uploading: false }">
-                                        <label class="btn-primary-outline btn-xs relative cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform">
-                                            <span x-show="!uploading" class="flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                                </svg>+ Wajah
-                                            </span>
-                                            <span x-show="uploading" class="animate-pulse">...</span>
-                                            <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                                @change="
-                                                const file = $event.target.files[0];
-                                                if (file) {
-                                                    uploading = true;
-                                                    const reader = new FileReader();
-                                                    reader.onload = (e) => {
-                                                        @this.call('enrollUserFace', {{ $u->id }}, e.target.result)
-                                                            .then(() => { uploading = false; })
-                                                            .catch(() => { uploading = false; });
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            ">
-                                        </label>
-                                    </div>
-                                @endif
+                            <div class="text-right flex-shrink-0">
+                                <div class="label-xs text-fg-subtle font-semibold uppercase tracking-wider mb-1">Mode Kerja</div>
+                                <span class="badge-rect-info inline-block text-[9.5px] font-bold">{{ strtoupper($u->work_mode) }}</span>
                             </div>
                         </div>
-                    @empty
-                        <div class="px-5 py-12 text-center text-fg-subtle font-bold tracking-wider label-xs bg-surface">
-                            Tidak ada data karyawan yang cocok.
+
+                        <div class="mt-3 flex items-center justify-end gap-2 border-t border-border pt-3">
+                            <button wire:click="openUserEditModal({{ $u->id }})" class="btn-secondary btn-xs shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-transform">Kelola</button>
+                            @if ($u->is_registered)
+                                <button wire:click="revokeBiometrics({{ $u->id }})"
+                                    wire:confirm="Apakah Anda yakin ingin menghapus dan membatalkan kunci biometrik untuk {{ $u->name }}?"
+                                    class="btn-danger-outline btn-xs hover:scale-[1.02] active:scale-[0.98] transition-transform">Hapus Wajah</button>
+                            @else
+                                <div x-data="{ uploading: false }">
+                                    <label class="btn-primary-outline btn-xs relative cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform">
+                                        <span x-show="!uploading" class="flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>+ Wajah
+                                        </span>
+                                        <span x-show="uploading" class="animate-pulse">...</span>
+                                        <input type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            @change="
+                                            const file = $event.target.files[0];
+                                            if (file) {
+                                                uploading = true;
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => {
+                                                    @this.call('enrollUserFace', {{ $u->id }}, e.target.result)
+                                                        .then(() => { uploading = false; })
+                                                        .catch(() => { uploading = false; });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        ">
+                                    </label>
+                                </div>
+                            @endif
                         </div>
-                    @endforelse
-                </div>
+                    </div>
+                @empty
+                    <div class="px-5 py-12 text-center text-fg-subtle font-bold tracking-wider label-xs bg-surface border border-border rounded-2xl shadow-sm">
+                        Tidak ada data karyawan yang cocok.
+                    </div>
+                @endforelse
             </div>
 
             <div class="mt-5">{{ $users->links() }}</div>
