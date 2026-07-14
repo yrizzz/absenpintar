@@ -98,12 +98,12 @@
         @endif
 
         {{-- Content --}}
-        <main class="flex-grow">
+        <main class="flex-grow pb-16 lg:pb-0">
             {{ $slot }}
         </main>
 
         @auth
-            <footer class="border-t border-border bg-surface px-4 sm:px-6 lg:px-8 py-5">
+            <footer class="border-t border-border bg-surface px-4 sm:px-6 lg:px-8 py-5 mb-16 lg:mb-0">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-fg-muted">
                     <span>© {{ date('Y') }} PresensiKu — Enterprise Presence System</span>
                     <span class="flex items-center gap-2">
@@ -113,6 +113,36 @@
             </footer>
         @endauth
     </div>
+
+    @auth
+        {{-- Mobile Sticky Navigation Bar --}}
+        <div class="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface/95 backdrop-blur-lg border-t border-border shadow-lg flex justify-around items-center h-16 pb-safe">
+            <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('dashboard') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Dasbor</span>
+            </a>
+            <a href="{{ route('attendance.index') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('attendance.*') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Absensi</span>
+            </a>
+            <a href="{{ route('permissions.index') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('permissions.*') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Izin</span>
+            </a>
+            <a href="{{ route('profile') }}" class="flex flex-col items-center justify-center flex-1 h-full text-center transition-colors {{ request()->routeIs('profile') ? 'text-primary' : 'text-fg-muted hover:text-fg' }}">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                <span class="text-[10px] mt-1 font-medium">Profil</span>
+            </a>
+        </div>
+    @endauth
 
     @livewireScripts
 </body>

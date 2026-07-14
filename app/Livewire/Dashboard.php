@@ -17,6 +17,11 @@ class Dashboard extends Component
     public $stats = [];
     public $isAdmin = false;
 
+    // Logged-in user's attendance status for hero actions
+    public $hasCheckIn = false;
+    public $hasCheckOut = false;
+    public $hasTidakMasuk = false;
+
     // Analytics for the dashboard charts
     public $weekSeries = [];
     public $distribution = [];
@@ -34,6 +39,19 @@ class Dashboard extends Component
     public function loadData()
     {
         $user = Auth::user();
+
+        // Calculate logged-in user's attendance status for hero actions
+        $myTodayLogs = AttendanceLog::where('user_id', $user->id)
+            ->whereDate('timestamp', today())
+            ->get();
+        
+        $this->hasCheckIn = $myTodayLogs->where('type', 'checkin')->isNotEmpty();
+        $this->hasCheckOut = $myTodayLogs->where('type', 'checkout')->isNotEmpty();
+        $this->hasTidakMasuk = \App\Models\PermissionRequest::where('user_id', $user->id)
+            ->whereDate('date', today())
+            ->where('type', 'ijin_tidak_masuk')
+            ->where('status', 'approved')
+            ->exists();
         
         if ($this->isAdmin) {
             // HR / Admin: get today's attendance for ALL employees
@@ -254,30 +272,19 @@ class Dashboard extends Component
         }
         $this->spark = ['total' => $sTotal, 'on_time' => $sOn, 'late' => $sLate, 'suspicious' => $sus];
 
-        // Upcoming approved leaves + permissions.
+        // Upcoming approved permissions (Tidak Masuk only).
         $up = [];
-        $leaveLabels = ['annual' => 'Cuti Tahunan', 'sick' => 'Cuti Sakit', 'unpaid' => 'Cuti Tanpa Gaji', 'maternity' => 'Cuti Melahirkan', 'paternity' => 'Cuti Ayah', 'custom' => 'Cuti Khusus'];
-        $leaveQ = \App\Models\LeaveRequest::with('user')->where('status', 'hr_approved')->whereDate('end_date', '>=', today());
-        if (! $this->isAdmin) {
-            $leaveQ->where('user_id', $user->id);
-        }
-        foreach ($leaveQ->orderBy('start_date')->limit(6)->get() as $lv) {
-            $up[] = [
-                'tone' => 'success',
-                'title' => ($leaveLabels[$lv->leave_type] ?? 'Cuti').' – '.($lv->user->name ?? '—'),
-                'subtitle' => \Carbon\Carbon::parse($lv->start_date)->translatedFormat('j M').' – '.\Carbon\Carbon::parse($lv->end_date)->translatedFormat('j M Y'),
-                'sort' => \Carbon\Carbon::parse($lv->start_date)->toDateString(),
-            ];
-        }
-        $permLabels = ['ijin_datang_terlambat' => 'Izin Telat', 'ijin_pulang_awal' => 'Izin Pulang Awal', 'ijin_setengah_hari' => 'Izin 1/2 Hari', 'ijin_tidak_masuk' => 'Izin Tidak Masuk'];
-        $permQ = \App\Models\PermissionRequest::with('user')->where('status', 'approved')->whereDate('date', '>=', today());
+        $permQ = \App\Models\PermissionRequest::with('user')
+            ->where('type', 'ijin_tidak_masuk')
+            ->where('status', 'approved')
+            ->whereDate('date', '>=', today());
         if (! $this->isAdmin) {
             $permQ->where('user_id', $user->id);
         }
         foreach ($permQ->orderBy('date')->limit(6)->get() as $pm) {
             $up[] = [
                 'tone' => 'warning',
-                'title' => ($permLabels[$pm->type] ?? 'Izin').' – '.($pm->user->name ?? '—'),
+                'title' => 'Tidak Masuk – '.($pm->user->name ?? '—'),
                 'subtitle' => \Carbon\Carbon::parse($pm->date)->translatedFormat('l, j M Y'),
                 'sort' => \Carbon\Carbon::parse($pm->date)->toDateString(),
             ];

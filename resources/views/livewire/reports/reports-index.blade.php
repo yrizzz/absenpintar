@@ -174,7 +174,6 @@
                         <select wire:model.live="report_type" class="cursor-pointer">
                             <option value="presence_summary">Ringkasan Kehadiran Biometrik</option>
                             <option value="coordinates_log">Telemetri Pelanggaran Geofence</option>
-                            <option value="leaves_audit">Ledger Cuti Tahunan &amp; Lembur</option>
                             <option value="system_logs">Audit Sidik Jari Perangkat</option>
                         </select>
                     </div>

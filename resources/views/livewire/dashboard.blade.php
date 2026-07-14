@@ -173,12 +173,33 @@
                             <div class="mt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-200">Waktu {{ $heroTzLabel }}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('attendance.checkin') }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-blue-700 bg-white hover:bg-blue-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-900/35">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            Absen Sekarang
-                        </a>
-                        <a href="{{ route('attendance.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-white border border-white/20 hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    <div class="flex flex-wrap items-center gap-2">
+                        @if($hasTidakMasuk)
+                            <span class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 cursor-not-allowed">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                Izin Tidak Masuk Aktif
+                            </span>
+                        @elseif($hasCheckIn && $hasCheckOut)
+                            <span class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 cursor-not-allowed">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                Absensi Hari Ini Selesai
+                            </span>
+                        @elseif($hasCheckIn)
+                            <a href="{{ route('attendance.checkout') }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-rose-950/30">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                Absen Keluar
+                            </a>
+                        @else
+                            <a href="{{ route('attendance.checkin') }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-blue-700 bg-white hover:bg-blue-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-blue-900/35">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                Absen Masuk
+                            </a>
+                            <a href="{{ route('permissions.index', ['step' => 'create']) }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-white border border-white/20 hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                Izin Tidak Masuk
+                            </a>
+                        @endif
+                        <a href="{{ route('attendance.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-xs font-semibold text-white/80 border border-white/10 hover:bg-white/5 hover:scale-[1.02] active:scale-[0.98] transition-all">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             Riwayat
                         </a>

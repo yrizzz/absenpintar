@@ -4,14 +4,14 @@
         {{-- Header --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="heading-1">Sistem Izin Kerja</h1>
-                <p class="mt-1 label-sm">Pengajuan izin datang terlambat, pulang awal, setengah hari, dan tidak masuk dengan alur persetujuan ganda.</p>
+                <h1 class="heading-1">Pengajuan Tidak Masuk</h1>
+                <p class="mt-1 label-sm">Pengajuan ketidakhadiran kerja penuh hari dengan alur persetujuan ganda.</p>
             </div>
             <div>
                 @if($step === 'index')
                     <button wire:click="$set('step', 'create')" type="button" class="btn-primary btn-sm">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                        Ajukan Izin Baru
+                        Ajukan Tidak Masuk
                     </button>
                 @else
                     <button wire:click="$set('step', 'index')" type="button" class="btn-secondary btn-sm">
@@ -43,54 +43,28 @@
             <div class="card p-6 sm:p-8 max-w-3xl mx-auto">
                 <h3 class="heading-3 mb-6 flex items-center gap-2">
                     <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Formulir Pengajuan Izin Kerja
+                    Formulir Pengajuan Tidak Masuk
                 </h3>
 
                 <form wire:submit.prevent="submitRequest" class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="space-y-1.5">
                             <label class="label">Kategori Izin</label>
-                            <select wire:model.live="type" required class="cursor-pointer">
-                                <option value="ijin_datang_terlambat">Izin Datang Terlambat</option>
-                                <option value="ijin_pulang_awal">Izin Pulang Awal</option>
-                                <option value="ijin_tidak_masuk">Izin Tidak Masuk</option>
-                                <option value="ijin_setengah_hari">Izin Setengah Hari</option>
-                            </select>
-                            <p class="label-xs">Pilih kategori dispensasi izin kerja yang diajukan.</p>
-                            @if($type === 'ijin_datang_terlambat')
-                                <p class="text-xs font-medium text-warning">Batas toleransi datang terlambat maksimal {{ cache()->get('settings.permission_max_late_hours', 2.0) }} jam.</p>
-                            @elseif($type === 'ijin_pulang_awal')
-                                <p class="text-xs font-medium text-warning">Batas toleransi pulang awal maksimal {{ cache()->get('settings.permission_max_early_hours', 2.0) }} jam.</p>
-                            @elseif($type === 'ijin_setengah_hari')
-                                <p class="text-xs font-medium text-warning">Batas toleransi setengah hari maksimal {{ cache()->get('settings.permission_max_half_day_hours', 4.0) }} jam.</p>
-                            @endif
+                            <input type="text" readonly value="Tidak Masuk" class="w-full bg-surface-muted border-border cursor-not-allowed text-fg-muted font-medium rounded-xl h-10 px-3 text-xs">
+                            <input type="hidden" wire:model="type" value="ijin_tidak_masuk">
+                            <p class="label-xs">Mencatat ketidakhadiran kerja penuh hari.</p>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="label">Tanggal Izin</label>
+                            <label class="label">Tanggal Tidak Masuk</label>
                             <input wire:model="date" type="date" required class="cursor-pointer">
                             @error('date') <span class="text-xs text-danger">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
-                    @if($type !== 'ijin_tidak_masuk')
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div class="space-y-1.5">
-                                <label class="label">Jam Mulai Izin</label>
-                                <input wire:model="start_time" type="time" required>
-                                @error('start_time') <span class="text-xs text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="label">Jam Selesai Izin</label>
-                                <input wire:model="end_time" type="time" required>
-                                @error('end_time') <span class="text-xs text-danger">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                    @endif
-
                     <div class="space-y-1.5">
-                        <label class="label">Alasan Izin</label>
-                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan izin Anda di sini secara jelas…" class="resize-none"></textarea>
+                        <label class="label">Alasan Tidak Masuk</label>
+                        <textarea wire:model="reason" rows="4" required placeholder="Tuliskan detail alasan pengajuan tidak masuk Anda di sini secara jelas…" class="resize-none"></textarea>
                         @error('reason') <span class="text-xs text-danger">{{ $message }}</span> @enderror
                     </div>
 
@@ -116,7 +90,7 @@
 
                     <div class="flex justify-end gap-3 pt-4 border-t border-border">
                         <button wire:click="$set('step', 'index')" type="button" class="btn-secondary btn-sm">Batal</button>
-                        <button type="submit" class="btn-primary btn-sm">Kirim Pengajuan Izin</button>
+                        <button type="submit" class="btn-primary btn-sm">Kirim Pengajuan Tidak Masuk</button>
                     </div>
                 </form>
             </div>
@@ -154,7 +128,7 @@
                 <h3 class="heading-3 mb-5">Alur Persetujuan Ganda</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     @foreach ([
-                        ['01', 'Karyawan Mengajukan', 'Mengisi tipe izin (telat, pulang awal, setengah hari, tidak masuk) disertai alasan & berkas.'],
+                        ['01', 'Karyawan Mengajukan', 'Mengisi pengajuan tidak masuk disertai alasan & berkas pendukung.'],
                         ['02', 'Kepala Divisi (Kadiv)', 'Melakukan review kesesuaian operasional & beban kerja di divisi terkait.'],
                         ['03', 'HR Manager (HRD)', 'Persetujuan akhir & sinkronisasi data dispensasi kehadiran sistem.'],
                         ['04', 'Cetak Surat Resmi', 'Sistem menerbitkan surat izin resmi bertanda tangan digital ber-barkod pengaman.'],
@@ -194,7 +168,7 @@
                 <div class="card p-6 sm:p-8">
                     <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 pb-6 border-b border-border">
                         <div>
-                            <h3 class="heading-3">Tinjau Pengajuan Izin Karyawan</h3>
+                            <h3 class="heading-3">Tinjau Pengajuan Tidak Masuk</h3>
                             <p class="label-sm mt-1">Daftar permohonan aktif yang memerlukan verifikasi Kepala Divisi dan HR Manager.</p>
                         </div>
 
@@ -203,13 +177,6 @@
                                 <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fg-subtle" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                 <input wire:model.live.debounce.350ms="reviewSearch" type="text" placeholder="Cari nama / ID karyawan…" class="pl-10">
                             </div>
-                            <select wire:model.live="reviewTypeFilter" class="w-auto cursor-pointer">
-                                <option value="all">Semua Tipe</option>
-                                <option value="ijin_datang_terlambat">Terlambat</option>
-                                <option value="ijin_pulang_awal">Pulang Awal</option>
-                                <option value="ijin_setengah_hari">Setengah Hari</option>
-                                <option value="ijin_tidak_masuk">Tidak Masuk</option>
-                            </select>
                             <select wire:model.live="reviewStatusFilter" class="w-auto cursor-pointer">
                                 <option value="pending">Pending Review</option>
                                 <option value="approved">Disetujui</option>
@@ -237,8 +204,8 @@
                                 <thead>
                                     <tr class="border-b border-border label-xs uppercase tracking-wide">
                                         <th class="px-5 py-3.5 w-[240px]">Karyawan</th>
-                                        <th class="px-5 py-3.5 w-[140px]">Tipe Izin</th>
-                                        <th class="px-5 py-3.5 w-[160px]">Tanggal & Waktu</th>
+                                        <th class="px-5 py-3.5 w-[140px]">Kategori</th>
+                                        <th class="px-5 py-3.5 w-[160px]">Tanggal</th>
                                         <th class="px-5 py-3.5">Alasan & Lampiran</th>
                                         <th class="px-5 py-3.5 text-center w-[150px]">Persetujuan Ganda</th>
                                         <th class="px-5 py-3.5 text-right w-[200px]">Aksi Review</th>

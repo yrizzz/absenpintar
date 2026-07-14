@@ -3,42 +3,48 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Surat Izin Kerja - {{ $permission->user->name ?? 'Karyawan' }}</title>
+    <title>Surat Keterangan Tidak Masuk - {{ $permission->user->name ?? 'Karyawan' }}</title>
     <style>
-        @page { size: A4; margin: 30mm 25mm 25mm 25mm; }
+        @page { size: A4; margin: 25mm 20mm 20mm 20mm; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            color: #1a1a1a;
+            color: #111;
             margin: 0;
             padding: 0;
-            font-size: 12pt;
-            line-height: 1.8;
+            font-size: 11pt;
+            line-height: 1.6;
         }
-        .kop-surat {
+        .kop-surat-table {
+            width: 100%;
+            border-bottom: 3px double #111;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .kop-logo-cell {
+            width: 70px;
+            vertical-align: middle;
+        }
+        .kop-text-cell {
             text-align: center;
-            border-bottom: 3px solid #1a1a1a;
-            padding-bottom: 12px;
-            margin-bottom: 8px;
+            vertical-align: middle;
         }
         .kop-surat h1 {
             margin: 0;
             font-size: 18pt;
             font-weight: bold;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            color: #111;
         }
         .kop-surat p {
-            margin: 2px 0;
+            margin: 3px 0;
             font-size: 9pt;
             color: #444;
-        }
-        .kop-line-2 {
-            border-bottom: 1px solid #1a1a1a;
-            margin-bottom: 24px;
+            font-family: Arial, sans-serif;
         }
         .nomor-surat {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
         }
         .nomor-surat h3 {
             margin: 0;
@@ -48,49 +54,55 @@
             text-transform: uppercase;
         }
         .nomor-surat p {
-            margin: 4px 0 0;
+            margin: 5px 0 0;
             font-size: 10pt;
-            color: #555;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
         }
         .isi p {
             text-align: justify;
-            margin: 6px 0;
+            margin: 10px 0;
+            text-indent: 30px;
         }
         .data-table {
-            width: 100%;
-            margin: 12px 0 16px 20px;
+            width: 90%;
+            margin: 15px auto 20px auto;
+            border-collapse: collapse;
         }
         .data-table td {
-            padding: 3px 8px;
+            padding: 4px 8px;
             vertical-align: top;
-            font-size: 12pt;
+            font-size: 11pt;
         }
         .data-table td:first-child {
-            width: 180px;
+            width: 170px;
+            color: #333;
         }
         .data-table td:nth-child(2) {
             width: 15px;
             text-align: center;
         }
-        .ttd-container {
-            display: flex;
-            justify-content: space-between;
+        .ttd-table {
+            width: 100%;
             margin-top: 50px;
-            page-break-inside: avoid;
+            border: none;
         }
-        .ttd-box {
-            width: 45%;
+        .ttd-table td {
+            width: 50%;
             text-align: center;
+            vertical-align: top;
+            border: none;
+            padding: 0;
         }
         .ttd-box .label {
             font-size: 10pt;
-            color: #555;
-            margin-bottom: 4px;
+            color: #333;
+            margin-bottom: 5px;
         }
         .ttd-box .garis {
-            border-bottom: 1px solid #333;
-            width: 200px;
-            margin: 70px auto 6px;
+            border-bottom: 1.5px solid #111;
+            width: 180px;
+            margin: 60px auto 5px;
         }
         .ttd-box .nama {
             font-weight: bold;
@@ -102,31 +114,45 @@
         }
         .status-badge {
             display: inline-block;
-            padding: 3px 12px;
+            padding: 2px 10px;
             border-radius: 4px;
-            font-size: 10pt;
+            font-size: 9pt;
             font-weight: bold;
             text-transform: uppercase;
+            font-family: Arial, sans-serif;
         }
-        .badge-approved { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .badge-pending { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
-        .badge-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-approved { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-pending { background: #fef9c3; color: #a16207; border: 1px solid #fde68a; }
+        .badge-rejected { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
         .catatan {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            padding: 12px 16px;
-            margin: 16px 0;
+            padding: 10px 15px;
+            margin: 20px 0;
             font-size: 10pt;
-            color: #475569;
+            color: #334155;
+            font-family: Arial, sans-serif;
         }
-        .footer-doc {
-            margin-top: 40px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 12px;
+        .footer-doc-table {
+            width: 100%;
+            margin-top: 60px;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 15px;
+        }
+        .footer-doc-table td {
+            vertical-align: middle;
+            border: none;
+        }
+        .footer-doc-text {
             font-size: 8pt;
-            color: #94a3b8;
-            text-align: center;
+            color: #64748b;
+            line-height: 1.4;
+            font-family: Arial, sans-serif;
+        }
+        .footer-doc-qr {
+            width: 75px;
+            text-align: right;
         }
         @media print {
             body { margin: 0; }
@@ -142,14 +168,13 @@
         $phone = cache()->get('settings.company_phone', '(021) 1234-5678');
         $email = cache()->get('settings.company_email', 'hrd@presensiku.com');
         $tz = cache()->get('settings.timezone', 'Asia/Jakarta');
+        $tzLabel = match($tz) { 'Asia/Makassar' => 'WITA', 'Asia/Jayapura' => 'WIT', default => 'WIB' };
 
         $permTypes = [
-            'late_arrival' => 'Izin Terlambat Masuk',
-            'early_leave' => 'Izin Pulang Lebih Awal',
-            'official_duty' => 'Tugas Dinas / Perjalanan Resmi',
-            'personal' => 'Keperluan Pribadi',
-            'medical' => 'Keperluan Medis / Berobat',
-            'other' => 'Lainnya',
+            'ijin_datang_terlambat' => 'Izin Datang Terlambat',
+            'ijin_pulang_awal' => 'Izin Pulang Awal',
+            'ijin_setengah_hari' => 'Izin Setengah Hari',
+            'ijin_tidak_masuk' => 'Izin Tidak Masuk',
         ];
         $typeLabel = $permTypes[$permission->type] ?? ucfirst(str_replace('_', ' ', $permission->type));
 
@@ -161,26 +186,36 @@
         $statusLabel = $statusLabels[$permission->status] ?? ucfirst($permission->status);
         $statusClass = $permission->status === 'approved' ? 'badge-approved' : ($permission->status === 'rejected' ? 'badge-rejected' : 'badge-pending');
 
-        $nomorSurat = 'IK/' . str_pad($permission->id, 4, '0', STR_PAD_LEFT) . '/HRD/' . \Carbon\Carbon::now()->format('m/Y');
+        $nomorSurat = 'TM/' . str_pad($permission->id, 4, '0', STR_PAD_LEFT) . '/HRD/' . \Carbon\Carbon::now()->format('m/Y');
     @endphp
 
     <!-- Kop Surat -->
-    <div class="kop-surat">
-        <h1>{{ $company }}</h1>
-        <p>{{ $address }}</p>
-        <p>Telp: {{ $phone }} | Email: {{ $email }}</p>
-    </div>
-    <div class="kop-line-2"></div>
+    <table class="kop-surat-table">
+        <tr>
+            <td class="kop-logo-cell">
+                <svg width="55" height="55" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </td>
+            <td class="kop-text-cell">
+                <div class="kop-surat">
+                    <h1>{{ $company }}</h1>
+                    <p>{{ $address }}</p>
+                    <p>Telp: {{ $phone }} | Email: {{ $email }}</p>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <!-- Nomor Surat -->
     <div class="nomor-surat">
-        <h3>Surat Izin Kerja / Dispensasi</h3>
+        <h3>Surat Keterangan Tidak Masuk Kerja</h3>
         <p>Nomor: {{ $nomorSurat }}</p>
     </div>
 
     <!-- Isi Surat -->
     <div class="isi">
-        <p>Yang bertanda tangan di bawah ini, Pimpinan / HRD {{ $company }}, menerangkan bahwa:</p>
+        <p>Yang bertanda tangan di bawah ini, Pimpinan / HRD {{ $company }}, dengan ini menerangkan bahwa karyawan yang tercantum di bawah ini:</p>
 
         <table class="data-table">
             <tr>
@@ -205,7 +240,7 @@
             </tr>
         </table>
 
-        <p>Telah diberikan izin kerja dengan keterangan sebagai berikut:</p>
+        <p>Telah mengajukan izin dan mendapatkan dispensasi untuk tidak masuk kerja pada:</p>
 
         <table class="data-table">
             <tr>
@@ -214,10 +249,11 @@
                 <td><strong>{{ $typeLabel }}</strong></td>
             </tr>
             <tr>
-                <td>Tanggal</td>
+                <td>Hari, Tanggal</td>
                 <td>:</td>
                 <td>{{ \Carbon\Carbon::parse($permission->date)->translatedFormat('l, d F Y') }}</td>
             </tr>
+            @if($permission->type !== 'ijin_tidak_masuk' && ($permission->start_time || $permission->end_time))
             <tr>
                 <td>Waktu Mulai</td>
                 <td>:</td>
@@ -228,19 +264,20 @@
                 <td>:</td>
                 <td>{{ $permission->end_time ?? '-' }}</td>
             </tr>
+            @endif
             <tr>
                 <td>Alasan / Keperluan</td>
                 <td>:</td>
                 <td>{{ $permission->reason }}</td>
             </tr>
             <tr>
-                <td>Status Persetujuan</td>
+                <td>Status Pengajuan</td>
                 <td>:</td>
                 <td><span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span></td>
             </tr>
         </table>
 
-        <p>Demikian surat izin kerja ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
+        <p>Demikian surat keterangan dispensasi izin tidak masuk ini diberikan agar dapat dipergunakan dan dimaklumi oleh pihak-pihak terkait sebagaimana mestinya.</p>
 
         @if($permission->approval_notes)
         <div class="catatan">
@@ -250,30 +287,58 @@
         @endif
     </div>
 
-    <!-- Tanda Tangan -->
-    <div class="ttd-container">
-        <div class="ttd-box">
-            <p class="label">Pemohon,</p>
-            <div class="garis"></div>
-            <p class="nama">{{ $permission->user->name ?? 'N/A' }}</p>
-            <p class="jabatan">ID: {{ $permission->user->employee_id ?? 'N/A' }}</p>
-        </div>
-        <div class="ttd-box">
-            <p class="label">Mengetahui & Menyetujui,</p>
-            <div class="garis"></div>
-            <p class="nama">{{ $permission->hr->name ?? $permission->deptHead->name ?? '___________________' }}</p>
-            <p class="jabatan">HRD / Kepala Departemen</p>
-        </div>
-    </div>
+    <!-- Tanda Tangan Table (Reliable Layout) -->
+    <table class="ttd-table">
+        <tr>
+            <td>
+                <div class="ttd-box">
+                    <p class="label">Pemohon,</p>
+                    <div class="garis"></div>
+                    <p class="nama">{{ $permission->user->name ?? 'N/A' }}</p>
+                    <p class="jabatan">ID Karyawan: {{ $permission->user->employee_id ?? 'N/A' }}</p>
+                </div>
+            </td>
+            <td>
+                <div class="ttd-box">
+                    <p class="label">Mengetahui & Menyetujui,</p>
+                    <div class="garis"></div>
+                    <p class="nama">{{ $permission->hr->name ?? $permission->deptHead->name ?? '___________________' }}</p>
+                    <p class="jabatan">HRD / Kepala Departemen</p>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <p style="text-align: right; font-size: 10pt; color: #555; margin-top: 24px;">
-        {{ cache()->get('settings.company_address', 'Jakarta') }}, {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y') }}
-    </p>
-
-    <div class="footer-doc">
-        <p>Dokumen ini dicetak secara elektronik oleh sistem PresensiKu pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} WIB.</p>
-        <p>Surat ini sah tanpa tanda tangan basah apabila status persetujuan berstatus "Disetujui" pada sistem.</p>
-    </div>
+    <!-- Footer Document with Verification QR -->
+    <table class="footer-doc-table">
+        <tr>
+            <td class="footer-doc-text">
+                Dokumen ini diterbitkan secara elektronik oleh sistem PresensiKu pada {{ \Carbon\Carbon::now()->timezone($tz)->translatedFormat('d F Y, H:i:s') }} {{ $tzLabel }}.<br>
+                Surat dispensasi ini sah secara hukum tanpa tanda tangan basah apabila status persetujuan terverifikasi "Disetujui" di database.
+            </td>
+            <td class="footer-doc-qr">
+                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#222" stroke-width="2">
+                    <rect x="5" y="5" width="90" height="90" rx="6" stroke-width="3" />
+                    <rect x="15" y="15" width="20" height="20" stroke-width="4" />
+                    <rect x="20" y="20" width="10" height="10" fill="#222" />
+                    <rect x="65" y="15" width="20" height="20" stroke-width="4" />
+                    <rect x="70" y="20" width="10" height="10" fill="#222" />
+                    <rect x="15" y="65" width="20" height="20" stroke-width="4" />
+                    <rect x="20" y="70" width="10" height="10" fill="#222" />
+                    <rect x="45" y="20" width="8" height="8" fill="#222" />
+                    <rect x="45" y="35" width="8" height="8" fill="#222" />
+                    <rect x="65" y="45" width="8" height="8" fill="#222" />
+                    <rect x="75" y="55" width="8" height="8" fill="#222" />
+                    <rect x="35" y="55" width="8" height="8" fill="#222" />
+                    <rect x="55" y="65" width="8" height="8" fill="#222" />
+                    <rect x="45" y="75" width="8" height="8" fill="#222" />
+                    <rect x="65" y="75" width="8" height="8" fill="#222" />
+                    <rect x="75" y="75" width="8" height="8" fill="#222" />
+                </svg>
+                <div style="font-size: 6pt; color: #555; text-align: center; font-family: sans-serif; margin-top: 3px; font-weight: bold; letter-spacing: 0.5px;">SYSTEM VALIDATED</div>
+            </td>
+        </tr>
+    </table>
 
     <script>window.onload = function() { window.print(); }</script>
 </body>

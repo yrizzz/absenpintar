@@ -45,9 +45,8 @@
 
         <div class="space-y-1">
             <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">Pengajuan</p>
-            {!! $navLink('leaves.index', 'leaves.*', 'Manajemen Cuti', $icoLeave) !!}
             @if($user->hasAnyRole(['super_admin', 'hr_admin', 'manager', 'employee']))
-                {!! $navLink('permissions.index', 'permissions.*', 'Izin Kerja', $icoPerm) !!}
+                {!! $navLink('permissions.index', 'permissions.*', 'Izin Tidak Masuk', $icoPerm) !!}
             @endif
         </div>
 

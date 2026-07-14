@@ -20,7 +20,7 @@ class PermissionsIndex extends Component
     public $activeTab = 'my'; // 'my' or 'review'
     
     // Form fields
-    public $type = 'ijin_datang_terlambat';
+    public $type = 'ijin_tidak_masuk';
     public $date;
     public $start_time;
     public $end_time;

@@ -25,10 +25,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/demo', BiometricDemo::class)->name('demo');
     });
     
-    // Leaves routes
-    Route::prefix('leaves')->name('leaves.')->group(function () {
-        Route::get('/', \App\Livewire\Leaves\LeavesIndex::class)->name('index');
-    });
+    // Leaves routes (Disabled in autoin / simplified attendance)
+    // Route::prefix('leaves')->name('leaves.')->group(function () {
+    //     Route::get('/', \App\Livewire\Leaves\LeavesIndex::class)->name('index');
+    // });
     
     // Permissions routes (employee, manager, hr_admin, super_admin)
     Route::middleware(['role:super_admin|hr_admin|manager|employee'])->prefix('permissions')->name('permissions.')->group(function () {
