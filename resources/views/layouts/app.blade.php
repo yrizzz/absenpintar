@@ -33,16 +33,20 @@
 <body class="min-h-screen text-fg antialiased font-sans"
     x-data="{
         sidebarOpen: false,
-        /* desktop modes: 'expanded' | 'collapsed' | 'horizontal' */
+        /* desktop modes: 'expanded' | 'collapsed' | 'full' | 'horizontal' */
         desktopNav: localStorage.getItem('desktopNav') || 'expanded',
         setNav(mode) {
             this.desktopNav = mode;
             localStorage.setItem('desktopNav', mode);
+        },
+        toggleSidebar() {
+            const cycle = { expanded: 'collapsed', collapsed: 'full', full: 'expanded' };
+            this.setNav(cycle[this.desktopNav] || 'expanded');
         }
     }">
 
     @auth
-        {{-- Desktop sidebar — shown in expanded or collapsed mode --}}
+        {{-- Desktop sidebar — shown in expanded or collapsed mode only --}}
         <aside
             x-show="desktopNav === 'expanded' || desktopNav === 'collapsed'"
             x-cloak
@@ -85,37 +89,53 @@
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
 
-                    {{-- Mobile brand --}}
-                    <a href="{{ route('dashboard') }}" class="lg:hidden flex items-center gap-2">
+                    {{-- Desktop: 1 sidebar toggle button --}}
+                    <button type="button" @click="desktopNav === 'horizontal' ? setNav('expanded') : toggleSidebar()"
+                        class="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-fg-muted hover:bg-surface-muted hover:text-fg transition-colors"
+                        :title="desktopNav === 'expanded' ? 'Collapse Sidebar' : desktopNav === 'collapsed' ? 'Sembunyikan Sidebar' : 'Tampilkan Sidebar'">
+                        {{-- Icon: expanded=collapse arrows, collapsed=hide icon, full/horizontal=show sidebar --}}
+                        <template x-if="desktopNav === 'expanded'">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+                        </template>
+                        <template x-if="desktopNav === 'collapsed'">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+                        </template>
+                        <template x-if="desktopNav === 'full' || desktopNav === 'horizontal'">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8M4 18h16" /></svg>
+                        </template>
+                    </button>
+
+                    {{-- Brand logo — always on desktop when horizontal/full, mobile always --}}
+                    <a href="{{ route('dashboard') }}"
+                       class="flex items-center gap-2 lg:hidden"
+                       :class="{ 'lg:flex': desktopNav === 'horizontal' || desktopNav === 'full' }">
                         <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
-                            <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         </span>
                         <span class="text-base font-semibold tracking-tight text-fg">Presensi<span class="text-primary">Ku</span></span>
                     </a>
 
-                    {{-- Desktop sidebar toggle --}}
-                    <div class="hidden lg:flex items-center gap-1">
-                        {{-- Expand --}}
-                        <button type="button" @click="setNav('expanded')"
-                            :class="desktopNav === 'expanded' ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-muted hover:text-fg'"
-                            class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors" title="Sidebar Lebar">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h8M4 18h16" /></svg>
-                        </button>
-                        {{-- Collapse (icon-only) --}}
-                        <button type="button" @click="setNav('collapsed')"
-                            :class="desktopNav === 'collapsed' ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-muted hover:text-fg'"
-                            class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors" title="Sidebar Kecil">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
-                        </button>
-                        {{-- Horizontal --}}
+                    <div class="flex-1"></div>
+
+                    {{-- Right side: horizontal nav mode + full display buttons (desktop only) --}}
+                    <div class="hidden lg:flex items-center gap-1 mr-2">
+                        {{-- Horizontal mode --}}
                         <button type="button" @click="setNav('horizontal')"
-                            :class="desktopNav === 'horizontal' ? 'bg-primary/10 text-primary' : 'text-fg-muted hover:bg-surface-muted hover:text-fg'"
-                            class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors" title="Navigasi Horizontal">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            :class="desktopNav === 'horizontal' ? 'bg-primary/10 text-primary border-primary/30' : 'text-fg-muted hover:bg-surface-muted hover:text-fg border-border'"
+                            class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-xs font-semibold transition-colors"
+                            title="Mode Horizontal">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            <span>Horizontal</span>
+                        </button>
+                        {{-- Full display mode --}}
+                        <button type="button" @click="setNav('full')"
+                            :class="desktopNav === 'full' ? 'bg-primary/10 text-primary border-primary/30' : 'text-fg-muted hover:bg-surface-muted hover:text-fg border-border'"
+                            class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-xs font-semibold transition-colors"
+                            title="Tampilan Penuh">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                            <span>Penuh</span>
                         </button>
                     </div>
-
-                    <div class="flex-1"></div>
 
                     @livewire('notification-bell')
                     @include('layouts.partials.theme-toggle')
@@ -123,7 +143,7 @@
 
                 {{-- Horizontal nav bar (desktop only, shown when mode = horizontal) --}}
                 <div x-show="desktopNav === 'horizontal'" x-cloak
-                    class="hidden lg:flex items-center gap-1 px-6 pb-2 overflow-x-auto">
+                    class="hidden lg:flex items-center gap-1 px-6 pb-2.5 overflow-x-auto border-t border-border/60">
                     @php
                         $hLinks = [
                             ['dashboard',          'dashboard',        'Dasbor'],
