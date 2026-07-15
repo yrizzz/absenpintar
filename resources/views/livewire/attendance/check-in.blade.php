@@ -4,7 +4,7 @@
     <style>
         @keyframes scan {
             0%, 100% { transform: translateY(0); opacity: 0.8; }
-            50% { transform: translateY(220px); opacity: 1; }
+            50% { transform: translateY(280px); opacity: 1; }
         }
         .animate-scan {
             animation: scan 3s infinite ease-in-out;
@@ -124,7 +124,7 @@
                     <div class="p-6 bg-surface flex flex-col items-center">
                         
                         {{-- Circular Camera Container --}}
-                        <div class="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full border-4 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-950">
+                        <div class="relative w-48 sm:w-56 rounded-2xl border-4 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-950" style="aspect-ratio: 3/4;">
                             
                             {{-- Scanning Neon Line --}}
                             <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-x-0 h-1 z-20 bg-gradient-to-r from-transparent via-primary to-transparent animate-scan shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
@@ -272,8 +272,8 @@
                     this.errorMessage = '';
                     const constraints = {
                         video: {
-                            width: { ideal: 640 },
-                            height: { ideal: 480 },
+                            width: { ideal: 480 },
+                            height: { ideal: 640 },
                             facingMode: 'user'
                         },
                         audio: false
@@ -339,9 +339,9 @@
                 try {
                     const video = this.$refs.video;
                     const canvas = document.createElement('canvas');
-                    // Higher resolution capture for OpenCV face recognition accuracy
-                    canvas.width = 640;
-                    canvas.height = 480;
+                    // Portrait resolution capture for OpenCV face recognition accuracy
+                    canvas.width = 480;
+                    canvas.height = 640;
                     const ctx = canvas.getContext('2d');
 
                     // Flip image horizontally on canvas to match user preview mirror
