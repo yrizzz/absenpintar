@@ -117,23 +117,21 @@
 
                     <div class="flex-1"></div>
 
-                    {{-- Right side: horizontal nav mode + full display buttons (desktop only) --}}
-                    <div class="hidden lg:flex items-center gap-1 mr-2">
+                    {{-- Right side: nav mode buttons — icon-only, compact (desktop only) --}}
+                    <div class="hidden lg:flex items-center gap-0.5 rounded-lg border border-border bg-surface-muted p-0.5 mr-1">
                         {{-- Horizontal mode --}}
                         <button type="button" @click="setNav('horizontal')"
-                            :class="desktopNav === 'horizontal' ? 'bg-primary/10 text-primary border-primary/30' : 'text-fg-muted hover:bg-surface-muted hover:text-fg border-border'"
-                            class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-xs font-semibold transition-colors"
-                            title="Mode Horizontal">
+                            :class="desktopNav === 'horizontal' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'"
+                            class="flex h-7 w-7 items-center justify-center rounded-md transition-all"
+                            title="Navigasi Horizontal">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                            <span>Horizontal</span>
                         </button>
-                        {{-- Full display mode --}}
+                        {{-- Full / no sidebar mode --}}
                         <button type="button" @click="setNav('full')"
-                            :class="desktopNav === 'full' ? 'bg-primary/10 text-primary border-primary/30' : 'text-fg-muted hover:bg-surface-muted hover:text-fg border-border'"
-                            class="flex items-center gap-1.5 h-8 px-2.5 rounded-lg border text-xs font-semibold transition-colors"
+                            :class="desktopNav === 'full' ? 'bg-surface text-primary shadow-sm' : 'text-fg-muted hover:text-fg'"
+                            class="flex h-7 w-7 items-center justify-center rounded-md transition-all"
                             title="Tampilan Penuh">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-                            <span>Penuh</span>
                         </button>
                     </div>
 
