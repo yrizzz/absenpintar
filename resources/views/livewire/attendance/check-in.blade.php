@@ -130,7 +130,7 @@
                             <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-x-0 h-1 z-20 bg-gradient-to-r from-transparent via-primary to-transparent animate-scan shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
 
                             {{-- Live Video --}}
-                            <video x-ref="video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100" :class="cameraActive ? '' : 'hidden'"></video>
+                            <video x-ref="video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover transform -scale-x-100" :class="cameraActive ? '' : 'hidden'"></video>
 
                             {{-- Camera Off State --}}
                             <div x-show="!cameraActive" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 space-y-2.5 z-10">
@@ -144,7 +144,7 @@
                             </div>
 
                             {{-- Face Mask Guide --}}
-                            <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-6 rounded-full border-2 border-dashed border-white/30 pointer-events-none z-10 animate-pulse"></div>
+                            <div x-show="cameraActive && !isAnalyzing && !$wire.faceValid" x-cloak class="absolute inset-4 rounded-xl border-2 border-dashed border-white/30 pointer-events-none z-10 animate-pulse"></div>
 
                             {{-- AI Analisis Overlay --}}
                             <div x-show="isAnalyzing" x-cloak class="absolute inset-0 flex items-center justify-center bg-black/60 z-25 pointer-events-none">
@@ -160,14 +160,24 @@
                             <!-- GPS Status Badge -->
                             <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold shadow-sm"
                                 :class="$wire.locationValid ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20'">
-                                <span class="w-1.5 h-1.5 rounded-full" :class="$wire.locationValid ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                                <template x-if="$wire.locationValid">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                </template>
+                                <template x-if="!$wire.locationValid">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                </template>
                                 GPS: <span x-text="$wire.locationValid ? 'OK' : 'Luar Area'"></span>
                             </div>
 
                             <!-- Face Match Status Badge -->
                             <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] font-bold shadow-sm"
                                 :class="$wire.faceValid ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-500/20'">
-                                <span class="w-1.5 h-1.5 rounded-full" :class="$wire.faceValid ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                                <template x-if="$wire.faceValid">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                </template>
+                                <template x-if="!$wire.faceValid">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                </template>
                                 Wajah: <span x-text="$wire.faceValid ? 'Cocok' : 'Memindai…'"></span>
                             </div>
                         </div>
@@ -186,7 +196,7 @@
 
                         {{-- Auto-detect processing message --}}
                         <div x-show="$wire.locationValid && $wire.faceValid" x-cloak class="w-full max-w-sm mt-4 flex items-center justify-center gap-2 rounded-xl border border-success/30 bg-success-soft p-3 text-xs font-semibold text-success shadow-sm">
-                            <svg class="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                             <span>AI &amp; GPS Valid. Mengirim otomatis…</span>
                         </div>
 

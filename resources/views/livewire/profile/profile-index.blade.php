@@ -111,7 +111,7 @@
                                 <div class="pt-2 flex flex-wrap gap-2.5">
                                     <button wire:click="$set('step', 'enroll')" class="btn-primary btn-sm">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                        {{ auth()->user()->hasRegisteredFace() ? 'Daftar Ulang Multi-Sudut' : 'Daftarkan Kunci Wajah' }}
+                                        {{ auth()->user()->hasRegisteredFace() ? 'Daftar Ulang Wajah' : 'Daftarkan Kunci Wajah' }}
                                     </button>
                                     @if (auth()->user()->hasRegisteredFace())
                                         <button wire:click="deleteFace" wire:confirm="Apakah Anda yakin ingin menghapus biometrik wajah Anda? Anda tidak akan dapat absen sebelum melakukan pendaftaran ulang." class="btn-danger-outline btn-sm">Hapus Otorisasi Kunci</button>
@@ -120,7 +120,7 @@
                             </div>
 
                             <div class="flex-shrink-0 mx-auto md:mx-0">
-                                <div class="relative flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl border border-border bg-surface">
+                                <div class="relative overflow-hidden rounded-xl border border-border bg-surface" style="width: 84px; aspect-ratio: 3/4;">
                                     @if (auth()->user()->hasRegisteredFace())
                                         <img src="{{ auth()->user()->getMasterFaceUrl() }}" class="w-full h-full object-cover" style="transform: scaleX(-1);">
                                         <div class="absolute bottom-1 right-1 rounded-full bg-success p-1 text-white">
@@ -425,10 +425,9 @@
                         </div>
                     </div>
 
-                    {{-- Camera viewport (intentionally dark) --}}
-                    <div x-show="enrollStage !== 'verify_details'" class="relative mx-auto w-72 h-72 overflow-hidden rounded-full border-2 border-border bg-slate-950 flex items-center justify-center">
-                        <div class="absolute inset-2 border border-dashed border-white/20 rounded-full animate-spin pointer-events-none z-10" style="animation-duration: 30s;"></div>
-                        <div class="absolute inset-5 border border-white/15 rounded-full pointer-events-none z-10"></div>
+                    {{-- Camera viewport — portrait rectangle, same as check-in --}}
+                    <div x-show="enrollStage !== 'verify_details'" class="relative mx-auto overflow-hidden rounded-2xl border-4 border-slate-200 dark:border-slate-800 bg-slate-950" style="width: 192px; aspect-ratio: 3/4;">
+                        <div class="absolute inset-4 border border-dashed border-white/20 rounded-xl animate-spin pointer-events-none z-10" style="animation-duration: 30s;"></div>
 
                         <div class="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent z-10 pointer-events-none" style="animation: scanLine 2s linear infinite;"></div>
 
@@ -438,12 +437,14 @@
                             <div class="text-xs text-slate-400 mt-1">Tahan Posisi</div>
                         </div>
 
-                        <div class="absolute bottom-5 z-10 flex items-center gap-1.5 rounded-full bg-black/60 border border-white/10 px-3 py-1 text-xs font-medium text-white">
-                            <span class="h-1.5 w-1.5 rounded-full bg-white animate-ping"></span>
-                            Live
+                        <div class="absolute bottom-4 left-0 right-0 z-10 flex justify-center">
+                            <div class="flex items-center gap-1.5 rounded-full bg-black/60 border border-white/10 px-3 py-1 text-xs font-medium text-white">
+                                <span class="h-1.5 w-1.5 rounded-full bg-white animate-ping"></span>
+                                Live
+                            </div>
                         </div>
 
-                        <video x-ref="video" autoplay playsinline muted class="w-full h-full object-cover rounded-full" style="transform: scaleX(-1);"></video>
+                        <video x-ref="video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover" style="transform: scaleX(-1);"></video>
                         <canvas x-ref="canvas" class="hidden"></canvas>
                     </div>
 
@@ -451,9 +452,9 @@
                     <div x-show="enrollStage === 'verify_details'" x-cloak class="rounded-xl border border-border bg-surface-muted p-5">
                         <h4 class="label-xs uppercase tracking-wide mb-4 text-left">Hasil Foto Wajah</h4>
                         <div class="flex justify-center mb-5">
-                            <div class="relative overflow-hidden rounded-lg border border-border bg-surface aspect-square w-40">
+                            <div class="relative overflow-hidden rounded-xl border border-border bg-surface" style="width: 160px; aspect-ratio: 3/4;">
                                 <img :src="frontImage" class="w-full h-full object-cover" style="transform: scaleX(-1)">
-                                <div class="absolute bottom-0 inset-x-0 bg-primary text-primary-fg text-xs font-medium py-0.5 text-center">Depan</div>
+                                <div class="absolute bottom-0 inset-x-0 bg-primary text-primary-fg text-xs font-medium py-0.5 text-center">Wajah Depan</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2.5 rounded-lg border border-info/20 bg-info-soft p-3 text-xs font-medium text-info">

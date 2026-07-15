@@ -242,12 +242,14 @@
                                 <button @click="navigator.clipboard.writeText(selectedLog.latitude + ', ' + selectedLog.longitude); showToast('Koordinat disalin!', 'success')" class="atd-copy-btn">Salin</button>
                             </span>
                         </div>
-                    </div>
 
-                    {{-- Resolved address --}}
-                    <div class="atd-block" x-show="selectedLog && selectedLog.resolved_address">
-                        <span class="atd-block-title">Alamat Terdeteksi</span>
-                        <p class="atd-muted-text" style="margin:4px 0 0 0;" x-text="selectedLog ? selectedLog.resolved_address : ''"></p>
+                        <div class="atd-row" x-show="selectedLog && selectedLog.resolved_address">
+                            <span class="atd-row-label">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                                Alamat GPS
+                            </span>
+                            <span class="atd-row-value" style="font-size:11px; max-width:220px; white-space:normal; line-height:1.45; text-align:right;" x-text="selectedLog ? selectedLog.resolved_address : ''"></span>
+                        </div>
                     </div>
 
                     {{-- Notes --}}
