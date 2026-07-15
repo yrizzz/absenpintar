@@ -98,19 +98,22 @@
                 {{-- Tab Switch --}}
                 <div class="inline-flex rounded-lg p-0.5 bg-surface-muted border border-border">
                     <button type="button" wire:click="$set('viewMode','table')"
-                        class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all
                                {{ $viewMode === 'table' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
-                        Versi Tabel
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18M10 3v18M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6z" /></svg>
+                        Tabel
                     </button>
                     <button type="button" wire:click="$set('viewMode','gallery')"
-                        class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all
                                {{ $viewMode === 'gallery' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
-                        Versi Galeri Foto
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        Foto
                     </button>
                     <button type="button" wire:click="$set('viewMode','matrix')"
-                        class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all
                                {{ $viewMode === 'matrix' ? 'bg-surface text-primary shadow-sm' : 'text-fg-subtle hover:text-fg' }}">
-                        Versi Ceklis Bulanan
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Ceklis
                     </button>
                 </div>
             </div>
@@ -289,31 +292,31 @@
                 </div>
 
                 {{-- Mobile cards --}}
-                <div class="md:hidden divide-y divide-border">
+                <div class="md:hidden space-y-3 p-3">
                     @foreach($attendances as $attendance)
-                        <div class="p-4 hover:bg-surface-muted transition-colors">
+                        <div class="bg-surface rounded-2xl border border-border shadow-sm p-4 hover:shadow-md transition-shadow">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     @if($isAdmin)
-                                        <div class="label-md truncate">{{ $attendance->user->name ?? 'Karyawan' }}</div>
-                                        <div class="label-xs font-mono mb-1">#{{ $attendance->user->employee_id ?? 'N/A' }}</div>
+                                        <div class="label-md truncate font-bold">{{ $attendance->user->name ?? 'Karyawan' }}</div>
+                                        <div class="label-xs font-mono text-fg-subtle mb-1">#{{ $attendance->user->employee_id ?? 'N/A' }}</div>
                                     @endif
-                                    <div class="label-md">{{ $attendance->timestamp->translatedFormat('d M Y') }}</div>
-                                    <div class="label-sm mt-0.5">{{ $attendance->timestamp->timezone($tzSetting)->format('H:i:s') }} {{ $tzLabel }}</div>
+                                    <div class="text-sm font-semibold text-fg">{{ $attendance->timestamp->translatedFormat('d M Y') }}</div>
+                                    <div class="text-xs text-fg-muted mt-0.5">{{ $attendance->timestamp->timezone($tzSetting)->format('H:i:s') }} {{ $tzLabel }}</div>
                                 </div>
                                 <span class="{{ $attendance->type === 'checkin' ? 'badge-rect-success' : 'badge-rect-info' }} flex-shrink-0">
                                     {{ $attendance->type === 'checkin' ? 'Masuk' : 'Keluar' }}
                                 </span>
                             </div>
 
-                            <div class="mt-3 grid grid-cols-2 gap-2">
+                            <div class="mt-3 grid grid-cols-2 gap-3 p-3 rounded-xl bg-surface-muted border border-border/60">
                                 <div>
-                                    <div class="label-xs uppercase tracking-wide">Cabang</div>
-                                    <div class="label-sm font-medium text-fg truncate">{{ $attendance->branch?->name ?? 'HQ Workspace' }}</div>
+                                    <div class="label-xs uppercase tracking-wide text-fg-subtle mb-0.5">Cabang</div>
+                                    <div class="text-xs font-semibold text-fg truncate">{{ $attendance->branch?->name ?? 'HQ Workspace' }}</div>
                                 </div>
                                 <div>
-                                    <div class="label-xs uppercase tracking-wide">Akurasi GPS</div>
-                                    <div class="label-sm font-medium text-fg">± {{ round($attendance->accuracy) }}m</div>
+                                    <div class="label-xs uppercase tracking-wide text-fg-subtle mb-0.5">Akurasi GPS</div>
+                                    <div class="text-xs font-semibold text-fg">± {{ round($attendance->accuracy) }}m</div>
                                 </div>
                             </div>
 
@@ -349,9 +352,16 @@
                                     'employee_name' => $attendance->user->name ?? 'Karyawan',
                                     'resolved_address' => $attendance->metadata['resolved_address'] ?? null
                                 ]) }}; showModal = true; initDetailMap();"
-                                class="text-sm font-medium text-primary hover:opacity-80 transition-opacity cursor-pointer">Lihat Detail</button>
+                                class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline cursor-pointer">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    Lihat Detail
+                                </button>
                                 <span class="text-border-strong">|</span>
-                                <a href="{{ route('letters.attendance-slip', $attendance->id) }}" target="_blank" class="text-sm font-medium text-success hover:opacity-80 transition-opacity">Cetak Slip</a>
+                                <a href="{{ route('letters.attendance-slip', $attendance->id) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-xs font-bold text-success hover:underline">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                                    Cetak Slip
+                                </a>
                             </div>
                         </div>
                     @endforeach
