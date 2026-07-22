@@ -378,7 +378,7 @@
                 }
             },
 
-            // Stamps a GPS-camera style watermark (date/time + coordinates + address) onto the bottom of the canvas.
+            // Stamps a professional GPS-camera style watermark onto the bottom of the canvas.
             drawAttendanceWatermark(ctx, w, h) {
                 const pad = n => String(n).padStart(2, '0');
                 const now = new Date();
@@ -402,71 +402,125 @@
                 const addr = this.$wire.resolvedAddress;
                 const addrStr = addr ? 'Alamat: ' + addr : '';
 
-                // Calculate band height dynamically
-                let lineCount = 2; // Date + Coordinates
-                if (distStr) lineCount++;
-                if (addrStr) lineCount += 2; // Give address 2 lines for wrapping
-
-                const bandH = 20 + (lineCount * 18);
-                const x = 12;
-                let y = h - bandH + 15;
-
-                // Semi-transparent dark background band
-                ctx.save();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                ctx.fillRect(0, h - bandH, w, bandH);
-
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.9)';
-                ctx.shadowBlur = 3;
-
-                // Draw Date & Time
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 15px Arial, sans-serif';
-                ctx.fillText('🕒 ' + dateStr, x, y);
-                y += 18;
-
-                // Draw Coordinates
-                ctx.font = '12px "Courier New", monospace';
-                ctx.fillStyle = '#f8fafc';
-                ctx.fillText('📍 ' + coordStr, x, y);
-                y += 18;
-
-                // Draw Distance
-                if (distStr) {
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.fillText('🏢 ' + distStr, x, y);
-                    y += 18;
-                }
-
-                // Draw Address with simple wrapping
+                // Word wrap address
+                let addrLines = [];
+                const maxW = w - 46;
                 if (addrStr) {
-                    ctx.fillStyle = '#94a3b8';
-                    const maxW = w - 24;
-                    // Simple word wrap
+                    ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
                     const words = addrStr.split(' ');
                     let line = '';
-                    let lines = [];
-                    ctx.font = '11px Arial, sans-serif';
-                    
                     for (let n = 0; n < words.length; n++) {
                         let testLine = line + words[n] + ' ';
-                        let metrics = ctx.measureText(testLine);
-                        if (metrics.width > maxW && n > 0) {
-                            lines.push(line);
+                        if (ctx.measureText(testLine).width > maxW && n > 0) {
+                            addrLines.push(line.trim());
                             line = words[n] + ' ';
                         } else {
                             line = testLine;
                         }
                     }
-                    lines.push(line);
-                    
-                    // Draw maximum 2 lines of address to avoid drawing off the image
-                    for (let i = 0; i < Math.min(lines.length, 2); i++) {
-                        ctx.fillText(lines[i], x, y);
-                        y += 15;
+                    addrLines.push(line.trim());
+                }
+
+                const visibleAddrLines = Math.min(addrLines.length, 2);
+                let lineCount = 2; // Date + Coordinates
+                if (distStr) lineCount++;
+                lineCount += visibleAddrLines;
+
+                const yStep = 24;
+                const bandH = 24 + (lineCount * yStep);
+                const startY = h - bandH;
+                const padX = 16;
+                const textX = padX + 24;
+                let y = startY + 22;
+
+                ctx.save();
+                // Dark background overlay
+                ctx.fillStyle = 'rgba(11, 17, 32, 0.88)';
+                ctx.fillRect(0, startY, w, bandH);
+
+                // Top Accent Line (Emerald/Blue gradient effect)
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(0, startY, w, 3);
+
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 4;
+
+                // --- 1. Date & Time ---
+                // Vector Clock Icon
+                ctx.strokeStyle = '#34d399';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(padX + 7, y, 7, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(padX + 7, y - 4);
+                ctx.lineTo(padX + 7, y);
+                ctx.lineTo(padX + 11, y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.fillText(dateStr, textX, y);
+                y += yStep;
+
+                // --- 2. Coordinates & Accuracy ---
+                // Vector Map Pin Icon
+                ctx.fillStyle = '#f43f5e';
+                ctx.beginPath();
+                ctx.arc(padX + 7, y - 3, 5, Math.PI * 0.85, Math.PI * 0.15, false);
+                ctx.lineTo(padX + 7, y + 6);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(padX + 7, y - 3, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.font = '13px "Geist Mono", "Courier New", monospace';
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillText(coordStr, textX, y);
+                y += yStep;
+
+                // --- 3. Office Distance ---
+                if (distStr) {
+                    // Vector Building Icon
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 1.8;
+                    ctx.strokeRect(padX + 2, y - 7, 10, 14);
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(padX + 5, y - 4, 2, 2);
+                    ctx.fillRect(padX + 9, y - 4, 2, 2);
+                    ctx.fillRect(padX + 5, y, 2, 2);
+                    ctx.fillRect(padX + 9, y, 2, 2);
+                    ctx.fillRect(padX + 6, y + 3, 3, 4);
+
+                    ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fillText(distStr, textX, y);
+                    y += yStep;
+                }
+
+                // --- 4. Address ---
+                if (visibleAddrLines > 0) {
+                    // Vector Home/Location Marker Icon
+                    ctx.strokeStyle = '#a855f7';
+                    ctx.lineWidth = 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(padX, y - 1);
+                    ctx.lineTo(padX + 7, y - 8);
+                    ctx.lineTo(padX + 14, y - 1);
+                    ctx.stroke();
+                    ctx.strokeRect(padX + 2, y - 1, 10, 8);
+
+                    ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                    ctx.fillStyle = '#cbd5e1';
+                    for (let i = 0; i < visibleAddrLines; i++) {
+                        ctx.fillText(addrLines[i], textX, y);
+                        y += yStep - 4;
                     }
                 }
+
                 ctx.restore();
             },
 
