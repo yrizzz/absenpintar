@@ -68,14 +68,14 @@
         </div>
     @endauth
 
-    <div class="flex min-h-screen flex-col transition-all duration-300 ease-in-out
+    <div class="flex min-h-screen flex-col transition-all duration-300 ease-in-out"
         @auth
-            lg:[padding-left:var(--sidebar-w,256px)]
-        @endauth"
-        :style="@auth
-            desktopNav === 'expanded' ? '--sidebar-w:256px' :
-            desktopNav === 'collapsed' ? '--sidebar-w:64px' : '--sidebar-w:0px'
-        @endauth">
+            :class="{
+                'lg:pl-64': desktopNav === 'expanded',
+                'lg:pl-16': desktopNav === 'collapsed',
+                'lg:pl-0': desktopNav === 'full' || desktopNav === 'horizontal'
+            }"
+        @endauth>
 
         @auth
             {{-- Topbar --}}
