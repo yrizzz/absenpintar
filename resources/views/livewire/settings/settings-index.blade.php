@@ -520,25 +520,36 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach ($branches as $b)
                                     <div
-                                        class="p-5 bg-surface-muted border border-border rounded-xl space-y-3.5 hover:border-border transition-all">
+                                        class="p-5 bg-surface-muted border border-border rounded-xl space-y-3 hover:border-border transition-all">
                                         <div class="flex items-center justify-between">
-                                            <span
-                                                class="label-sm font-bold text-fg">{{ $b->name }}</span>
+                                            <div>
+                                                <span class="label-sm font-bold text-fg block">{{ $b->name }}</span>
+                                                <span class="text-[10px] font-mono text-primary font-semibold">Kode: {{ $b->code }} {{ $b->city ? '• ' . $b->city : '' }}</span>
+                                            </div>
                                             @if ($b->is_active)
                                                 <span class="badge-success text-[9px] py-0.5">Aktif</span>
                                             @else
                                                 <span class="badge-neutral text-[9px] py-0.5">Nonaktif</span>
                                             @endif
                                         </div>
-                                        <div
-                                            class="label-xs font-mono text-fg-muted space-y-1 pt-1.5 border-t border-border">
-                                            <div class="flex justify-between"><span>Latitude:</span> <span
-                                                    class="text-fg">{{ $b->latitude }}</span></div>
-                                            <div class="flex justify-between"><span>Longitude:</span> <span
-                                                    class="text-fg">{{ $b->longitude }}</span></div>
-                                            <div class="flex justify-between"><span>Radius Geofence:</span> <span
-                                                    class="text-primary font-bold">{{ $b->radius }} meter</span>
+                                        @if($b->manager_name || $b->phone || $b->email)
+                                            <div class="text-[11px] text-fg-muted space-y-0.5 pt-2 border-t border-border/60">
+                                                @if($b->manager_name)
+                                                    <div><span class="text-fg-subtle">Kepala:</span> <strong class="text-fg">{{ $b->manager_name }}</strong></div>
+                                                @endif
+                                                @if($b->phone)
+                                                    <div><span class="text-fg-subtle">Telp:</span> {{ $b->phone }}</div>
+                                                @endif
+                                                @if($b->email)
+                                                    <div><span class="text-fg-subtle">Email:</span> {{ $b->email }}</div>
+                                                @endif
                                             </div>
+                                        @endif
+                                        <div
+                                            class="label-xs font-mono text-fg-muted space-y-1 pt-2 border-t border-border">
+                                            <div class="flex justify-between"><span>Timezone:</span> <span class="text-fg font-sans font-semibold">{{ $b->timezone ?? 'Asia/Jakarta' }}</span></div>
+                                            <div class="flex justify-between"><span>Lat / Lng:</span> <span class="text-fg">{{ $b->latitude }}, {{ $b->longitude }}</span></div>
+                                            <div class="flex justify-between"><span>Radius Geofence:</span> <span class="text-primary font-bold">{{ $b->radius }} meter</span></div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -942,28 +953,68 @@
                 class="space-y-4 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block label-xs mb-1.5">Nama Cabang</label>
-                        <input wire:model="branch_name" type="text" placeholder="Contoh: Surabaya Branch" required
-                            class="w-full text-xs">
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Nama Cabang / Unit *</label>
+                        <input wire:model="branch_name" type="text" placeholder="Contoh: Surabaya Regional Office" required
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
                         @error('branch_name')
                             <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block label-xs mb-1.5">Kode Cabang</label>
-                        <input wire:model="branch_code" type="text" placeholder="Contoh: SBY" required
-                            class="w-full text-xs">
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Kode Cabang Unik *</label>
+                        <input wire:model="branch_code" type="text" placeholder="Contoh: SBY-01" required
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
                         @error('branch_code')
                             <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Kota / Wilayah</label>
+                        <input wire:model="branch_city" type="text" placeholder="Contoh: Surabaya"
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
+                        @error('branch_city')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Kepala / Manager Cabang</label>
+                        <input wire:model="branch_manager_name" type="text" placeholder="Contoh: Bpk. Hendra Wijaya"
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
+                        @error('branch_manager_name')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Nomor Telepon Kantor</label>
+                        <input wire:model="branch_phone" type="text" placeholder="Contoh: 031-8976543"
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
+                        @error('branch_phone')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Email Resmi Cabang</label>
+                        <input wire:model="branch_email" type="email" placeholder="Contoh: sby@perusahaan.com"
+                            class="w-full text-xs rounded-lg border border-border bg-surface text-fg px-3 py-2">
+                        @error('branch_email')
+                            <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
                 <div>
-                    <label class="block label-xs mb-1.5">Alamat Lengkap</label>
-                    <textarea wire:model="branch_address" required rows="2" placeholder="Nama jalan, nomor, kota..."
-                        class="w-full text-xs resize-none"></textarea>
+                    <label class="block label-xs mb-1.5 font-semibold text-fg">Alamat Lengkap Kantor *</label>
+                    <textarea wire:model="branch_address" required rows="2" placeholder="Nama jalan, nomor gedung, kelurahan, kecamatan..."
+                        class="w-full text-xs resize-none rounded-lg border border-border bg-surface text-fg px-3 py-2"></textarea>
                     @error('branch_address')
                         <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                     @enderror
@@ -971,31 +1022,43 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block label-xs mb-1.5">Latitude</label>
-                        <input wire:model="branch_latitude" type="text" placeholder="Contoh: -7.257472" required
-                            class="w-full text-xs">
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Latitude *</label>
+                        <input wire:model="branch_latitude" type="text" placeholder="-7.257472" required
+                            class="w-full text-xs font-mono rounded-lg border border-border bg-surface text-fg px-3 py-2">
                         @error('branch_latitude')
                             <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block label-xs mb-1.5">Longitude</label>
-                        <input wire:model="branch_longitude" type="text" placeholder="Contoh: 112.752090" required
-                            class="w-full text-xs">
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Longitude *</label>
+                        <input wire:model="branch_longitude" type="text" placeholder="112.752090" required
+                            class="w-full text-xs font-mono rounded-lg border border-border bg-surface text-fg px-3 py-2">
                         @error('branch_longitude')
                             <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block label-xs mb-1.5">Radius Batas (meter)</label>
+                        <label class="block label-xs mb-1.5 font-semibold text-fg">Radius Geofence (meter) *</label>
                         <input wire:model="branch_radius" type="number" required
-                            class="w-full text-xs">
+                            class="w-full text-xs font-mono rounded-lg border border-border bg-surface text-fg px-3 py-2">
                         @error('branch_radius')
                             <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
+                </div>
+
+                <div>
+                    <label class="block label-xs mb-1.5 font-semibold text-fg">Zona Waktu Cabang (Timezone) *</label>
+                    <select wire:model="branch_timezone" required class="w-full text-xs cursor-pointer rounded-lg border border-border bg-surface text-fg px-3 py-2">
+                        <option value="Asia/Jakarta">WIB — Asia/Jakarta (GMT+7)</option>
+                        <option value="Asia/Makassar">WITA — Asia/Makassar (GMT+8)</option>
+                        <option value="Asia/Jayapura">WIT — Asia/Jayapura (GMT+9)</option>
+                    </select>
+                    @error('branch_timezone')
+                        <span class="label-xs text-danger font-bold block mt-1">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="pt-2">
@@ -1007,8 +1070,7 @@
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
                                 :class="$wire.branch_is_active ? 'translate-x-5' : 'translate-x-0'"></span>
                         </button>
-                        <span class="ml-3 text-xs font-semibold text-fg-muted">Set Status Kantor Cabang ke
-                            Aktif</span>
+                        <span class="ml-3 text-xs font-semibold text-fg">Set Status Kantor Cabang ke Aktif</span>
                     </div>
                 </div>
 

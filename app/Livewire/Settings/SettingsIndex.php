@@ -59,6 +59,11 @@ class SettingsIndex extends Component
     public $branch_name = '';
     public $branch_code = '';
     public $branch_address = '';
+    public $branch_city = '';
+    public $branch_phone = '';
+    public $branch_email = '';
+    public $branch_manager_name = '';
+    public $branch_timezone = 'Asia/Jakarta';
     public $branch_latitude = '';
     public $branch_longitude = '';
     public $branch_radius = 200;
@@ -213,12 +218,18 @@ class SettingsIndex extends Component
             $this->branch_name = $branch->name;
             $this->branch_code = $branch->code;
             $this->branch_address = $branch->address;
+            $this->branch_city = $branch->city ?? '';
+            $this->branch_phone = $branch->phone ?? '';
+            $this->branch_email = $branch->email ?? '';
+            $this->branch_manager_name = $branch->manager_name ?? '';
+            $this->branch_timezone = $branch->timezone ?? 'Asia/Jakarta';
             $this->branch_latitude = $branch->latitude;
             $this->branch_longitude = $branch->longitude;
             $this->branch_radius = $branch->radius;
             $this->branch_is_active = (bool) $branch->is_active;
         } else {
-            $this->reset(['branch_name', 'branch_code', 'branch_address', 'branch_latitude', 'branch_longitude', 'branch_radius', 'branch_is_active']);
+            $this->reset(['branch_name', 'branch_code', 'branch_address', 'branch_city', 'branch_phone', 'branch_email', 'branch_manager_name', 'branch_timezone', 'branch_latitude', 'branch_longitude', 'branch_radius', 'branch_is_active']);
+            $this->branch_timezone = 'Asia/Jakarta';
             $this->branch_radius = 200;
             $this->branch_is_active = true;
         }
@@ -232,6 +243,11 @@ class SettingsIndex extends Component
             'branch_name' => 'required|string|max:255',
             'branch_code' => 'required|string|max:50|unique:branches,code,' . $this->selectedBranchId,
             'branch_address' => 'required|string',
+            'branch_city' => 'nullable|string|max:100',
+            'branch_phone' => 'nullable|string|max:50',
+            'branch_email' => 'nullable|email|max:255',
+            'branch_manager_name' => 'nullable|string|max:255',
+            'branch_timezone' => 'required|string',
             'branch_latitude' => 'required|numeric|between:-90,90',
             'branch_longitude' => 'required|numeric|between:-180,180',
             'branch_radius' => 'required|integer|min:10',
@@ -243,6 +259,11 @@ class SettingsIndex extends Component
             'name' => $this->branch_name,
             'code' => $this->branch_code,
             'address' => $this->branch_address,
+            'city' => $this->branch_city ?: null,
+            'phone' => $this->branch_phone ?: null,
+            'email' => $this->branch_email ?: null,
+            'manager_name' => $this->branch_manager_name ?: null,
+            'timezone' => $this->branch_timezone,
             'latitude' => $this->branch_latitude,
             'longitude' => $this->branch_longitude,
             'radius' => $this->branch_radius,
@@ -273,7 +294,7 @@ class SettingsIndex extends Component
 
         session()->flash('success', $msg);
         $this->showBranchModal = false;
-        $this->reset(['branch_name', 'branch_code', 'branch_address', 'branch_latitude', 'branch_longitude', 'branch_radius', 'branch_is_active', 'selectedBranchId']);
+        $this->reset(['branch_name', 'branch_code', 'branch_address', 'branch_city', 'branch_phone', 'branch_email', 'branch_manager_name', 'branch_timezone', 'branch_latitude', 'branch_longitude', 'branch_radius', 'branch_is_active', 'selectedBranchId']);
     }
 
     public function deleteBranch($branchId)
