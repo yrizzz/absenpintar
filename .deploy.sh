@@ -104,7 +104,7 @@ setup_reverb_keys() {
             sed -i 's|^REVERB_HOST=.*|REVERB_HOST="localhost"|g' .env
         fi
         if grep -q "^REVERB_PORT=\s*$" .env || ! grep -q "^REVERB_PORT=" .env; then
-            sed -i "s|^REVERB_PORT=.*|REVERB_PORT=8080|g" .env
+            sed -i "s|^REVERB_PORT=.*|REVERB_PORT=8082|g" .env
         fi
         if grep -q "^REVERB_SCHEME=\s*$" .env || ! grep -q "^REVERB_SCHEME=" .env; then
             sed -i "s|^REVERB_SCHEME=.*|REVERB_SCHEME=http|g" .env

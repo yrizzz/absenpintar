@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "presensiku-reverb",
       script: "artisan",
-      args: "reverb:start",
+      args: "reverb:start --host=0.0.0.0 --port=8082",
       interpreter: "php",
       cwd: "/www/wwwroot/presensiku.yrizzz.my.id/presensiku",
       autorestart: true,
